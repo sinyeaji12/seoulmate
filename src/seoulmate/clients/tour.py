@@ -14,6 +14,13 @@ TTL_SECONDS = 600
 _cache: dict[tuple, tuple[float, list[dict]]] = {}
 
 
+def _coord(v) -> float | None:
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def fetch_places(api_key: str, content_type_id: str, keyword: str = "", rows: int = 15,
                  district: str = "", client: httpx.Client | None = None) -> list[dict]:
     if not api_key:
@@ -44,7 +51,8 @@ def fetch_places(api_key: str, content_type_id: str, keyword: str = "", rows: in
         raise LookupError(f"tourapi error: {body['header']['resultMsg']}")
     items = (body["body"].get("items") or {}).get("item", [])
     places = [{"name": i["title"], "address": i["addr1"], "content_type_id": i["contenttypeid"],
-               "image": i.get("firstimage", "")}
+               "image": i.get("firstimage", ""),
+               "lat": _coord(i.get("mapy")), "lng": _coord(i.get("mapx"))}
               for i in items]
     _cache[key] = (time.monotonic(), places)
     return places
