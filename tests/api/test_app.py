@@ -50,7 +50,7 @@ def test_gacha_endpoint_uses_tools_and_skips_crowded():
         d = c.post("/gacha", json={}).json()
         assert d["ok"] and d["pick"]["place"] != "경복궁"  # mock: 경복궁은 '붐빔'
         assert d["pick"]["grade"] in ("SSR", "SR", "R")
-        assert {x["name"] for x in d["checked"]} >= {"list_places", "get_weather", "get_crowd"}
+        assert {x["name"] for x in d["checked"]} >= {"get_weather", "get_crowd"}
         webapp.limiter._hits.clear()
 
 

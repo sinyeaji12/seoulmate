@@ -1,6 +1,7 @@
 from seoulmate.clients.seoul import fetch_citydata
 
-_MOCK = {"경복궁": "붐빔", "북촌한옥마을": "약간 붐빔", "서울숲": "여유", "DDP": "보통"}
+_MOCK = {"경복궁": "붐빔", "북촌한옥마을": "약간 붐빔", "서울숲": "여유", "서울숲공원": "여유", "DDP": "보통",
+         "DDP(동대문디자인플라자)": "보통"}
 
 
 def get_crowd(place: str, *, mock: bool = True, api_key: str = "") -> dict:

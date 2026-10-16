@@ -424,6 +424,7 @@ function renderGacha(p, checked) {
   const [ci, cl] = CAT[p.category] || ['pin', '장소'];
   const tag = el('span', 'tag'); tag.style.position = 'static'; tag.append(icon(ci), cl);
   const head = el('div'); head.append(h, tag);
+  if (p.fallback) { const fb = el('span', 'tag', '🥲 차선책'); fb.style.cssText = 'position:static;margin-left:6px;background:var(--sky)'; head.append(fb); }
   const why = el('p', 'why1'); why.append(el('b', null, '왜 여기?'), p.reason);
   const ok = (n) => checked.some(c => c.name === n && c.ok);
   const v = el('div', 'verify'); v.append(icon('check'), ok('get_weather') && ok('get_crowd') ? '날씨·혼잡도 확인 완료' + (MOCK ? ' (샘플 데이터)' : '') : '확인 정보 없음');
