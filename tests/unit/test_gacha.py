@@ -180,3 +180,11 @@ def test_reason_mentions_weather_and_crowd():
     reg, _ = make_registry(crowds={"서울숲": "여유"})
     r = run(reg, random.Random(0), spots=[PLACES[0]])
     assert r.pick["reason"] == "지금 18도 맑음, 사람도 여유로워요"
+
+
+def test_on_call_reports_tool_progress_in_order_weather_then_crowd():
+    reg, _ = make_registry()
+    seen = []
+    r = run(reg, random.Random(0), on_call=lambda c: seen.append(c["name"]))
+    assert r.ok and seen[:2] == ["get_weather", "get_crowd"]
+    assert seen == [c["name"] for c in r.checked]

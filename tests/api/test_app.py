@@ -75,6 +75,15 @@ def test_gacha_endpoint_uses_tools_and_skips_crowded():
         webapp.limiter._hits.clear()
 
 
+def test_gacha_stream_sends_tool_progress_then_verified_result():
+    c = make_client(FakeLLM([]))
+    ev = events(c.post("/gacha/stream", json={}).text)
+    names = [e[0] for e in ev]
+    assert names[-1] == "result" and names.count("tool") >= 2
+    assert [e[1]["name"] for e in ev if e[0] == "tool"][:2] == ["get_weather", "get_crowd"]  # 확인이 먼저
+    assert ev[-1][1]["ok"] and ev[-1][1]["pick"]["place"]
+
+
 def test_gacha_rejects_too_many_excludes():
     assert make_client(FakeLLM([])).post("/gacha", json={"exclude": ["a"] * 11}).status_code == 422
 

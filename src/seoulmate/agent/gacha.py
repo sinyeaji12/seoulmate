@@ -8,6 +8,7 @@ LLM 없이 결정적으로 동작하지만 에이전트와 같은 원칙을 지�
 """
 import json
 import random
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -77,7 +78,7 @@ def _sky(weather: dict) -> str:
 
 
 def spin(registry: ToolRegistry, rng: random.Random | None = None, exclude: list[str] | None = None,
-         spots: list[dict] | None = None) -> GachaResult:
+         spots: list[dict] | None = None, on_call: Callable[[dict], None] | None = None) -> GachaResult:
     rng = rng or random.Random()
     checked: list[dict] = []
     rejected: list[dict] = []
@@ -85,6 +86,8 @@ def spin(registry: ToolRegistry, rng: random.Random | None = None, exclude: list
     def call(name: str, args: dict) -> dict:
         out = registry.call(name, args)
         checked.append({"name": name, "input": args, "ok": out["ok"]})
+        if on_call:  # 화면이 실제 도구 호출 진행(날씨 → 혼잡도)에 맞춰 문구를 바꿀 수 있게
+            on_call(checked[-1])
         return out
 
     def reject(spot: dict, why: str) -> None:

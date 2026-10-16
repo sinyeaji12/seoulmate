@@ -65,6 +65,30 @@ def create_app(settings: Settings | None = None, llm_factory=build_llm,
         except Exception:  # noqa: BLE001 - 내부 오류는 클라이언트에 노출하지 않는다
             return {"ok": False, "message": "앗, 가챠 기계가 잠깐 멈췄어. 다시 돌려줘!", "pick": None, "checked": []}
 
+    @app.post("/gacha/stream", dependencies=[Depends(limiter.check)])
+    def gacha_stream(req: GachaRequest):
+        """/gacha와 같은 결과를, 날씨·혼잡도 도구가 호출되는 순간마다 tool 이벤트로 먼저 알려준다."""
+        events: queue.Queue = queue.Queue()
+
+        def work():
+            try:
+                r = spin(build_registry(s), exclude=req.exclude,
+                         on_call=lambda c: events.put(("tool", {"name": c["name"], "ok": c["ok"]})))
+                events.put(("result", r.to_dict()))
+            except Exception:  # noqa: BLE001 - 내부 오류는 클라이언트에 노출하지 않는다
+                events.put(("result", {"ok": False, "message": "앗, 가챠 기계가 잠깐 멈췄어. 다시 돌려줘!",
+                                       "pick": None, "checked": [], "rejected": []}))
+            events.put(None)
+
+        threading.Thread(target=work, daemon=True).start()
+
+        def stream():
+            while (item := events.get()) is not None:
+                yield f"event: {item[0]}\ndata: {json.dumps(item[1], ensure_ascii=False)}\n\n"
+
+        return StreamingResponse(stream(), media_type="text/event-stream",
+                                 headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
     @app.post("/chat", dependencies=[Depends(limiter.check)])
     def chat(req: ChatRequest):
         message = req.message.strip()[: s.max_message_chars]
