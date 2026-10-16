@@ -6,7 +6,7 @@
  {"name": "익선동", "area": "익선동", "category": "outdoor"},
  {"name": "남산공원", "area": "남산공원", "category": "outdoor"},
  {"name": "서울숲", "area": "서울숲공원", "category": "outdoor"},
- {"name": "성수 카페거리", "area": "성수카페거리", "category": "outdoor"},
+ {"name": "성수 카페거리", "area": "성수카페거리", "category": "outdoor", "image_query": ["성수카페거리"]},
  {"name": "뚝섬한강공원", "area": "뚝섬한강공원", "category": "outdoor"},
  {"name": "여의도한강공원", "area": "여의도한강공원", "category": "outdoor"},
  {"name": "반포한강공원", "area": "반포한강공원", "category": "outdoor"},
@@ -15,11 +15,11 @@
  {"name": "월드컵공원", "area": "월드컵공원", "category": "outdoor"},
  {"name": "북서울꿈의숲", "area": "북서울꿈의숲", "category": "outdoor"},
  {"name": "서울대공원", "area": "서울대공원", "category": "outdoor"},
- {"name": "DDP", "area": "DDP(동대문디자인플라자)", "category": "indoor"},
+ {"name": "DDP", "area": "DDP(동대문디자인플라자)", "category": "indoor", "image_query": ["동대문디자인플라자", "DDP"]},
  {"name": "국립중앙박물관", "area": "국립중앙박물관·용산가족공원", "category": "indoor"},
  {"name": "서울식물원", "area": "서울식물원·마곡나루역", "category": "indoor"},
- {"name": "잠실 롯데월드몰", "area": "잠실 관광특구", "category": "indoor"},
- {"name": "강남역 지하상가", "area": "강남역", "category": "indoor"},
- {"name": "명동 쇼핑거리", "area": "명동 관광특구", "category": "indoor"},
- {"name": "홍대 카페·전시 골목", "area": "홍대 관광특구", "category": "indoor"}
+ {"name": "잠실 롯데월드몰", "area": "잠실 관광특구", "category": "indoor", "image_query": ["롯데월드몰"]},
+ {"name": "강남역 지하상가", "area": "강남역", "category": "indoor", "image_query": ["강남역"]},
+ {"name": "명동 쇼핑거리", "area": "명동 관광특구", "category": "indoor", "image_query": ["명동"]},
+ {"name": "홍대 카페·전시 골목", "area": "홍대 관광특구", "category": "indoor", "image_query": ["홍대"]}
 ]

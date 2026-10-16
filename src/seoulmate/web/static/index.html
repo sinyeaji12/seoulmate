@@ -69,8 +69,11 @@
   .stop { position:relative; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; display:grid; grid-template-columns:170px 1fr; overflow:visible; }
   @media (max-width:560px) { .stop { grid-template-columns:1fr; } }
   .time { position:absolute; left:-8px; top:-12px; z-index:2; padding:1px 10px; background:var(--sky); border:2px solid var(--ink); box-shadow:2px 2px 0 var(--ink); font-family:var(--title); font-size:1.05rem; transform:rotate(-4deg); border-radius:6px; }
-  .photo { position:relative; min-height:150px; background:var(--sky); border-right:var(--bd); border-radius:11px 0 0 11px; overflow:hidden; }
-  @media (max-width:560px) { .photo { border-right:0; border-bottom:var(--bd); border-radius:11px 11px 0 0; min-height:140px; } }
+  .photo-wrap { display:flex; flex-direction:column; border-right:var(--bd); border-radius:11px 0 0 11px; overflow:hidden; background:var(--sky); }
+  .photo { position:relative; flex:1; min-height:150px; overflow:hidden; }
+  .credit { display:none; padding:2px 8px; font-size:.68rem; background:var(--paper); border-top:2px solid var(--ink); }
+  .photo-wrap.has-img .credit { display:block; }
+  @media (max-width:560px) { .photo-wrap { border-right:0; border-bottom:var(--bd); border-radius:11px 11px 0 0; } .photo { min-height:140px; } }
   .photo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .photo .ph { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:.8rem; }
   .photo .ph svg { width:38px; height:38px; }
@@ -118,6 +121,8 @@
   .stamp small { font-size:1rem; }
   .stamp.SSR { background:linear-gradient(135deg,var(--yellow),var(--pink) 55%,var(--sky)); }
   .stamp.SR { background:var(--sky); } .stamp.R { background:var(--paper); }
+  .gres .photo-wrap { grid-column:1 / -1; border:var(--bd); border-radius:10px; }
+  .gres .photo { min-height:170px; }
   .gres h3 { margin:0; font-family:var(--title); font-weight:400; font-size:1.3rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .gres .why1 { grid-column:1 / -1; margin:4px 0 0; padding:8px 12px; background:var(--butter); border:2px solid var(--ink); border-radius:10px; font-weight:700; }
   .gres .why1 b { font-family:var(--title); font-weight:400; margin-right:6px; }
@@ -226,7 +231,7 @@
         <use href="#wmA" fill="#FF5FA2"/>
       </g>
     </svg>
-    <div class="tagline">친구가 카톡으로<br>코스 짜주는 느낌</div>
+    <div class="tagline">실시간 날씨·붐빔을<br>확인한 서울 나들이 코스</div>
     <div class="spacer"></div>
     <span id="mode" class="badge" role="status" title="서버 연결 상태"><b id="mode-dot">🟡</b><span id="mode-txt">확인 중</span></span>
   </div>
@@ -276,7 +281,6 @@ const NS = 'http://www.w3.org/2000/svg';
 // 서버에서 온 값은 항상 textContent로만 넣는다(HTML 주입 방지). 아이콘은 우리 코드의 고정 심볼만 쓴다.
 function icon(name, cls) { const s = document.createElementNS(NS, 'svg'); s.setAttribute('class', 'ic' + (cls ? ' ' + cls : '')); const u = document.createElementNS(NS, 'use'); u.setAttribute('href', '#i-' + name); s.append(u); return s; }
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-function safeUrl(u) { try { const x = new URL(u); return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : ''; } catch { return ''; } }
 
 const TOOL = { get_weather:['sun','날씨'], get_crowd:['person','혼잡도'], list_places:['pin','장소 목록'], list_festivals:['festival','오늘 행사'] };
 const CAT = { outdoor:['tree','야외'], indoor:['museum','실내'], food:['food','음식점'], festival:['festival','행사'] };
@@ -360,6 +364,21 @@ for (const t of ['비 와도 갈 데 있어?', '덜 붐비는 데이트 코스',
   const b = el('button', 'chip', t); b.type = 'button'; b.onclick = () => ask(t); $('chips').append(b);
 }
 
+// 장소 사진: 프론트는 외부 이미지를 직접 요청하지 않고 백엔드(/place-image)만 부른다. 없으면 플레이스홀더.
+function placePhoto(name, category) {
+  const wrap = el('div', 'photo-wrap'), photo = el('div', 'photo');
+  const [ci, cl] = CAT[category] || ['pin', '장소'];
+  const ph = el('div', 'ph'); ph.append(icon(CAT[category] ? ci : 'image'), el('span', null, '사진 준비 중')); photo.append(ph);
+  const img = new Image(); img.alt = name; img.loading = 'lazy';
+  img.onload = () => { ph.remove(); wrap.classList.add('has-img'); };
+  img.onerror = () => img.remove();
+  img.src = '/place-image?name=' + encodeURIComponent(name);
+  photo.prepend(img);
+  const tag = el('span', 'tag'); tag.append(icon(ci), cl); photo.append(tag);
+  wrap.append(photo, el('div', 'credit', '사진: 한국관광공사'));
+  return wrap;
+}
+
 function renderCourse(bubble, course) {
   const w = course.weather;
   const kp = el('div', 'kpis');
@@ -380,12 +399,7 @@ function renderCourse(bubble, course) {
   for (const s of course.stops) {
     const card = el('div', 'stop');
     card.append(el('span', 'time', s.time));
-    const photo = el('div', 'photo'); const [ci, cl] = CAT[s.category] || ['pin', '장소'];
-    const ph = el('div', 'ph'); ph.append(icon(CAT[s.category] ? ci : 'image'), el('span', null, '사진 준비 중'));
-    photo.append(ph);
-    const url = safeUrl(s.image);
-    if (url) { const img = new Image(); img.alt = s.place; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer'; img.onload = () => ph.remove(); img.onerror = () => img.remove(); img.src = url; photo.prepend(img); }
-    const tag = el('span', 'tag'); tag.append(icon(ci), cl); photo.append(tag);
+    const photo = placePhoto(s.place, s.category);
     const info = el('div', 'info');
     const h = el('h3'); h.append(icon('pin'), ' ', s.place, ' ', trafficLight(s.crowd, s.crowd_next));
     const n = levelOf(s.crowd), cr = el('div', 'crowd lv-' + (n > 0 ? n : 0));
@@ -421,14 +435,13 @@ function renderGacha(p, checked) {
   const card = el('div', 'gres');
   const st = el('div', 'stamp ' + p.grade); st.append(emo ? el('small', null, emo) : '', name); st.title = hint;
   const h = el('h3'); h.append(p.place, trafficLight(p.crowd, p.crowd_next));
-  const [ci, cl] = CAT[p.category] || ['pin', '장소'];
-  const tag = el('span', 'tag'); tag.style.position = 'static'; tag.append(icon(ci), cl);
-  const head = el('div'); head.append(h, tag);
+  const head = el('div'); head.append(h);
+  const photo = placePhoto(p.place, p.category);
   if (p.fallback) { const fb = el('span', 'tag', '🥲 차선책'); fb.style.cssText = 'position:static;margin-left:6px;background:var(--sky)'; head.append(fb); }
   const why = el('p', 'why1'); why.append(el('b', null, '왜 여기?'), p.reason);
   const ok = (n) => checked.some(c => c.name === n && c.ok);
   const v = el('div', 'verify'); v.append(icon('check'), ok('get_weather') && ok('get_crowd') ? '날씨·혼잡도 확인 완료' + (MOCK ? ' (샘플 데이터)' : '') : '확인 정보 없음');
-  card.append(st, head, why, v);
+  card.append(photo, st, head, why, v);
   $('gout').replaceChildren(card);
 }
 

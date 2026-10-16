@@ -1,8 +1,10 @@
 import json
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 
+from seoulmate.clients.placeimg import PlaceImages
 from seoulmate.config import Settings
 from seoulmate.web import app as webapp
 from tests.conftest import FakeLLM, final, tool_use
@@ -18,6 +20,25 @@ def _fresh_limiter():
 
 def make_client(llm):
     return TestClient(webapp.create_app(Settings(seoulmate_mock_tools=True), llm_factory=lambda s: llm))
+
+
+def image_client(*, search_status=200, found=True):
+    seen: list[str] = []
+
+    def handler(req):
+        seen.append(req.url.path)
+        if req.url.path.endswith("searchKeyword2"):
+            if search_status != 200:
+                return httpx.Response(search_status)
+            items = [{"title": "북촌한옥마을", "contenttypeid": "12",
+                      "firstimage": "http://tong.visitkorea.or.kr/a.jpg"}] if found else ""
+            return httpx.Response(200, json={"response": {"header": {"resultCode": "0000"},
+                                                          "body": {"items": {"item": items} if items else ""}}})
+        return httpx.Response(200, content=b"IMG", headers={"content-type": "image/jpeg"})
+
+    return TestClient(webapp.create_app(
+        Settings(seoulmate_mock_tools=False, tour_api_key="k"), llm_factory=lambda s: None,
+        images=PlaceImages("k", client=httpx.Client(transport=httpx.MockTransport(handler))))), seen
 
 
 def events(text):
@@ -77,3 +98,40 @@ def test_rate_limit():
     c = make_client(FakeLLM([final("{}") for _ in range(12)]))
     codes = [c.post("/chat", json={"message": "x"}).status_code for _ in range(11)]
     assert codes[-1] == 429
+
+
+def test_place_image_served_through_backend_with_cache_headers():
+    c, _ = image_client()
+    r = c.get("/place-image", params={"name": "북촌한옥마을"})
+    assert r.status_code == 200 and r.content == b"IMG" and r.headers["content-type"] == "image/jpeg"
+    assert "max-age=86400" in r.headers["cache-control"]
+
+
+def test_place_image_404_when_no_photo():
+    c, _ = image_client(found=False)
+    r = c.get("/place-image", params={"name": "경복궁"})
+    assert r.status_code == 404 and r.content == b""
+
+
+def test_place_image_502_when_tourapi_fails_without_leaking():
+    c, _ = image_client(search_status=500)
+    r = c.get("/place-image", params={"name": "북촌한옥마을"})
+    assert r.status_code == 502 and "k" not in r.text and r.headers["cache-control"] == "no-store"
+
+
+def test_place_image_is_cached_per_place():
+    c, seen = image_client()
+    for _ in range(3):
+        c.get("/place-image", params={"name": "북촌한옥마을"})
+    assert sum(p.endswith("searchKeyword2") for p in seen) == 1
+
+
+def test_place_image_mock_mode_makes_no_external_call():
+    r = make_client(FakeLLM([])).get("/place-image", params={"name": "북촌한옥마을"})
+    assert r.status_code == 404
+
+
+def test_place_image_validates_name():
+    c = make_client(FakeLLM([]))
+    assert c.get("/place-image").status_code == 422
+    assert c.get("/place-image", params={"name": "가" * 61}).status_code == 422
