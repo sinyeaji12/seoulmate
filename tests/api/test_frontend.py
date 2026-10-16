@@ -135,3 +135,30 @@ def test_mates_note_shows_only_when_the_response_has_an_explanation():
     assert "box-shadow" not in rule and "background" not in rule and "border-top:1px solid" in rule
     assert "“" not in HTML.split('id="mates-note"')[1].split("</section>")[0]
     assert 'class="lede"' not in HTML  # 예전 평범한 문단은 MATE'S NOTE로 대체됐다
+
+
+def test_map_and_schedule_are_linked_only_for_places_with_coordinates():
+    assert "function select(i, opt = {})" in HTML
+    assert "if (pos) {" in HTML and "li.classList.add('has-pos')" in HTML  # 좌표가 있는 장소만 선택 가능
+    assert "row('위치', '정보 없음')" in HTML  # 좌표가 없으면 지어내지 않고 표시
+    assert "m.on('click', () => select(p.n - 1, { scroll: true }))" in HTML  # 핀 → 일정으로 스크롤
+    assert "map.setView([curStops[i].lat, curStops[i].lng]" in HTML  # 일정 → 지도 이동
+    for state in (".step.sel .stop-btn", ".step.sel .rail::after", ".step.sel figure.ph", ".pin.on"):
+        assert state in HTML, state
+    assert re.search(r"\.pin\.on \{[^}]*var\(--olive\)", HTML)  # 선택은 올리브 + 굵은 링
+
+
+def test_map_link_is_keyboard_and_reduced_motion_friendly():
+    assert "button', 'stop-btn'" in HTML.replace('"', "'") or "el('button', 'stop-btn'" in HTML
+    assert "aria-pressed" in HTML and "setAttribute('aria-label', `${p.n}번 ${p.s.place}`)" in HTML
+    assert "e.key === 'Enter' || e.key === ' '" in HTML  # 핀에서 Enter·Space
+    assert "e.key === 'Escape'" in HTML  # Esc로 선택 해제
+    assert "matchMedia('(prefers-reduced-motion: reduce)')" in HTML and "animate: !reduced()" in HTML
+    assert "behavior = reduced() ? 'auto' : 'smooth'" in HTML
+    assert re.search(r"@media \(prefers-reduced-motion:reduce\) \{[^}]*\.pin", HTML)
+
+
+def test_mobile_can_hop_between_schedule_and_map_and_attribution_stays():
+    assert re.search(r"\.m-only \{ display:none; \}\s*@media \(max-width:900px\) \{ \.m-only \{ display:inline-block; \} \}", HTML)
+    assert "지도에서 보기" in HTML and 'id="to-list"' in HTML and "일정으로 돌아가기" in HTML
+    assert "OpenStreetMap" in HTML and 'class="mapcap"' in HTML  # 기존 지도 출처 표기 유지

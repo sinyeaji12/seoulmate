@@ -146,7 +146,24 @@
   .leaflet-tile-pane { filter:grayscale(1) contrast(.9) brightness(1.07); }  /* 타일만 저채도 회색. 경로·핀은 올리브 그대로 */
   .leaflet-container { font-family:var(--sans); }
   .mapcap { margin:10px 0 0; font-size:12px; line-height:1.5; color:var(--mute); }
-  .pin { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--olive); color:#fff; font:700 14px/1 var(--sans); border:2px solid var(--paper); box-shadow:0 1px 3px rgba(0,0,0,.28); }
+  .pin { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--olive); color:#fff; font:700 14px/1 var(--sans); border:2px solid var(--paper); box-shadow:0 1px 3px rgba(0,0,0,.28); transition:transform .15s, box-shadow .15s; }
+  .leaflet-marker-icon { outline:none; }
+  .pin.on { transform:scale(1.2); box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--olive); }   /* 선택: 올리브 + 굵은 링 */
+  .leaflet-marker-icon:focus-visible .pin { box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }  /* 키보드 포커스 */
+
+  /* 일정 ↔ 지도 연결: 좌표가 있는 장소만 선택할 수 있다 */
+  .stop-btn { margin:0; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; color:inherit; text-align:left; cursor:pointer; text-decoration:underline transparent 1px; text-underline-offset:6px; transition:text-decoration-color .15s; }
+  .stop-btn:focus-visible { outline:2px solid var(--olive); outline-offset:4px; border-radius:2px; }
+  .step.has-pos figure.ph { cursor:pointer; transition:outline-color .15s; outline:2px solid transparent; outline-offset:4px; }
+  .step.has-pos:hover .stop-btn { text-decoration-color:var(--ink); }
+  .step.sel .stop-btn { text-decoration-thickness:3px; text-decoration-color:var(--olive); }
+  .step.sel .rail .n { color:var(--olive); }
+  .step.sel .rail::after { background:var(--olive); width:2px; margin-left:-.5px; }
+  .step.sel figure.ph { outline-color:var(--olive); }
+  .to-map, .to-list { margin-top:12px; font-size:14px; }
+  .m-only { display:none; }
+  @media (max-width:900px) { .m-only { display:inline-block; } }
+  @media (prefers-reduced-motion:reduce) { .pin, .stop-btn, .step.has-pos figure.ph { transition:none; } }
   .back { display:inline-block; margin-top:6px; padding:0; border:0; background:none; font-size:14px; text-decoration:underline; text-underline-offset:5px; }
   @media (max-width:900px) { .body { grid-template-columns:1fr; } .mapcol { position:static; } .step { grid-template-columns:52px minmax(0,1fr); } .rail::after { left:12px; } }
 
@@ -235,6 +252,7 @@
       <aside class="mapcol" id="mapcol">
         <div id="map" role="img" aria-label="코스 경로 지도"></div>
         <p class="mapcap">지도 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors · 장소를 직선으로 이은 경로예요(실제 도보 경로와 다를 수 있어요).<span id="map-miss"></span></p>
+        <button class="textlink to-list m-only" id="to-list" type="button">일정으로 돌아가기</button>
         <button class="back" id="back" type="button">← 다른 산책 찾아보기</button>
       </aside>
     </div>
@@ -382,10 +400,12 @@ const dry = (p) => !p || /없|none|^-$/i.test(String(p));
 const meters = (a, b) => { const R = 6371000, r = Math.PI / 180, dLa = (b.lat - a.lat) * r, dLo = (b.lng - a.lng) * r;
   const h = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
 const hasPos = (s) => typeof s.lat === 'number' && typeof s.lng === 'number';
-let map = null;
+let map = null, markers = [], steps = [], selected = -1, curStops = [];
+const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function showResult(course, checkedAt) {
   const stops = course.stops, w = course.weather;
+  curStops = stops; steps = []; markers = []; selected = -1;
   $('home').hidden = true; $('result').hidden = false;
 
   const d = new Date(); $('date').textContent = `${d.getFullYear()}. ${pad2(d.getMonth() + 1)}. ${pad2(d.getDate())}`;
@@ -425,10 +445,21 @@ function showResult(course, checkedAt) {
     for (let k = 1; k <= 4; k++) dots.append(el('i', k <= n ? 'on' : ''));
     row('혼잡도', [dots, document.createTextNode(s.crowd ? s.crowd + (s.crowd_next ? ` · 다음 시간 ${s.crowd_next}` : '') : '정보 없음')]);
     row('운영시간', '정보 없음');
+    const pos = hasPos(s);
+    if (!pos) row('위치', '정보 없음');   // 좌표가 없으면 지도 연동도 하지 않는다(값을 지어내지 않음)
     const next = stops[i + 1];
     if (next) row('다음 장소', hasPos(s) && hasPos(next) ? `도보 약 ${Math.max(1, Math.round(meters(s, next) / 80))}분 (직선거리 기준)` : '정보 없음');
     meta.append(el('dt', null, '사진'), photoDd);
-    col.append(fig, when, el('h3', null, s.place), el('p', 'why', s.reason), meta);
+    let title, btn = null;
+    if (pos) {   // 좌표가 있는 장소: 키보드로도 고를 수 있는 버튼 + 카드 어디를 눌러도 선택
+      btn = el('button', 'stop-btn', s.place); btn.type = 'button'; btn.setAttribute('aria-pressed', 'false');
+      title = el('h3'); title.append(btn);
+      li.classList.add('has-pos');
+      li.addEventListener('click', (e) => { if (!e.target.closest('a, .to-map')) select(i); });
+    } else title = el('h3', null, s.place);
+    col.append(fig, when, title, el('p', 'why', s.reason), meta);
+    if (pos) { const tm = el('button', 'textlink to-map m-only', '지도에서 보기'); tm.type = 'button'; tm.addEventListener('click', () => select(i, { reveal: 'map' })); col.append(tm); }
+    steps[i] = { li, btn };
     li.append(rail, col); tl.append(li);
   });
 
@@ -447,13 +478,42 @@ function drawMap(stops) {
   L.tileLayer(TILES.url, { maxZoom: TILES.maxZoom }).addTo(map);
   const latlngs = pts.map(p => [p.s.lat, p.s.lng]);
   if (latlngs.length > 1) L.polyline(latlngs, { color: '#737B52', weight: 3, opacity: .95 }).addTo(map);
-  pts.forEach(p => L.marker([p.s.lat, p.s.lng], { title: p.s.place, icon: L.divIcon({ className: '', html: `<span class="pin">${p.n}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(map));
+  pts.forEach(p => {
+    const m = L.marker([p.s.lat, p.s.lng], { title: p.s.place, keyboard: true, icon: L.divIcon({ className: '', html: `<span class="pin">${p.n}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(map);
+    m.on('click', () => select(p.n - 1, { scroll: true }));   // 핀 클릭 → 해당 일정으로 스크롤하고 장소명을 강조
+    markers[p.n - 1] = m;
+  });
   if (latlngs.length > 1) map.fitBounds(latlngs, { padding: [36, 36] }); else map.setView(latlngs[0], 16);
+  // 핀 요소는 지도 뷰가 정해진 뒤에야 만들어진다. 그때 접근성 이름과 키보드 선택(Enter·Space)을 붙인다.
+  pts.forEach(p => {
+    const node = markers[p.n - 1].getElement(); if (!node) return;
+    node.setAttribute('aria-label', `${p.n}번 ${p.s.place}`);
+    node.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(p.n - 1, { scroll: true }); } });
+  });
   setTimeout(() => map && map.invalidateSize(), 0);
 }
 
+// 선택: 일정 카드 ↔ 지도 핀을 같은 상태로 맞춘다. opt.scroll=핀에서 와서 일정으로 이동, opt.reveal='map'=지도로 이동(모바일)
+function select(i, opt = {}) {
+  selected = i;
+  steps.forEach((st, k) => { if (!st) return; const on = k === i; st.li.classList.toggle('sel', on); st.btn?.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  markers.forEach((m, k) => { if (!m) return; m.getElement()?.querySelector('.pin')?.classList.toggle('on', k === i); m.setZIndexOffset(k === i ? 1000 : 0); });
+  if (i < 0 || !curStops[i]) return;
+  const behavior = reduced() ? 'auto' : 'smooth';
+  if (map && markers[i]) map.setView([curStops[i].lat, curStops[i].lng], Math.max(map.getZoom(), 16), { animate: !reduced() });
+  if (opt.reveal === 'map' && markers[i]) { $('mapcol').scrollIntoView({ behavior, block: 'center' }); markers[i].getElement()?.focus({ preventScroll: true }); }
+  if (opt.scroll && steps[i]) { steps[i].li.scrollIntoView({ behavior, block: 'center' }); steps[i].btn?.focus({ preventScroll: true }); }
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && selected >= 0 && !$('result').hidden) select(-1); });
+$('to-list').addEventListener('click', () => {
+  const st = steps[selected] || steps.find(Boolean);
+  (st ? st.li : $('timeline')).scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+  st?.btn?.focus({ preventScroll: true });
+});
+
 function goHome() {
   if (map) { map.remove(); map = null; }
+  markers = []; steps = []; selected = -1;
   $('result').hidden = true; $('home').hidden = false; setBusy(false); window.scrollTo(0, 0); q.focus();
 }
 $('back').addEventListener('click', goHome);
