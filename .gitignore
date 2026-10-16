@@ -6,3 +6,6 @@ __pycache__/
 .vercel/
 *.egg-info/
 .ruff_cache/
+
+.vercel
+.env*
