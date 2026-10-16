@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     anthropic_workspace_id: str = ""
     seoul_api_key: str = ""
     tour_api_key: str = ""
-    kma_api_key: str = ""  # 비우면 공공데이터포털 키(tour_api_key)를 같이 쓴다
     seoulmate_mock_tools: bool = True
     max_tool_rounds: int = 6
     max_message_chars: int = 500

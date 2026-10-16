@@ -6,13 +6,11 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, Query
 from fastapi.responses import FileResponse, Response, StreamingResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from seoulmate.agent.enrich import make_enricher
 from seoulmate.agent.gacha import SPOTS, spin
 from seoulmate.agent.loop import run_agent
-from seoulmate.agent.now import SeoulNow
 from seoulmate.clients.llm import build_llm
 from seoulmate.clients.placeimg import ImageLookupError, PlaceImages
 from seoulmate.config import Settings, get_settings
@@ -21,7 +19,6 @@ from seoulmate.web.security import RateLimiter
 
 STATIC = Path(__file__).parent / "static"
 limiter = RateLimiter()
-now_limiter = RateLimiter(limit=30)
 img_limiter = RateLimiter(limit=120)  # 코스 한 번에 사진 5장 안팎 → 채팅 한도와 분리
 IMAGE_QUERIES = {sp["name"]: sp["image_query"] for sp in SPOTS if sp.get("image_query")}
 
@@ -35,13 +32,11 @@ class GachaRequest(BaseModel):
 
 
 def create_app(settings: Settings | None = None, llm_factory=build_llm,
-               images: PlaceImages | None = None, now: SeoulNow | None = None) -> FastAPI:
+               images: PlaceImages | None = None) -> FastAPI:
     s = settings or get_settings()
-    now = now or SeoulNow(lambda: build_registry(s), enabled=not s.seoulmate_mock_tools)
     # 샘플 모드에서는 외부 호출을 하지 않는다(키를 비운 PlaceImages는 항상 '사진 없음')
     images = images or PlaceImages("" if s.seoulmate_mock_tools else s.tour_api_key)
     app = FastAPI(title="서울 메이트")
-    app.mount("/static", StaticFiles(directory=STATIC), name="static")  # 표지 사진 등 정적 파일만
 
     @app.get("/health")
     def health():
@@ -50,13 +45,6 @@ def create_app(settings: Settings | None = None, llm_factory=build_llm,
     @app.get("/")
     def index():
         return FileResponse(STATIC / "index.html")
-
-    @app.get("/seoul-now", dependencies=[Depends(now_limiter.check)])
-    def seoul_now(response: Response):
-        """지금 한산한 곳 / 붐비는 곳(기존 get_crowd 도구 결과). 5분 캐싱, 실패·샘플 모드는 ok=false."""
-        data = now.get()
-        response.headers["Cache-Control"] = "public, s-maxage=300, stale-while-revalidate=300" if data["ok"] else "no-store"
-        return data
 
     @app.get("/place-image", dependencies=[Depends(img_limiter.check)])
     def place_image(name: str = Query(min_length=1, max_length=60)):
