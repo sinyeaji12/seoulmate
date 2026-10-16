@@ -41,3 +41,11 @@ def test_reduced_motion_and_mobile_bottom_sheet_rules_exist():
 
 def test_frontend_never_requests_external_images_directly():
     assert "/place-image?name=" in HTML and "visitkorea" not in HTML
+
+
+def test_chat_does_not_show_tool_progress_list():
+    """확인 중에는 한 줄 상태만. 날씨·혼잡도·오늘 행사·장소 목록 같은 도구 진행 내역은 보이지 않는다."""
+    assert "el('ul', 'steps')" not in HTML and "const TOOL" not in HTML and ".steps" not in HTML
+    for label in ("장소 목록", "오늘 행사", "건너뜀"):
+        assert label not in HTML, label
+    assert "날씨랑 붐빔 확인하는 중" in HTML

@@ -30,7 +30,7 @@ def image_client(*, search_status=200, found=True):
         if req.url.path.endswith("searchKeyword2"):
             if search_status != 200:
                 return httpx.Response(search_status)
-            items = [{"title": "북촌한옥마을", "contenttypeid": "12",
+            items = [{"title": "북촌한옥마을", "contenttypeid": "12", "addr1": "서울특별시 종로구",
                       "firstimage": "http://tong.visitkorea.or.kr/a.jpg"}] if found else ""
             return httpx.Response(200, json={"response": {"header": {"resultCode": "0000"},
                                                           "body": {"items": {"item": items} if items else ""}}})

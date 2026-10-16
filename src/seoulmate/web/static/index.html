@@ -50,10 +50,6 @@
   .mate-col { min-width:0; flex:1; }
   .msg.mate:not(.has-wide) .mate-col { flex:0 1 auto; }
 
-  .steps { list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; }
-  .steps li { display:flex; align-items:center; gap:8px; font-size:.88rem; padding:5px 10px; background:var(--paper); border:2px solid var(--ink); border-radius:10px; }
-  .steps li.fail { background:var(--gray); }
-  .steps small { margin-left:auto; font-weight:700; }
   .dots span { display:inline-block; animation:bounce 1s infinite; }
   .dots span:nth-child(2) { animation-delay:.15s; } .dots span:nth-child(3) { animation-delay:.3s; }
   @keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-5px); } }
@@ -352,7 +348,6 @@ const NS = 'http://www.w3.org/2000/svg';
 function icon(name, cls) { const s = document.createElementNS(NS, 'svg'); s.setAttribute('class', 'ic' + (cls ? ' ' + cls : '')); const u = document.createElementNS(NS, 'use'); u.setAttribute('href', '#i-' + name); s.append(u); return s; }
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
-const TOOL = { get_weather:['sun','날씨'], get_crowd:['person','혼잡도'], list_places:['pin','장소 목록'], list_festivals:['festival','오늘 행사'] };
 const CAT = { outdoor:['tree','야외'], indoor:['museum','실내'], food:['food','음식점'], festival:['festival','행사'] };
 const LEVELS = ['여유', '보통', '약간 붐빔', '붐빔'];
 function levelOf(c) { const i = LEVELS.indexOf(c); return i + 1; }
@@ -644,7 +639,7 @@ async function ask(text) {
   addMe(text);
   const { msg, bubble } = addMate(false);
   const wait = el('div', 'dots'); wait.append('날씨랑 붐빔 확인하는 중', ...[1,2,3].map(() => el('span', null, '.')));
-  const steps = el('ul', 'steps'); bubble.append(wait, steps);
+  bubble.append(wait);  // 확인 중에는 한 줄 상태만 보여준다(도구별 진행 내역은 숨김)
   try {
     const resp = await fetch('/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message: text }) });
     if (!resp.ok) throw new Error(resp.status === 429 ? '요청이 너무 많아! 잠깐 쉬었다가 다시 해줘.' : '앗, 요청에 실패했어.');
@@ -656,19 +651,14 @@ async function ask(text) {
       while ((i = buf.indexOf('\n\n')) >= 0) {
         const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
         const ev = /event: (\w+)/.exec(chunk)?.[1], data = JSON.parse(/data: (.*)/s.exec(chunk)[1]);
-        if (ev === 'tool') {
-          const [, tl] = TOOL[data.name] || ['spark', data.name];
-          const target = data.input.place || data.input.area || data.input.keyword || data.input.district || '';
-          const li = el('li', data.ok ? 'ok' : 'fail'); li.append(icon(data.ok ? 'check' : 'warn'), el('span', null, tl + (target ? ' · ' + target : '')), el('small', null, data.ok ? '완료' : '건너뜀'));
-          steps.append(li); scrollDown();
-        } else if (ev === 'result') {
-          wait.remove(); steps.remove();
+        if (ev === 'result') {
+          wait.remove();
           if (data.course) { msg.classList.add('has-wide'); bubble.classList.add('wide'); renderCourse(bubble, data.course); }
           else say(bubble, data.answer);
-        } else if (ev === 'error') { wait.remove(); steps.remove(); say(bubble, data.message); }
+        } else if (ev === 'error') { wait.remove(); say(bubble, data.message); }
       }
     }
-  } catch (err) { wait.remove(); steps.remove(); say(bubble, err.message); }
+  } catch (err) { wait.remove(); say(bubble, err.message); }
   busy = false; $('send').disabled = false; scrollDown();
 }
 

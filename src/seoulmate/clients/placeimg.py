@@ -9,10 +9,11 @@ import time
 
 import httpx
 
-from seoulmate.clients.tour import BASE, SEOUL_AREA
+from seoulmate.clients.tour import BASE
 
 IMAGE_HOST = "visitkorea.or.kr"  # 이 도메인(과 하위 도메인)의 https 이미지만 내려준다(SSRF 방지)
-ALLOWED_TYPES = {"12", "14"}  # 관광지·문화시설만. 음식점·숙박·상점 사진은 장소 사진으로 쓰지 않는다
+ALLOWED_TYPES = {"12", "14"}  # 관광지·문화시설은 시작/포함 일치도 허용
+EXACT_ONLY_TYPES = {"39", "38", "32", "28", "15"}  # 음식점·쇼핑·숙박·레포츠·행사는 이름이 정확히 같을 때만(식당 이름 장소용)
 MAX_BYTES = 5_000_000
 HIT_TTL, MISS_TTL, FAIL_TTL = 86400.0, 3600.0, 60.0
 
@@ -32,16 +33,34 @@ def queries_for(name: str) -> list[str]:
     return [q for q in dict.fromkeys([base, *parts]) if len(q) >= 2]
 
 
+def _in_seoul(item: dict) -> bool:
+    """TourAPI는 경복궁·청계천처럼 areacode가 빈 항목이 많아 지역 필터로는 걸러진다 → 주소로 서울을 확인한다."""
+    title = item.get("title", "")
+    return "서울" in item.get("addr1", "") or item.get("areacode") == "1" or title.startswith("서울")
+
+
 def _pick(items: list[dict], query: str) -> str | None:
-    """사진이 있는 관광지·문화시설 중 제목이 검색어와 같거나 검색어로 시작하는 것만 채택(정확한 순)."""
+    """사진이 있는 서울의 관광지·문화시설 중 제목이 검색어와 같거나 검색어로 시작하는 것을 채택(정확한 순).
+    검색어가 4자 이상이면 제목에 포함된 것도 받는다(예: '롯데월드몰' → '롯데월드타워&롯데월드몰'). 그보다 짧은 이름은
+    엉뚱한 상점('홍대' → '○○폰케이스 홍대점')이 걸리지 않게 시작 일치만 허용한다."""
     q = _norm(query)
     best: tuple[int, str] | None = None
     for i in items:
         t = _norm(i.get("title", ""))
         img = i.get("firstimage", "")
-        if not img or i.get("contenttypeid") not in ALLOWED_TYPES or not t.startswith(q):
+        ctype = i.get("contenttypeid")
+        if not img or not _in_seoul(i) or ctype not in ALLOWED_TYPES | EXACT_ONLY_TYPES:
             continue
-        score = len(t) - len(q)  # 0이면 정확히 일치
+        if ctype in EXACT_ONLY_TYPES:
+            if t != q:  # '서촌' → '서촌돌솥' 같은 이웃 가게 사진을 장소 사진으로 쓰지 않는다
+                continue
+            score = 50
+        elif t.startswith(q):
+            score = len(t) - len(q)  # 0이면 정확히 일치
+        elif len(q) >= 4 and q in t:
+            score = 100 + len(t) - len(q)
+        else:
+            continue
         if best is None or score < best[0]:
             best = (score, img)
     return best[1] if best else None
@@ -61,7 +80,7 @@ class PlaceImages:
 
     def _search(self, keyword: str) -> list[dict]:
         params = {"serviceKey": self.api_key, "MobileOS": "ETC", "MobileApp": "seoulmate", "_type": "json",
-                  "keyword": keyword, "areaCode": SEOUL_AREA, "numOfRows": 20, "pageNo": 1}
+                  "keyword": keyword, "numOfRows": 50, "pageNo": 1}  # areaCode 필터는 쓰지 않는다(_in_seoul 참고)
         try:
             resp = self._http().get(f"{BASE}/searchKeyword2", params=params)
             resp.raise_for_status()

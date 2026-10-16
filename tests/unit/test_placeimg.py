@@ -7,8 +7,8 @@ IMG_URL = "http://tong.visitkorea.or.kr/cms/resource/04/a.jpg"
 BYTES = b"\xff\xd8\xffJPEGDATA"
 
 
-def item(title, ctype="12", image=IMG_URL):
-    return {"title": title, "contenttypeid": ctype, "firstimage": image}
+def item(title, ctype="12", image=IMG_URL, addr="서울특별시 종로구", areacode=""):
+    return {"title": title, "contenttypeid": ctype, "firstimage": image, "addr1": addr, "areacode": areacode}
 
 
 def make(items_by_query, *, search_status=200, image_status=200, ctype="image/jpg", image_url_host=None):
@@ -131,3 +131,33 @@ def test_failure_is_cached_briefly_to_avoid_hammering():
     with pytest.raises(ImageLookupError):
         pi.find_url("x장소")
     assert len(calls) == 2
+
+
+# ---- 서울 판별 / 포함 일치 (사진이 안 나오던 원인: areaCode 필터가 areacode 빈 항목을 걸러냄) ----
+def test_blank_areacode_but_seoul_address_is_accepted():
+    pi, calls = make({"경복궁": [item("경복궁", areacode="", addr="서울특별시 종로구 사직로 161")]})
+    assert pi.fetch("경복궁") is not None
+    assert not any("areaCode" in c for c in calls)  # 지역 필터를 걸지 않는다
+
+
+def test_same_title_in_another_city_is_rejected():
+    pi, _ = make({"남산공원": [item("남산공원", addr="대구광역시 중구")]})
+    assert pi.fetch("남산공원") is None
+
+
+def test_seoul_named_place_outside_seoul_address_is_accepted():
+    pi, _ = make({"서울대공원": [item("서울대공원", addr="경기도 과천시 대공원광장로 102")]})
+    assert pi.fetch("서울대공원") is not None
+
+
+def test_long_query_matches_inside_title_but_short_query_does_not():
+    pi, _ = make({"롯데월드몰": [item("롯데월드타워&롯데월드몰")], "홍대": [item("내맘대로폰케이스 홍대점")]})
+    assert pi.find_url("잠실 롯데월드몰", ["롯데월드몰"])
+    assert pi.find_url("홍대 골목", ["홍대"]) is None
+
+
+def test_restaurant_photo_only_for_exact_name():
+    shop = [item("토속촌 삼계탕", ctype="39"), item("서촌돌솥", ctype="39")]
+    pi, _ = make({"토속촌 삼계탕": shop, "서촌": shop})
+    assert pi.find_url("토속촌 삼계탕")            # 식당 이름이 같으면 그 식당 사진
+    assert pi.find_url("서촌") is None             # 동네 이름으로 이웃 식당 사진을 빌리지 않는다
