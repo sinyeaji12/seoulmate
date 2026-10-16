@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>서울 메이트 · 서울메이트</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%23C6FF00' stroke='%23111' stroke-width='5'/%3E%3Cg fill='%23111' stroke='%23111' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='31' y='8' width='2' height='9'/%3E%3Cpath d='M23 24Q23 17 32 17Q41 17 41 24L39 29H25Z'/%3E%3Cpath d='M29 29H35L37 50H27Z'/%3E%3Cpath d='M22 50H42L46 57H18Z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%23FFE45C' stroke='%23111' stroke-width='5'/%3E%3Cg fill='%23111' stroke='%23111' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='31' y='8' width='2' height='9'/%3E%3Cpath d='M23 24Q23 17 32 17Q41 17 41 24L39 29H25Z'/%3E%3Cpath d='M29 29H35L37 50H27Z'/%3E%3Cpath d='M22 50H42L46 57H18Z'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:#FFF8E7; --lime:#C6FF00; --pink:#FF5FA2; --sky:#6EC6FF; --ink:#111111; --paper:#ffffff;
+    --bg:#FFF8E7; --lime:#C6FF00; --butter:#FFE45C; --pink:#FF5FA2; --sky:#6EC6FF; --ink:#111111; --paper:#ffffff;
     --yellow:#FFE45C; --gray:#e4dfd0;
     --bd:3px solid var(--ink); --sh:4px 4px 0 var(--ink);
     --title:"Black Han Sans","Malgun Gothic",sans-serif;
@@ -40,11 +40,11 @@
   #log { display:flex; flex-direction:column; gap:18px; }
   .msg { display:flex; gap:10px; max-width:100%; }
   .msg.me { justify-content:flex-end; }
-  .avatar { width:40px; height:40px; flex:none; border:var(--bd); border-radius:50%; background:var(--lime); display:grid; place-items:center; box-shadow:2px 2px 0 var(--ink); }
+  .avatar { width:40px; height:40px; flex:none; border:var(--bd); border-radius:50%; background:var(--butter); display:grid; place-items:center; box-shadow:2px 2px 0 var(--ink); }
   .avatar svg { width:20px; height:26px; }
   .bubble { position:relative; padding:12px 16px; border:var(--bd); box-shadow:var(--sh); min-width:0; max-width:min(100%, 560px); overflow-wrap:anywhere; }
   .me .bubble { background:var(--pink); color:var(--ink); border-radius:18px 18px 4px 18px; font-weight:700; transform:rotate(.6deg); }
-  .mate .bubble { background:var(--lime); border-radius:18px 18px 18px 4px; }
+  .mate .bubble { background:var(--butter); border-radius:18px 18px 18px 4px; }
   .mate .bubble.wide { max-width:100%; flex:1; }
   .mate .name { font-family:var(--title); font-size:.95rem; margin-bottom:2px; }
   .mate-col { min-width:0; flex:1; }
@@ -106,7 +106,7 @@
   .burst i { position:absolute; left:-6px; top:-6px; width:12px; height:12px; border:2px solid var(--ink); border-radius:50%; animation:spark .75s ease-out forwards; }
   .burst i:nth-child(3n) { border-radius:2px; }
   @keyframes spark { from { transform:translate(0,0) scale(1); opacity:1; } to { transform:translate(var(--dx),var(--dy)) scale(.3) rotate(240deg); opacity:0; } }
-  .gbtn { width:100%; max-width:420px; padding:14px 18px; border:var(--bd); border-radius:16px; background:var(--lime); box-shadow:6px 6px 0 var(--ink); font-family:var(--title); font-size:1.5rem; line-height:1.2; }
+  .gbtn { width:100%; max-width:420px; padding:14px 18px; border:var(--bd); border-radius:16px; background:var(--butter); box-shadow:6px 6px 0 var(--ink); font-family:var(--title); font-size:1.5rem; line-height:1.2; }
   .gbtn:active:not(:disabled) { transform:translate(4px,4px); box-shadow:2px 2px 0 var(--ink); }
   .gbtn:disabled { background:var(--gray); cursor:default; box-shadow:6px 6px 0 var(--ink); }
   .g-left { margin:8px 0 0; font-size:.82rem; }
@@ -119,7 +119,7 @@
   .stamp.SSR { background:linear-gradient(135deg,var(--yellow),var(--pink) 55%,var(--sky)); }
   .stamp.SR { background:var(--sky); } .stamp.R { background:var(--paper); }
   .gres h3 { margin:0; font-family:var(--title); font-weight:400; font-size:1.3rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .gres .why1 { grid-column:1 / -1; margin:4px 0 0; padding:8px 12px; background:var(--lime); border:2px solid var(--ink); border-radius:10px; font-weight:700; }
+  .gres .why1 { grid-column:1 / -1; margin:4px 0 0; padding:8px 12px; background:var(--butter); border:2px solid var(--ink); border-radius:10px; font-weight:700; }
   .gres .why1 b { font-family:var(--title); font-weight:400; margin-right:6px; }
   .gres .verify { grid-column:1 / -1; font-size:.78rem; display:flex; gap:6px; align-items:center; }
 
@@ -154,7 +154,7 @@
   textarea::placeholder { color:#777; }
 
   button { font:inherit; color:var(--ink); cursor:pointer; }
-  button.primary { display:flex; align-items:center; gap:6px; padding:0 18px; border:var(--bd); border-radius:14px; background:var(--lime); box-shadow:var(--sh); font-family:var(--title); font-size:1.05rem; white-space:nowrap; }
+  button.primary { display:flex; align-items:center; gap:6px; padding:0 18px; border:var(--bd); border-radius:14px; background:var(--butter); box-shadow:var(--sh); font-family:var(--title); font-size:1.05rem; white-space:nowrap; }
   button.primary:active, .chip:active { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
   button.primary:disabled { background:var(--gray); cursor:default; transform:none; box-shadow:var(--sh); animation:none; }
   .chip { display:inline-flex; align-items:center; gap:6px; flex:none; padding:6px 13px; border:2px solid var(--ink); border-radius:99px; background:var(--paper); box-shadow:3px 3px 0 var(--ink); font-size:.9rem; font-weight:700; }
@@ -218,7 +218,7 @@
       </defs>
       <g transform="rotate(-4 150 120)" filter="url(#sticker)">
         <path d="M150 14 C84 14 38 54 38 108 C38 140 56 164 84 178 L72 198 L112 182 C124 185 137 186 150 186 C216 186 262 146 262 108 C262 54 216 14 150 14 Z" fill="#fff" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
-        <path d="M150 14 C84 14 38 54 38 108 C38 140 56 164 84 178 L72 198 L112 182 C124 185 137 186 150 186 C216 186 262 146 262 108 C262 54 216 14 150 14 Z" fill="#C6FF00" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M150 14 C84 14 38 54 38 108 C38 140 56 164 84 178 L72 198 L112 182 C124 185 137 186 150 186 C216 186 262 146 262 108 C262 54 216 14 150 14 Z" fill="#FFE45C" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
         <use href="#tower" x="120" y="42" width="60" height="120"/>
         <path d="M214 56 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5 z" fill="#FF5FA2" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
         <use href="#wmA" stroke="#fff" stroke-width="16" stroke-linejoin="round" fill="#fff"/>
@@ -235,7 +235,7 @@
 <main>
   <section class="gacha" aria-label="서울 가챠">
     <h2>🎰 서울 가챠</h2>
-    <p class="sub">고르기 귀찮을 땐 뽑아! 날씨랑 붐빔 확인하고 알려줄게</p>
+    <p class="sub">오늘의 서울, 운명에 맡겨 볼래?</p>
     <div class="g-stage">
       <svg id="cap" class="cap" viewBox="0 0 120 120" aria-hidden="true">
         <g class="bot"><path d="M18 60 H102 A42 42 0 0 1 18 60 Z" fill="#6EC6FF" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
@@ -408,7 +408,7 @@ let gBusy = false;
 
 function burst() {
   const b = $('burst'); b.replaceChildren();
-  const colors = ['#FF5FA2', '#C6FF00', '#6EC6FF', '#FFE45C'];
+  const colors = ['#FF5FA2', '#FFE45C', '#6EC6FF', '#FFE45C'];
   for (let i = 0; i < 16; i++) {
     const p = document.createElement('i'), a = (Math.PI * 2 * i) / 16, d = 60 + Math.random() * 40;
     p.style.setProperty('--dx', Math.cos(a) * d + 'px'); p.style.setProperty('--dy', Math.sin(a) * d + 'px'); p.style.background = colors[i % 4]; b.append(p);
