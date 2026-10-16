@@ -124,3 +124,14 @@ def test_about_has_two_calm_items_and_sources_live_in_footer_and_map_caption():
     footer = re.search(r"<footer.*?</footer>", HTML, re.S).group(0)
     assert "서울시 실시간 도시데이터" in footer and "한국관광공사" in footer and "정보 없음" in footer
     assert "OpenStreetMap" in HTML and "<p class=\"mapcap\">지도 ©" in HTML  # 지도 출처 표기는 지도 곁에 유지
+
+
+def test_mates_note_shows_only_when_the_response_has_an_explanation():
+    assert "Mate's Note" in HTML and 'id="mates-note"' in HTML and 'aria-label="이 코스를 고른 이유"' in HTML
+    assert re.search(r'<section class="mates-note" id="mates-note"[^>]*\bhidden>', HTML)  # 기본은 숨김
+    assert "$('mates-note').hidden = !why" in HTML and "(course.summary || '').trim()" in HTML
+    # 장식 요소 없음: 따옴표 문자·카드 그림자·배경 박스를 쓰지 않는다
+    rule = re.search(r"\.mates-note \{([^}]*)\}", HTML).group(1)
+    assert "box-shadow" not in rule and "background" not in rule and "border-top:1px solid" in rule
+    assert "“" not in HTML.split('id="mates-note"')[1].split("</section>")[0]
+    assert 'class="lede"' not in HTML  # 예전 평범한 문단은 MATE'S NOTE로 대체됐다

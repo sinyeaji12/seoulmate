@@ -107,7 +107,11 @@
   .note h1 { margin:18px 0 0; font-weight:700; font-size:clamp(42px,7.4vw,108px); line-height:1.03; letter-spacing:-.045em; text-wrap:balance; }
   .note h1:focus { outline:none; }
   .sum { margin:22px 0 0; font-size:16px; color:var(--mute); }
-  .lede { margin:10px 0 0; font-size:16px; line-height:1.75; max-width:40em; }
+  /* MATE'S NOTE: 따옴표·카드 없이 작은 라벨 + 여백 + 얇은 구분선 */
+  .mates-note { display:grid; grid-template-columns:132px minmax(0,40em); gap:8px 24px; margin-top:30px; padding-top:20px; border-top:1px solid var(--line); }
+  .mates-note .mn-label { font:400 15px/1.9 var(--serif); letter-spacing:.2em; color:var(--mute); text-transform:uppercase; }
+  .mates-note p { margin:0; font-size:16px; line-height:1.85; }
+  @media (max-width:640px) { .mates-note { grid-template-columns:1fr; } }
   .status { display:flex; flex-wrap:wrap; gap:6px 26px; margin-top:30px; padding:13px 0; border-top:1px solid var(--line-strong); border-bottom:1px solid var(--line); font-size:14px; font-weight:500; }
   .status span { display:inline-flex; align-items:center; gap:7px; }
   .status .ic { width:1.25em; height:1.25em; }
@@ -221,7 +225,10 @@
     <div class="kicker">Walking Note · <span id="date"></span></div>
     <h1 id="note-title" tabindex="-1"></h1>
     <p class="sum" id="sum"></p>
-    <p class="lede" id="lede"></p>
+    <section class="mates-note" id="mates-note" aria-label="이 코스를 고른 이유" hidden>
+      <div class="mn-label">Mate's Note</div>
+      <p id="mn-text"></p>
+    </section>
     <div class="status" id="status"></div>
     <div class="body" id="body">
       <ol id="timeline" style="margin:0;padding:0"></ol>
@@ -384,7 +391,9 @@ function showResult(course, checkedAt) {
   const d = new Date(); $('date').textContent = `${d.getFullYear()}. ${pad2(d.getMonth() + 1)}. ${pad2(d.getDate())}`;
   $('note-title').textContent = FALLBACK_TITLE;
   $('sum').textContent = [w && w.area ? `${w.area} 일대` : null, `${stops.length}곳`, `${stops[0].time} – ${stops[stops.length - 1].time}`].filter(Boolean).join(' · ');
-  $('lede').textContent = course.summary || '';
+  // 이 코스를 고른 이유: 응답에 설명(summary)이 있을 때만 보여 주고, 없으면 영역째 생략한다. 프런트에서 문장을 만들지 않는다.
+  const why = (course.summary || '').trim();
+  $('mates-note').hidden = !why; $('mn-text').textContent = why;
 
   // 상태 줄: 값이 없으면 지어내지 않고 "정보 없음"
   const st = $('status'); st.replaceChildren();
