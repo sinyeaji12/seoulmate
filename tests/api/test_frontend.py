@@ -11,10 +11,16 @@ STATIC = Path(__file__).parents[2] / "src" / "seoulmate" / "web" / "static"
 HTML = (STATIC / "index.html").read_text("utf-8")
 
 
-def test_palette_and_fonts():
-    for token in ("#F5F3EE", "#242620", "#737B52"):
-        assert token in HTML.upper(), token
-    assert "Pretendard" in HTML and "Cormorant Garamond" in HTML  # 한글 고딕 + 얇은 세리프
+def test_palette_is_the_binder_palette_managed_as_css_variables():
+    up = HTML.upper()
+    for token in ("#E9E6DF", "#F7F3EA", "#292B26", "#4D593F", "#B8C3A6", "#ACC1CB", "#C5B8CD"):
+        assert token in up, token
+    for old in ("#F5F3EE", "#737B52", "#242620"):  # 이전 팔레트는 더 이상 쓰지 않는다
+        assert old not in up, old
+    root = re.search(r":root \{(.*?)\n  \}", HTML, re.S).group(1)
+    for var in ("--desk", "--paper", "--ink", "--olive", "--tab-course", "--tab-today", "--tab-note"):
+        assert var + ":" in root, var  # 모든 색은 한 곳에서 관리
+    assert "Pretendard" in HTML and "Cormorant Garamond" in HTML
 
 
 def test_kitsch_style_fully_removed():
@@ -39,16 +45,17 @@ def test_cover_copy_and_masthead_are_real_html_text():
     assert "[COVER.place, COVER.season, COVER.credit].join(' · ')" in HTML  # "북촌 · 가을 · 사진 출처"
 
 
-def test_top_menu_is_logo_plus_single_link():
-    nav = re.search(r"<nav>(.*?)</nav>", HTML, re.S).group(1)
-    assert nav.count("<a ") == 1 and "서비스 소개" in nav and 'href="#about"' in nav
-    assert 'id="about"' in HTML
+def test_top_has_logo_and_a_small_about_link_not_a_tab():
+    top = re.search(r'<header class="top">(.*?)</header>', HTML, re.S).group(1)
+    assert top.count("<a ") == 1 and 'href="#about"' in top and ">소개<" in top
+    assert 'data-k="about"' in HTML and HTML.count('role="tab"') == 3  # 소개는 탭이 아니다
 
 
-def test_selected_mood_is_olive_and_white_bold_16px():
+def test_selected_mood_and_run_button_are_deep_olive_with_white_text():
     rule = re.search(r'\.mood\[aria-pressed="true"\]\s*\{([^}]*)\}', HTML).group(1)
-    assert "var(--olive)" in rule and "#fff" in rule and "font-weight:700" in rule and "font-size:16px" in rule
-    assert re.search(r"\.btn \{[^}]*background:var\(--olive\)[^}]*color:#fff[^}]*font-size:16px[^}]*font-weight:700", HTML)
+    assert "var(--olive)" in rule and "var(--on-olive)" in rule and "font-weight:700" in rule and "font-size:16px" in rule
+    assert re.search(r"\.btn \{[^}]*background:var\(--olive\)[^}]*color:var\(--on-olive\)[^}]*font-size:16px[^}]*font-weight:700", HTML)
+    assert "--on-olive:#FFFFFF" in HTML
 
 
 def test_mood_choices_are_sent_with_the_question():
@@ -78,7 +85,7 @@ def test_progress_is_two_gentle_sentences_not_a_list_of_tool_calls():
 
 
 def test_result_note_sections_and_honest_placeholders():
-    for text in ("Walking Note", "정보 없음", "다음 시간", "확인`", "운영시간", "다음 장소", "직선거리 기준", "한국관광공사"):
+    for text in ("Walking Note", "정보 없음", "다음 시간", "확인 시각", "운영시간", "다음 장소", "직선거리 기준", "한국관광공사"):
         assert text in HTML, text
     assert "나만의 서울 산책 노트" in HTML  # title 필드가 아직 없어 고정 제목
 
@@ -92,7 +99,7 @@ def test_map_uses_leaflet_with_sri_gray_tiles_and_attribution():
     assert HTML.count('integrity="sha512-') == 2  # CSS + JS 모두 무결성 검증
     assert "tile.openstreetmap.org" in HTML and "OpenStreetMap" in HTML and "contributors" in HTML
     assert re.search(r"\.leaflet-tile-pane\s*\{[^}]*grayscale", HTML)
-    assert "#737B52" in HTML  # 경로·핀은 올리브
+    assert "color: '#4D593F'" in HTML and "#737B52" not in HTML.upper()  # 경로·핀은 딥 올리브(탭 색 아님)
     assert "cartocdn" not in HTML  # CARTO는 API 키가 필요해 쓰지 않는다
 
 
@@ -118,12 +125,14 @@ def test_missing_photo_is_a_low_band_and_network_errors_are_korean():
     assert "서버에 연결하지 못했어요" in HTML  # 브라우저의 'Failed to fetch'를 그대로 보이지 않는다
 
 
-def test_about_has_two_calm_items_and_sources_live_in_footer_and_map_caption():
-    about = re.search(r'<section class="about".*?</section>', HTML, re.S).group(0)
+def test_about_has_two_calm_items_and_sources_live_with_the_note_and_map_caption():
+    about = re.search(r'<div class="about" id="about">.*?</ol>', HTML, re.S).group(0)
     assert about.count("<li>") == 2 and "출처" not in about  # 소개는 서비스 이야기만
-    footer = re.search(r"<footer.*?</footer>", HTML, re.S).group(0)
-    assert "서울시 실시간 도시데이터" in footer and "한국관광공사" in footer and "정보 없음" in footer
-    assert "OpenStreetMap" in HTML and "<p class=\"mapcap\">지도 ©" in HTML  # 지도 출처 표기는 지도 곁에 유지
+    foot = re.search(r'<footer class="foot">.*?</footer>', HTML, re.S).group(0)
+    assert "서울시 실시간 도시데이터" in foot and "한국관광공사" in foot and "정보 없음" in foot
+    note = re.search(r'<p class="srcnote">.*?</p>', HTML, re.S).group(0)
+    assert "서울시 실시간 도시데이터" in note and "기상청 단기예보" in note and "한국관광공사" in note
+    assert "OpenStreetMap" in HTML and '<p class="mapcap">지도 ©' in HTML  # 지도 출처 표기는 지도 곁에 유지
 
 
 def test_mates_note_shows_only_when_the_response_has_an_explanation():
@@ -143,9 +152,9 @@ def test_map_and_schedule_are_linked_only_for_places_with_coordinates():
     assert "row('위치', '정보 없음')" in HTML  # 좌표가 없으면 지어내지 않고 표시
     assert "m.on('click', () => select(p.n - 1, { scroll: true }))" in HTML  # 핀 → 일정으로 스크롤
     assert "map.setView([curStops[i].lat, curStops[i].lng]" in HTML  # 일정 → 지도 이동
-    for state in (".step.sel .stop-btn", ".step.sel .rail::after", ".step.sel figure.ph", ".pin.on"):
+    for state in (".step.sel .stop-btn", ".step.sel .rail .n", ".step.sel figure.ph", ".pin.on"):
         assert state in HTML, state
-    assert re.search(r"\.pin\.on \{[^}]*var\(--olive\)", HTML)  # 선택은 올리브 + 굵은 링
+    assert re.search(r"\.pin\.on \{[^}]*var\(--olive\)", HTML)  # 선택은 딥 올리브 + 굵은 링
 
 
 def test_map_link_is_keyboard_and_reduced_motion_friendly():
@@ -159,17 +168,17 @@ def test_map_link_is_keyboard_and_reduced_motion_friendly():
 
 
 def test_mobile_can_hop_between_schedule_and_map_and_attribution_stays():
-    assert re.search(r"\.m-only \{ display:none; \}\s*@media \(max-width:900px\) \{ \.m-only \{ display:inline-block; \} \}", HTML)
+    assert ".m-only { display:none; }" in HTML and ".m-only { display:inline-block; }" in HTML  # 900px 이하에서만 보인다
     assert "지도에서 보기" in HTML and 'id="to-list"' in HTML and "일정으로 돌아가기" in HTML
     assert "OpenStreetMap" in HTML and 'class="mapcap"' in HTML  # 기존 지도 출처 표기 유지
 
 
-def test_today_in_seoul_is_hidden_until_real_data_arrives_and_is_a_magazine_toc():
-    assert re.search(r'<section class="today" id="today"[^>]*\bhidden>', HTML)  # 기본은 숨김
-    for text in ("Today in Seoul", "오늘의 서울", "지금 한산한 곳", "지금 붐비는 곳", "서울시 실시간 도시데이터"):
+def test_today_in_seoul_shows_a_calm_state_until_real_data_arrives_and_is_a_magazine_toc():
+    assert re.search(r'<div class="today-cols" id="today-cols" hidden>', HTML)  # 데이터가 오기 전에는 목록을 만들지 않는다
+    for text in ("Today in Seoul", "오늘의 서울", "지금 한산한 곳", "지금 붐비는 곳", "서울시 실시간 도시데이터", "지금은 오늘의 서울을 불러오지 못했어요"):
         assert text in HTML, text
-    assert "fetch('/seoul-now')" in HTML and "if (d && d.ok) renderToday(d)" in HTML  # 실패·샘플 모드면 아무것도 보이지 않는다
-    assert "if (!a && !b) return;" in HTML and "box.hidden = items.length === 0" in HTML  # 빈 쪽·빈 지면은 숨김
+    assert "fetch('/seoul-now')" in HTML and "if (d && d.ok) renderToday(d)" in HTML  # 실패·샘플 모드면 지어내지 않는다
+    assert "if (!a && !b)" in HTML and "box.hidden = items.length === 0" in HTML  # 빈 쪽은 숨김
     assert "pad2(i + 1)" in HTML and "' 기준'" in HTML  # 번호 + 기준 시각
     rule = re.search(r"\.toc li \{([^}]*)\}", HTML).group(1)
     assert "border-bottom:1px solid var(--line)" in rule and "box-shadow" not in rule  # 얇은 구분선, 카드 아님
@@ -183,8 +192,10 @@ def test_today_places_are_appended_to_the_question_never_overwrite_it():
     assert re.search(r"\.toc-row\.added \.nm \{[^}]*var\(--olive\)", HTML)  # 담은 곳은 올리브
 
 
-def test_today_lives_with_the_cover_and_hides_with_it_in_the_result_view():
-    assert '<div id="front">' in HTML and "$('front').hidden = true" in HTML and "$('front').hidden = false" in HTML
+def test_today_places_show_photos_from_the_backend_proxy_and_never_borrow_other_photos():
+    assert "function placeThumb(name)" in HTML and "'/place-image?name=' + encodeURIComponent(name)" in HTML
+    assert "box.classList.add('none'); box.textContent = '사진 정보 없음'" in HTML  # 사진이 없으면 비워 둔다
+    assert "visitkorea" not in HTML
 
 
 def test_with_when_time_are_single_choice_rows_sent_with_the_question():
@@ -217,3 +228,59 @@ def test_vibe_keywords_come_only_from_evidence_in_the_response():
     for invented in ("사진 많", "감성", "힙", "데이트"):  # 데이터가 없는 분위기는 만들지 않는다
         assert invented not in HTML.split("function vibeKeywords")[1].split("function showResult")[0], invented
     assert HTML.index('id="vibe"') < HTML.index('id="mates-note"')  # MATE'S NOTE 위
+
+
+
+def test_binder_has_three_files_with_vertical_index_tabs_and_tab_colors_only_on_tabs():
+    assert re.findall(r'<section class="sheet[^"]*" data-k="(\w+)"', HTML) == ["course", "today", "note", "about"]
+    tabs = re.findall(r'<button class="tab" role="tab" id="t-(\w+)"[^>]*aria-controls="p-\w+" aria-selected="(\w+)"', HTML)
+    assert tabs == [("course", "true"), ("today", "false"), ("note", "false")]
+    for no, label in (("01", "코스 만들기"), ("02", "오늘의 서울"), ("03", "산책 노트")):
+        assert f'<span class="no">{no}</span><span class="tx">{label}</span>' in HTML
+    assert 'role="tablist"' in HTML and 'aria-orientation="vertical"' in HTML
+    assert re.search(r"\.tab \.tx \{[^}]*writing-mode:vertical-rl", HTML)  # 탭 글자는 세로
+    assert re.search(r"\.tab \{[^}]*color:var\(--ink\)", HTML)  # 탭 위 글자는 먹색
+    assert re.search(r"\.sheet::before \{[^}]*height:4px[^}]*background:var\(--c\)", HTML)  # 종이 위 색 띠
+    assert ".dots i.on { background:var(--ink)" in HTML  # 혼잡도 점은 먹색
+
+
+def test_binder_navigation_hash_keyboard_swipe_and_reduced_motion():
+    assert "const FILES = ['course', 'today', 'note']" in HTML and "showFile(location.hash.slice(1))" in HTML
+    assert "history.replaceState(null, '', '#' + k)" in HTML and "addEventListener('hashchange'" in HTML
+    for key in ("ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"):
+        assert key in HTML, key
+    assert "t.setAttribute('aria-selected'" in HTML and 'role="tabpanel"' in HTML
+    assert "touchstart" in HTML and "touchend" in HTML and "visualViewport" in HTML and ".kbd .tabs { display:none; }" in HTML
+    assert re.search(r"@media \(prefers-reduced-motion:reduce\) \{ \.sheet,\.sheet\.on,\.tab \{ transition:none; \} \}", HTML)  # 넘기는 효과 없이 바로 전환
+    assert re.search(r"\.sheet \{[^}]*transition:opacity \.3s", HTML)  # 0.3초 페이드·슬라이드
+
+
+def test_submit_moves_to_the_note_file_and_errors_return_to_the_course_file():
+    assert "setNote('working'); showFile('note')" in HTML
+    assert 'id="note-empty"' in HTML and "아직 펼쳐 본 산책이 없어요" in HTML
+    assert "showFile('course')" in HTML and "const fail = (msg)" in HTML  # 실패하면 입력 화면에서 안내한다
+    assert "setNote('result'); showFile('note');" in HTML
+
+
+def test_props_are_exactly_clip_receipt_and_stamp_in_the_palette():
+    assert HTML.count('class="clip"') == 1 and "#292B26" in HTML.split('class="clip"')[1].split("</svg>")[0]  # 클립은 먹색 선, 색 없음
+    receipt = re.search(r'<div class="receipt" id="receipt">.*?</div></div>', HTML, re.S).group(0)
+    assert "SEOUL MATE · WALKING RECEIPT" in receipt and "THANK YOU FOR WALKING" in receipt
+    assert re.search(r"\.receipt \.band \{[^}]*background:var\(--tab-note\)", HTML)  # 맨 위 뮤트 라일락 띠
+    assert re.search(r"\.receipt \{[^}]*font-family:var\(--mono\)", HTML) and "border-top:1.5px dashed" in HTML
+    assert "linear-gradient(135deg,var(--paper)" in HTML and "linear-gradient(45deg,var(--paper)" in HTML  # 위아래 톱니
+    assert "rrow('확인 시각'" in HTML and "if (mode) ri.append(rrow('혼잡도', mode))" in HTML  # 데이터가 없는 항목은 생략
+    assert 'class="stamp"' in HTML and 'class="postmark"' in HTML and "SEOUL · KOREA" in HTML
+    assert re.search(r"\.stamp \{[^}]*var\(--tab-note\)", HTML) and re.search(r"\.postmark \{[^}]*color:var\(--olive\)", HTML)
+    assert "$('pm-day').textContent" in HTML  # 소인에는 코스 생성 날짜
+
+
+def test_note_shows_photos_for_each_stop_and_postcard_png_is_drawn_without_external_images():
+    assert "img.src = '/place-image?name=' + encodeURIComponent(s.place)" in HTML and "li.append(rail, fig, col)" in HTML
+    assert "async function saveCard()" in HTML and "toBlob" in HTML and "image/png" in HTML
+    assert "Image(" not in HTML.split("async function saveCard()")[1].split("$('save-card')")[0]  # 엽서 캔버스는 외부 이미지를 쓰지 않는다
+
+
+def test_my_log_is_removed():
+    for word in ("나의 기록", "localStorage", "다녀온 뒤"):
+        assert word not in HTML, word

@@ -5,25 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>서울 메이트</title>
 <meta name="description" content="날씨와 붐빔을 살펴, 지금 당신에게 어울리는 서울 산책 코스를 찾아요.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23737B52' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12c5-.5 8-3 11-7 3 4 6 6.5 11 7'/%3E%3Cpath d='M6 13v9h16v-9'/%3E%3Cpath d='M12 22v-5h4v5'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%234D593F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12c5-.5 8-3 11-7 3 4 6 6.5 11 7'/%3E%3Cpath d='M6 13v9h16v-9'/%3E%3Cpath d='M12 22v-5h4v5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
   :root {
-    --paper:#F5F3EE; --ink:#242620; --olive:#737B52;
-    --mute:#62645B;                 /* 종이색 위 대비 5.4:1 */
-    --line:rgba(36,38,32,.16); --line-strong:rgba(36,38,32,.38);
+    /* 모든 색은 여기 한 곳에서만 관리한다 */
+    --desk:#E9E6DF;                 /* 파일철을 받쳐 주는 바깥 배경 */
+    --paper:#F7F3EA;                /* 읽는 면은 모두 크림 */
+    --ink:#292B26;
+    --mute:#5E6057;                 /* 크림 위 대비 5.5:1 */
+    --olive:#4D593F;                /* 실행 버튼 · 선택된 선택지 · 지도 경로 */
+    --on-olive:#FFFFFF;
+    --tab-course:#B8C3A6; --tab-today:#ACC1CB; --tab-note:#C5B8CD;   /* 탭 색: 탭과 종이 위 띠에만 쓴다 */
+    --line:rgba(41,43,38,.16); --line-strong:rgba(41,43,38,.42);
+    --shadow:0 1px 2px rgba(41,43,38,.12), 0 6px 18px rgba(41,43,38,.08);
     --sans:"Pretendard Variable",Pretendard,-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
     --serif:"Cormorant Garamond","Noto Serif KR",Georgia,serif;
-    --r:4px; --gutter:clamp(20px,5vw,80px);
+    --mono:ui-monospace,"SFMono-Regular",Consolas,"Courier New",monospace;
+    --r:4px; --tabw:54px; --gap:clamp(14px,2vw,28px);
     color-scheme:light;
   }
   * { box-sizing:border-box; }
+  html,body { height:100%; }
   html { -webkit-text-size-adjust:100%; word-break:keep-all; overflow-wrap:break-word; }
-  @media (prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
-  body { margin:0; background:var(--paper); color:var(--ink); font:400 16px/1.7 var(--sans); }
+  body { margin:0; background:var(--desk); color:var(--ink); font:400 16px/1.6 var(--sans); letter-spacing:-.01em; overflow:hidden; display:flex; flex-direction:column; }
   [hidden] { display:none !important; }
   a { color:inherit; }
   button { font:inherit; color:inherit; cursor:pointer; }
@@ -31,77 +39,46 @@
   svg.ic { width:1.1em; height:1.1em; flex:none; fill:none; stroke:currentColor; stroke-width:1.25; stroke-linecap:round; stroke-linejoin:round; vertical-align:-.18em; }
   :focus-visible { outline:2px solid var(--olive); outline-offset:3px; }
 
-  /* ---------- 상단 메뉴 ---------- */
-  .top { height:64px; padding:0 var(--gutter); display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); background:var(--paper); }
-  .logo { display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:600; font-size:17px; letter-spacing:-.02em; background:none; border:0; padding:0; }
-  .logo svg { width:26px; height:26px; fill:none; stroke:var(--ink); stroke-width:1.25; stroke-linecap:round; stroke-linejoin:round; }
-  .top nav a { font-size:14px; text-decoration:none; padding:8px 0; border-bottom:1px solid transparent; }
-  .top nav a:hover { border-bottom-color:var(--ink); }
+  /* ---------- 상단: 로고 + 작은 소개 링크 ---------- */
+  .top { flex:none; height:52px; display:flex; align-items:center; gap:18px; padding:0 var(--gap); }
+  .logo { display:flex; align-items:center; gap:8px; background:none; border:0; padding:0; font-weight:700; font-size:16px; letter-spacing:-.03em; }
+  .logo svg { width:22px; height:22px; fill:none; stroke:var(--ink); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+  .about-link { font-size:13px; color:var(--mute); text-underline-offset:4px; text-decoration-color:var(--line-strong); }
+  .about-link:hover { color:var(--ink); }
 
-  /* ---------- 첫 화면: 잡지 표지 ---------- */
-  .cover { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); min-height:calc(100vh - 64px); min-height:calc(100dvh - 64px); }
-  .cover-text { padding:clamp(36px,6vw,96px) var(--gutter); display:flex; flex-direction:column; justify-content:center; }
-  .cover-photo { display:flex; flex-direction:column; border-left:1px solid var(--line); }
-  .frame { position:relative; flex:1; min-height:440px; overflow:hidden; background:#dcdcd6; }
-  .frame img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 0; }
-  .mast { position:absolute; z-index:2; left:clamp(20px,3vw,40px); top:clamp(18px,3vw,34px); color:var(--ink); }
-  .mast small { display:block; font:500 12px/1 var(--sans); letter-spacing:.34em; }
-  .mast .big { margin-top:8px; font:300 clamp(68px,9.2vw,144px)/.9 var(--serif); font-variant-numeric:lining-nums; letter-spacing:.03em; }
-  .caption { padding:10px 18px; border-top:1px solid var(--line); font-size:12px; line-height:1.4; color:var(--mute); }
+  /* ---------- 파일철: 겹친 종이 + 세로 인덱스 탭 ---------- */
+  .binder { position:relative; flex:1; min-height:0; margin:0 0 var(--gap) var(--gap); padding-right:var(--tabw); }
+  .stack { position:relative; height:100%; }
+  .stack::before,.stack::after { content:""; position:absolute; inset:0; background:var(--paper); border-radius:3px; box-shadow:var(--shadow); }   /* 뒤에 겹쳐 놓인 종이 */
+  .stack::before { transform:translate(7px,7px); opacity:.7; } .stack::after { transform:translate(3.5px,3.5px); opacity:.85; }
+  .sheet { position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; overflow:hidden; border-radius:3px; box-shadow:var(--shadow);
+    background:var(--paper) radial-gradient(rgba(41,43,38,.035) 1px, transparent 1.2px) 0 0/5px 5px;   /* 은은한 종이 결 */
+    opacity:0; visibility:hidden; transform:translateX(22px); transition:opacity .3s ease, transform .3s ease, visibility 0s .3s; }
+  .sheet.on { opacity:1; visibility:visible; transform:none; z-index:2; transition:opacity .3s ease, transform .3s ease; }
+  .sheet::before { content:""; flex:none; height:4px; background:var(--c); }   /* 펼쳐진 파일의 탭 색 띠 */
+  [data-k="course"] { --c:var(--tab-course); } [data-k="today"] { --c:var(--tab-today); } [data-k="note"] { --c:var(--tab-note); } [data-k="about"] { --c:var(--line-strong); }
+  .scroll { flex:1; min-height:0; overflow:auto; padding:clamp(20px,3vw,44px) clamp(20px,4vw,56px); overscroll-behavior:contain; }
+  .tabs { position:absolute; top:28px; right:0; width:var(--tabw); z-index:3; display:flex; flex-direction:column; }
+  .tab { position:relative; width:calc(var(--tabw) - 8px); height:152px; margin-bottom:-10px; padding:12px 0 0; border:1px solid rgba(41,43,38,.22); border-left:0; border-radius:0 9px 9px 0; background:var(--c); color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; gap:8px; box-shadow:1px 1px 3px rgba(41,43,38,.14); transition:width .2s ease; }
+  .tab .no { font:600 17px/1 var(--serif); letter-spacing:.04em; font-variant-numeric:lining-nums; }
+  .tab .tx { writing-mode:vertical-rl; font-size:14px; font-weight:600; letter-spacing:.08em; }
+  .tab:nth-child(1) { z-index:3; } .tab:nth-child(2) { z-index:2; } .tab:nth-child(3) { z-index:1; }
+  .tab:hover { width:calc(var(--tabw) - 4px); }
+  .tab[aria-selected="true"] { width:var(--tabw); margin-left:-2px; z-index:5; box-shadow:2px 1px 5px rgba(41,43,38,.2); }
+  .tab:focus-visible { outline:2px solid var(--ink); outline-offset:2px; z-index:6; }
+  @media (prefers-reduced-motion:reduce) { .sheet,.sheet.on,.tab { transition:none; } }
 
-  h1.lead { margin:0; font-weight:700; font-size:clamp(33px,4.3vw,62px); line-height:1.14; letter-spacing:-.04em; text-wrap:balance; }
-  h1.lead .l1 { display:block; font-weight:300; color:var(--mute); }
-  .desc { margin:20px 0 0; font-size:15px; line-height:1.7; color:var(--mute); max-width:30em; }
-
-  .ask { margin-top:44px; max-width:600px; }
-  .field { display:flex; align-items:flex-end; gap:16px; border-bottom:1px solid var(--ink); padding-bottom:10px; }
-  .field textarea { flex:1; min-height:56px; resize:none; border:0; background:transparent; color:var(--ink); font:400 18px/1.55 var(--sans); letter-spacing:-.01em; padding:6px 0; }
-  .field textarea::placeholder { color:#7c7e74; }
-  .field textarea:focus { outline:none; }
-  .field:focus-within { border-bottom-width:2px; padding-bottom:9px; }
-  .btn { flex:none; padding:12px 22px; border:0; border-radius:var(--r); background:var(--olive); color:#fff; font-size:16px; font-weight:700; letter-spacing:-.01em; }
-  .btn:hover { background:#68704a; }
-  .btn:disabled { opacity:.5; cursor:default; }
-  .moods { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
-  .mood { padding:9px 16px; border:1px solid var(--line-strong); border-radius:var(--r); background:transparent; font-size:15px; letter-spacing:-.01em; }
-  .mood:hover { border-color:var(--ink); }
-  .mood[aria-pressed="true"] { background:var(--olive); border-color:var(--olive); color:#fff; font-size:16px; font-weight:700; }
-  .sels { margin-top:26px; display:grid; gap:14px; }
-  .sel { display:grid; grid-template-columns:56px minmax(0,1fr); align-items:center; gap:12px; }
-  .sel-label { font-size:11px; font-weight:600; letter-spacing:.16em; color:var(--mute); }
-  .sel-opts { display:flex; flex-wrap:wrap; gap:8px; }
-  .opt { padding:7px 14px; border:1px solid var(--line-strong); border-radius:var(--r); background:transparent; font-size:14px; letter-spacing:-.01em; }
-  .opt:hover { border-color:var(--ink); }
-  .opt:focus-visible { outline:2px solid var(--olive); outline-offset:2px; }
-  .opt[aria-pressed="true"] { border-color:var(--olive); background:var(--olive); color:#fff; font-weight:700; }
-  .sel-note { margin:10px 0 0 68px; font-size:13px; color:var(--mute); }
-  @media (max-width:520px) { .sel { grid-template-columns:1fr; gap:6px; } .sel-note { margin-left:0; } }
-  .textlink { margin-top:26px; padding:0; border:0; background:none; font-size:14px; color:var(--mute); text-decoration:underline; text-underline-offset:5px; text-decoration-color:var(--line-strong); text-align:left; }
-  .textlink:hover { color:var(--ink); text-decoration-color:var(--ink); }
-  .textlink:disabled { cursor:default; text-decoration:none; }
-  .notice { margin:22px 0 0; font-size:14px; color:var(--ink); padding-left:14px; border-left:2px solid var(--ink); }
-
-  /* 오늘의 산책지(가챠): 입력창 아래 조용한 인라인 결과 */
-  .pick { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); max-width:600px; }
-  .pick .k { font:400 18px/1 var(--serif); letter-spacing:.18em; color:var(--mute); text-transform:uppercase; }
-  .pick h3 { margin:10px 0 0; font-size:28px; line-height:1.25; letter-spacing:-.035em; }
-  .pick p { margin:8px 0 0; font-size:15px; color:var(--mute); }
-  .acts { display:flex; align-items:center; gap:22px; margin-top:16px; flex-wrap:wrap; }
-  .acts .textlink { margin:0; }
-
-  @media (max-width:860px) {
-    .cover { grid-template-columns:1fr; min-height:0; }
-    .cover-photo { order:-1; border-left:0; }
-    .frame { min-height:min(58vh,500px); }
-    .ask { margin-top:34px; }
-    .field { flex-direction:column; align-items:stretch; }
-    .btn { width:100%; padding:14px; }
-  }
-
-  /* ---------- 확인 중 ---------- */
-  .working { margin-top:48px; max-width:600px; }
-  .working .q { margin:0 0 24px; padding-bottom:18px; border-bottom:1px solid var(--line); color:var(--mute); font-size:15px; white-space:pre-line; }
-  .working .q b { display:block; margin-bottom:4px; font:500 11px/1 var(--sans); letter-spacing:.3em; }
+  /* ---------- 공통 ---------- */
+  .kicker { font:600 14px/1 var(--serif); font-variant-numeric:lining-nums; letter-spacing:.22em; color:var(--mute); text-transform:uppercase; }
+  .btn { flex:none; padding:12px 22px; border:0; border-radius:var(--r); background:var(--olive); color:var(--on-olive); font-size:16px; font-weight:700; letter-spacing:-.01em; }
+  .btn:hover { filter:brightness(1.12); } .btn:disabled { opacity:.5; cursor:default; }
+  .textlink { padding:0; border:0; background:none; font-size:14px; color:var(--mute); text-decoration:underline; text-underline-offset:5px; text-decoration-color:var(--line-strong); text-align:left; }
+  .textlink:hover { color:var(--ink); text-decoration-color:var(--ink); } .textlink:disabled { cursor:default; text-decoration:none; }
+  .notice { margin:18px 0 0; font-size:14px; color:var(--ink); padding-left:14px; border-left:2px solid var(--ink); }
+  .dots { display:inline-flex; gap:3px; margin-right:8px; vertical-align:1px; }
+  .dots i { width:7px; height:7px; border-radius:50%; border:1px solid var(--ink); }
+  .dots i.on { background:var(--ink); } .dots.none i { border-color:var(--line-strong); }   /* 혼잡도 점은 먹색만 */
   .steps { list-style:none; margin:0; padding:0; }
   .steps li { display:flex; gap:14px; align-items:baseline; padding:9px 0; font-size:17px; letter-spacing:-.02em; animation:fade .5s ease both; }
   .steps li .ic { width:1.05em; height:1.05em; transform:translateY(3px); }
@@ -111,118 +88,194 @@
   @media (prefers-reduced-motion:reduce) { .steps li { animation:none; } }
   .mini .steps li { font-size:15px; padding:6px 0; }
 
-  /* ---------- 결과: 나만의 서울 산책 노트 ---------- */
-  .note { max-width:1280px; margin:0 auto; padding:clamp(36px,6vw,80px) var(--gutter) 0; }
-  .kicker { font:400 20px/1 var(--serif); font-variant-numeric:lining-nums; letter-spacing:.18em; color:var(--mute); text-transform:uppercase; }
-  .note h1 { margin:18px 0 0; font-weight:700; font-size:clamp(42px,7.4vw,108px); line-height:1.03; letter-spacing:-.045em; text-wrap:balance; }
-  .note h1:focus { outline:none; }
-  .sum { margin:22px 0 0; font-size:16px; color:var(--mute); }
-  /* MATE'S NOTE: 따옴표·카드 없이 작은 라벨 + 여백 + 얇은 구분선 */
-  .vibe { display:grid; grid-template-columns:132px minmax(0,40em); gap:8px 24px; margin-top:30px; padding-top:20px; border-top:1px solid var(--line); align-items:baseline; }
-  .vibe .mn-label { font:400 15px/1.9 var(--serif); letter-spacing:.2em; color:var(--mute); text-transform:uppercase; }
-  .vibe ul { display:flex; flex-wrap:wrap; margin:0; padding:0; list-style:none; font-size:20px; font-weight:700; letter-spacing:-.03em; }
-  .vibe li + li::before { content:""; display:inline-block; width:1px; height:.8em; margin:0 16px; background:var(--line-strong); vertical-align:-.05em; }
-  @media (max-width:640px) { .vibe { grid-template-columns:1fr; } }
-  .mates-note { display:grid; grid-template-columns:132px minmax(0,40em); gap:8px 24px; margin-top:30px; padding-top:20px; border-top:1px solid var(--line); }
-  .mates-note .mn-label { font:400 15px/1.9 var(--serif); letter-spacing:.2em; color:var(--mute); text-transform:uppercase; }
-  .mates-note p { margin:0; font-size:16px; line-height:1.85; }
-  @media (max-width:640px) { .mates-note { grid-template-columns:1fr; } }
-  .status { display:flex; flex-wrap:wrap; gap:6px 26px; margin-top:30px; padding:13px 0; border-top:1px solid var(--line-strong); border-bottom:1px solid var(--line); font-size:14px; font-weight:500; }
-  .status span { display:inline-flex; align-items:center; gap:7px; }
-  .status .ic { width:1.25em; height:1.25em; }
-  .body { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:clamp(32px,6vw,88px); padding:clamp(40px,6vw,72px) 0 clamp(48px,7vw,96px); align-items:start; }
-  .body.nomap { grid-template-columns:minmax(0,760px); }
-  .step { position:relative; display:grid; grid-template-columns:76px minmax(0,1fr); gap:clamp(14px,2.4vw,28px); padding-bottom:clamp(40px,5vw,64px); list-style:none; }
-  .step:last-child { padding-bottom:0; }
-  .rail { position:relative; }
-  .rail .n { font:300 clamp(48px,5.6vw,72px)/.9 var(--serif); font-variant-numeric:lining-nums; }
-  .rail::after { content:""; position:absolute; left:18px; top:clamp(64px,6.6vw,86px); bottom:calc(-1 * clamp(40px,5vw,64px) + 10px); width:1px; background:var(--line-strong); }
-  .step:last-child .rail::after { display:none; }
-  figure.ph { position:relative; margin:0; border-radius:var(--r); overflow:hidden; aspect-ratio:4/3; background:#e6e1d6; }
-  /* 모든 장소 사진을 표지 톤(따뜻하고 채도 낮게)으로 맞춘다 */
-  figure.ph img { width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.74) sepia(.16) contrast(.95) brightness(1.03); }
-  figure.ph::after { content:""; position:absolute; inset:0; background:#d8c7a8; mix-blend-mode:soft-light; opacity:.22; pointer-events:none; }
-  figure.ph.empty { aspect-ratio:16/5; }   /* 사진이 없으면 큰 빈 칸 대신 낮은 띠로 */
-  figure.ph .none { position:absolute; inset:0; display:grid; place-items:center; color:var(--mute); font-size:13px; }
-  .when { margin-top:18px; display:flex; align-items:baseline; gap:12px; }
-  .when .t { font:400 26px/1 var(--serif); font-variant-numeric:lining-nums; letter-spacing:.02em; }
-  .when .k { font-size:12px; letter-spacing:.16em; color:var(--mute); }
-  .step h3 { margin:6px 0 0; font-size:clamp(22px,2.4vw,28px); line-height:1.25; letter-spacing:-.035em; font-weight:700; }
-  .step p.why { margin:10px 0 0; font-size:16px; line-height:1.75; max-width:34em; }
-  .meta { margin:16px 0 0; padding:12px 0 0; border-top:1px solid var(--line); display:grid; grid-template-columns:max-content minmax(0,1fr); gap:5px 18px; font-size:13px; line-height:1.55; color:var(--mute); }
-  .meta dt { font-weight:500; color:var(--ink); }
-  .meta dd { margin:0; }
-  .dots { display:inline-flex; gap:3px; margin-right:8px; vertical-align:1px; }
-  .dots i { width:6px; height:6px; border-radius:50%; border:1px solid var(--ink); }
-  .dots i.on { background:var(--ink); }
-  .dots.none i { border-color:var(--line-strong); }
-  .mapcol { position:sticky; top:24px; }
-  #map { height:min(560px,70vh); border-radius:var(--r); overflow:hidden; background:#ebe9e3; border:1px solid var(--line); }
-  .leaflet-tile-pane { filter:grayscale(1) contrast(.9) brightness(1.07); }  /* 타일만 저채도 회색. 경로·핀은 올리브 그대로 */
-  .leaflet-container { font-family:var(--sans); }
-  .mapcap { margin:10px 0 0; font-size:12px; line-height:1.5; color:var(--mute); }
-  .pin { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--olive); color:#fff; font:700 14px/1 var(--sans); border:2px solid var(--paper); box-shadow:0 1px 3px rgba(0,0,0,.28); transition:transform .15s, box-shadow .15s; }
-  .leaflet-marker-icon { outline:none; }
-  .pin.on { transform:scale(1.2); box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--olive); }   /* 선택: 올리브 + 굵은 링 */
-  .leaflet-marker-icon:focus-visible .pin { box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }  /* 키보드 포커스 */
+  /* ---------- 01 코스 만들기 ---------- */
+  .course { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:clamp(24px,4vw,64px); padding:0; }
+  .cover-text { display:flex; flex-direction:column; justify-content:center; padding:clamp(20px,3vw,48px) 0 clamp(20px,3vw,48px) clamp(24px,4.5vw,72px); min-height:0; }
+  h1.lead { margin:18px 0 0; font-weight:700; font-size:clamp(32px,4.3vw,62px); line-height:1.1; letter-spacing:-.05em; text-wrap:balance; }
+  h1.lead .l1 { display:block; font-weight:300; color:var(--mute); }
+  .desc { margin:14px 0 0; font-size:15px; line-height:1.7; color:var(--mute); }
+  .ask { margin-top:clamp(16px,3vh,30px); max-width:580px; }
+  .field { display:flex; align-items:flex-end; gap:16px; border-bottom:1px solid var(--ink); padding-bottom:10px; }
+  .field textarea { flex:1; min-height:52px; resize:none; border:0; background:transparent; color:var(--ink); font:400 17px/1.55 var(--sans); letter-spacing:-.01em; padding:6px 0; }
+  .field textarea::placeholder { color:#6f7167; } .field textarea:focus { outline:none; }
+  .field:focus-within { border-bottom-width:2px; padding-bottom:9px; }
+  .moods { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .mood,.opt { padding:7px 14px; border:1px solid var(--line-strong); border-radius:var(--r); background:transparent; font-size:14px; letter-spacing:-.01em; }
+  .mood { padding:8px 15px; font-size:15px; }
+  .mood:hover,.opt:hover { border-color:var(--ink); }
+  .mood[aria-pressed="true"] { background:var(--olive); border-color:var(--olive); color:var(--on-olive); font-size:16px; font-weight:700; }
+  .opt[aria-pressed="true"] { border-color:var(--olive); background:var(--olive); color:var(--on-olive); font-weight:700; }
+  .sels { margin-top:14px; display:grid; gap:6px; }
+  .sel { display:grid; grid-template-columns:52px minmax(0,1fr); align-items:center; gap:10px; }
+  .sel-label { font-size:11px; font-weight:600; letter-spacing:.16em; color:var(--mute); }
+  .sel-opts { display:flex; flex-wrap:wrap; gap:6px; }
+  .sels .opt { padding:5px 11px; font-size:13px; }
+  .sel-note { margin:8px 0 0 62px; font-size:13px; color:var(--mute); }
+  .ask .textlink { display:block; margin-top:14px; }
+  .pick { margin-top:18px; padding-top:16px; border-top:1px solid var(--line); max-width:580px; }
+  .pick .k { font:600 16px/1 var(--serif); letter-spacing:.18em; color:var(--mute); text-transform:uppercase; }
+  .pick h3 { margin:10px 0 0; font-size:26px; line-height:1.25; letter-spacing:-.035em; }
+  .pick p { margin:8px 0 0; font-size:15px; color:var(--mute); }
+  .acts { display:flex; align-items:center; gap:22px; margin-top:14px; flex-wrap:wrap; }
+  .photo { position:relative; margin:clamp(24px,3.4vw,48px) clamp(24px,3.4vw,48px) clamp(34px,3.4vw,52px) 0; min-height:0; }
+  .frame { position:relative; height:100%; min-height:320px; overflow:hidden; border-radius:2px; box-shadow:0 1px 3px rgba(41,43,38,.25); background:#cfc8b8; }
+  .frame img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 0; }
+  .mast { position:absolute; z-index:2; left:clamp(18px,2.4vw,30px); top:clamp(16px,2.4vw,26px); color:var(--ink); }
+  .mast small { display:block; font:500 12px/1 var(--sans); letter-spacing:.34em; }
+  .mast .big { margin-top:8px; font:300 clamp(54px,7.2vw,110px)/.9 var(--serif); font-variant-numeric:lining-nums; letter-spacing:.03em; }
+  .caption { position:absolute; left:0; bottom:-26px; font-size:12px; line-height:1.4; color:var(--mute); }
+  .clip { position:absolute; top:-18px; right:26px; width:34px; height:84px; z-index:3; filter:drop-shadow(1px 2px 1.5px rgba(41,43,38,.3)); pointer-events:none; }   /* 소품 ① 클립: 먹색 가는 선 + 은은한 금속 하이라이트 */
 
-  /* 일정 ↔ 지도 연결: 좌표가 있는 장소만 선택할 수 있다 */
-  .stop-btn { margin:0; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; color:inherit; text-align:left; cursor:pointer; text-decoration:underline transparent 1px; text-underline-offset:6px; transition:text-decoration-color .15s; }
-  .stop-btn:focus-visible { outline:2px solid var(--olive); outline-offset:4px; border-radius:2px; }
-  .step.has-pos figure.ph { cursor:pointer; transition:outline-color .15s; outline:2px solid transparent; outline-offset:4px; }
-  .step.has-pos:hover .stop-btn { text-decoration-color:var(--ink); }
-  .step.sel .stop-btn { text-decoration-thickness:3px; text-decoration-color:var(--olive); }
-  .step.sel .rail .n { color:var(--olive); }
-  .step.sel .rail::after { background:var(--olive); width:2px; margin-left:-.5px; }
-  .step.sel figure.ph { outline-color:var(--olive); }
-  .to-map, .to-list { margin-top:12px; font-size:14px; }
-  .m-only { display:none; }
-  @media (max-width:900px) { .m-only { display:inline-block; } }
-  @media (prefers-reduced-motion:reduce) { .pin, .stop-btn, .step.has-pos figure.ph { transition:none; } }
-  .back { display:inline-block; margin-top:6px; padding:0; border:0; background:none; font-size:14px; text-decoration:underline; text-underline-offset:5px; }
-  @media (max-width:900px) { .body { grid-template-columns:1fr; } .mapcol { position:static; } .step { grid-template-columns:52px minmax(0,1fr); } .rail::after { left:12px; } }
-
-  /* ---------- 오늘의 서울: 잡지 목차 ---------- */
-  .today { border-top:1px solid var(--line); padding:clamp(48px,8vw,110px) var(--gutter); }
-  .today h2 { margin:12px 0 0; font-size:clamp(34px,5vw,64px); line-height:1.1; letter-spacing:-.045em; font-weight:700; }
-  .today-sub { margin:14px 0 0; font-size:15px; color:var(--mute); }
-  .today-cols { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(32px,6vw,96px); margin-top:clamp(28px,4vw,48px); max-width:1100px; }
-  .today-cols.one { grid-template-columns:minmax(0,520px); }
-  .toc h3 { margin:0; padding-bottom:12px; border-bottom:1px solid var(--ink); font-size:14px; font-weight:600; letter-spacing:-.01em; }
+  /* ---------- 02 오늘의 서울 ---------- */
+  .today h2 { margin:12px 0 0; font-size:clamp(34px,4.6vw,60px); line-height:1.1; letter-spacing:-.045em; font-weight:700; }
+  .today-sub { margin:12px 0 0; font-size:15px; color:var(--mute); }
+  .today-cols { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(28px,5vw,80px); margin-top:clamp(20px,4vh,40px); max-width:1000px; }
+  .today-cols.one { grid-template-columns:minmax(0,500px); }
+  .toc h3 { margin:0; padding-bottom:10px; border-bottom:1px solid var(--ink); font-size:14px; font-weight:600; }
   .toc ol { list-style:none; margin:0; padding:0; }
   .toc li { border-bottom:1px solid var(--line); }
-  .toc-row { display:grid; grid-template-columns:52px minmax(0,1fr) auto; align-items:baseline; gap:12px; width:100%; min-height:56px; padding:16px 0; border:0; background:none; text-align:left; cursor:pointer; }
-  .toc-row .no { font:300 32px/1 var(--serif); font-variant-numeric:lining-nums; }
-  .toc-row .nm { font-size:20px; font-weight:700; letter-spacing:-.03em; line-height:1.35; text-decoration:underline transparent 1px; text-underline-offset:6px; transition:text-decoration-color .15s; }
+  .toc-row { display:grid; grid-template-columns:96px minmax(0,1fr) auto; align-items:center; gap:16px; width:100%; min-height:56px; padding:12px 0; border:0; background:none; text-align:left; cursor:pointer; }
+  .toc-row .ttl2 { display:flex; align-items:baseline; gap:12px; min-width:0; }
+  .toc-row .no { font:300 30px/1 var(--serif); font-variant-numeric:lining-nums; }
+  .toc-row .nm { font-size:19px; font-weight:700; letter-spacing:-.03em; line-height:1.35; text-decoration:underline transparent 1px; text-underline-offset:6px; transition:text-decoration-color .15s; }
   .toc-row .lv { font-size:13px; color:var(--mute); white-space:nowrap; }
   .toc-row:hover .nm { text-decoration-color:var(--ink); }
   .toc-row:focus-visible { outline:2px solid var(--olive); outline-offset:2px; }
-  .toc-row.added .nm { text-decoration-color:var(--olive); text-decoration-thickness:3px; }   /* 입력창에 담은 곳: 올리브 */
-  .today-foot { margin:26px 0 0; font-size:12px; color:var(--mute); }
+  .toc-row.added .nm { text-decoration-color:var(--olive); text-decoration-thickness:3px; }
+  .th { position:relative; width:96px; height:68px; overflow:hidden; border-radius:2px; background:#e2ddd0; }
+  .th img { width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.85) sepia(.12); }
+  .th.none { display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--mute); border:1px solid var(--line); background:transparent; }
+  .today-foot { margin:22px 0 0; font-size:12px; color:var(--mute); }
   .today-added { margin:8px 0 0; min-height:1.5em; font-size:13px; color:var(--mute); }
-  @media (max-width:860px) { .today-cols { grid-template-columns:1fr; } .toc-row { grid-template-columns:44px minmax(0,1fr) auto; } }
+  .state { margin:clamp(24px,5vh,60px) 0 0; color:var(--mute); font-size:16px; }
   @media (prefers-reduced-motion:reduce) { .toc-row .nm { transition:none; } }
 
-  /* ---------- 서비스 소개 · 푸터 ---------- */
-  .about { border-top:1px solid var(--line); padding:clamp(48px,8vw,110px) var(--gutter); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.6fr); gap:clamp(28px,6vw,96px); scroll-margin-top:0; }
+  /* ---------- 03 산책 노트 ---------- */
+  .empty { min-height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:10px; color:var(--mute); }
+  .empty b { font-size:24px; color:var(--ink); letter-spacing:-.03em; }
+  .working { max-width:560px; margin:clamp(24px,8vh,90px) auto 0; }
+  .working .q { margin:0 0 24px; padding-bottom:18px; border-bottom:1px solid var(--line); color:var(--mute); font-size:15px; white-space:pre-line; }
+  .working .q b { display:block; margin-bottom:4px; font:500 11px/1 var(--sans); letter-spacing:.3em; }
+  .note-grid { display:grid; grid-template-columns:330px minmax(0,1fr); gap:clamp(24px,4vw,56px); align-items:start; }
+  /* 소품 ② 산책 영수증: 위아래 톱니, 점선, 고정폭 숫자 */
+  .receipt-wrap { filter:drop-shadow(0 1px 1.5px rgba(41,43,38,.28)) drop-shadow(0 6px 10px rgba(41,43,38,.08)); padding:10px 0; }
+  .receipt { position:relative; background:var(--paper); padding:0 22px 18px; font-family:var(--mono); font-size:13px; line-height:1.7; }
+  .receipt::before,.receipt::after { content:""; position:absolute; left:0; right:0; height:8px; background-size:16px 8px; background-position:-4px 0; }
+  .receipt::before { top:-7px; background-image:linear-gradient(135deg,var(--paper) 25%,transparent 25%),linear-gradient(225deg,var(--paper) 25%,transparent 25%); }
+  .receipt::after { bottom:-7px; background-image:linear-gradient(45deg,var(--paper) 25%,transparent 25%),linear-gradient(315deg,var(--paper) 25%,transparent 25%); }
+  .receipt .band { margin:0 -22px; padding:9px 22px; background:var(--tab-note); font-size:11px; font-weight:700; letter-spacing:.14em; }
+  .receipt .ttl { margin:14px 0 4px; font:700 15px/1.3 var(--sans); letter-spacing:-.02em; }
+  .receipt hr { border:0; border-top:1.5px dashed var(--line-strong); margin:10px 0; }
+  .receipt .r { display:flex; justify-content:space-between; gap:12px; font-variant-numeric:tabular-nums; }
+  .receipt .r span:first-child { color:var(--mute); }
+  .receipt .r b { font-weight:600; text-align:right; }
+  .receipt .thanks { margin-top:12px; text-align:center; letter-spacing:.22em; font-size:11px; font-weight:700; }
+  .vibe { margin-top:22px; display:grid; grid-template-columns:120px minmax(0,1fr); gap:6px 12px; align-items:baseline; }
+  .vibe .mn-label { font:600 14px/1.9 var(--serif); letter-spacing:.18em; color:var(--mute); }
+  .vibe ul { display:flex; flex-wrap:wrap; margin:0; padding:0; list-style:none; font-size:18px; font-weight:700; letter-spacing:-.03em; }
+  .vibe li + li::before { content:""; display:inline-block; width:1px; height:.8em; margin:0 14px; background:var(--line-strong); vertical-align:-.05em; }
+  .right h1 { margin:12px 0 0; font-weight:700; font-size:clamp(30px,3.6vw,48px); line-height:1.1; letter-spacing:-.045em; text-wrap:balance; }
+  .right h1:focus { outline:none; }
+  .sum { margin:12px 0 0; font-size:15px; color:var(--mute); }
+  .mates-note { display:grid; grid-template-columns:132px minmax(0,40em); gap:8px 24px; margin-top:22px; padding-top:16px; border-top:1px solid var(--line); }
+  .mates-note .mn-label { font:600 14px/1.9 var(--serif); letter-spacing:.2em; color:var(--mute); text-transform:uppercase; }
+  .mates-note p { margin:0; font-size:16px; line-height:1.85; }
+  .timeline { margin:20px 0 0; padding:0; }
+  .step { position:relative; display:grid; grid-template-columns:54px 200px minmax(0,1fr); gap:6px 18px; padding:18px 0; border-top:1px solid var(--line); align-items:start; list-style:none; }
+  .rail .n { font:300 34px/1 var(--serif); font-variant-numeric:lining-nums; }
+  figure.ph { position:relative; margin:0; width:200px; height:132px; border-radius:2px; overflow:hidden; background:#e2ddd0; }
+  figure.ph img { width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.8) sepia(.14) contrast(.96) brightness(1.03); }   /* 모든 사진에 같은 톤 */
+  figure.ph.empty { height:44px; border:1px solid var(--line); background:transparent; }   /* 사진이 없으면 큰 빈 칸 대신 낮은 띠로 */
+  figure.ph .none { position:absolute; inset:0; display:grid; place-items:center; color:var(--mute); font-size:12px; }
+  .when { display:flex; align-items:baseline; gap:12px; }
+  .when .t { font:500 13px/1 var(--mono); color:var(--mute); }
+  .when .k { font-size:12px; letter-spacing:.16em; color:var(--mute); }
+  .step h3 { margin:4px 0 0; font-size:clamp(19px,2vw,24px); line-height:1.25; letter-spacing:-.035em; font-weight:700; }
+  .step p.why { margin:8px 0 0; font-size:15px; line-height:1.75; max-width:34em; }
+  .meta { margin:12px 0 0; padding:10px 0 0; border-top:1px solid var(--line); display:grid; grid-template-columns:max-content minmax(0,1fr); gap:4px 16px; font-size:13px; line-height:1.55; color:var(--mute); }
+  .meta dt { font-weight:500; color:var(--ink); } .meta dd { margin:0; }
+  .mapcol { margin-top:22px; }
+  #map { height:260px; border-radius:2px; overflow:hidden; background:#e4e0d5; border:1px solid var(--line-strong); }
+  .leaflet-tile-pane { filter:grayscale(1) contrast(.9) brightness(1.07); }   /* 타일만 저채도 회색. 경로·핀은 먹색·딥 올리브 */
+  .leaflet-container { font-family:var(--sans); }
+  .mapcap { margin:10px 0 0; font-size:12px; line-height:1.5; color:var(--mute); }
+  .pin { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--olive); color:var(--on-olive); font:700 14px/1 var(--sans); border:2px solid var(--paper); box-shadow:0 1px 3px rgba(0,0,0,.28); transition:transform .15s, box-shadow .15s; }
+  .leaflet-marker-icon { outline:none; }
+  .pin.on { transform:scale(1.2); box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--olive); }
+  .leaflet-marker-icon:focus-visible .pin { box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
+  .stop-btn { margin:0; padding:0; border:0; background:none; font:inherit; letter-spacing:inherit; color:inherit; text-align:left; cursor:pointer; text-decoration:underline transparent 1px; text-underline-offset:6px; transition:text-decoration-color .15s; }
+  .stop-btn:focus-visible { outline:2px solid var(--olive); outline-offset:4px; border-radius:2px; }
+  .step.has-pos figure.ph { cursor:pointer; outline:2px solid transparent; outline-offset:4px; transition:outline-color .15s; }
+  .step.has-pos:hover .stop-btn { text-decoration-color:var(--ink); }
+  .step.sel .stop-btn { text-decoration-thickness:3px; text-decoration-color:var(--olive); }
+  .step.sel .rail .n { color:var(--olive); }
+  .step.sel figure.ph { outline-color:var(--olive); }
+  .to-map,.to-list { margin-top:10px; font-size:14px; }
+  .m-only { display:none; }
+  @media (prefers-reduced-motion:reduce) { .pin,.stop-btn,.step.has-pos figure.ph { transition:none; } }
+  /* 소품 ③ 서울 엽서 + 우표 도장 */
+  .lower { margin-top:clamp(28px,4vw,48px); padding-top:22px; border-top:1px solid var(--line-strong); max-width:640px; }
+  .lower h3 { margin:0 0 14px; font:600 14px var(--serif); letter-spacing:.24em; text-transform:uppercase; color:var(--mute); }
+  .card { position:relative; min-height:220px; padding:22px; background:#FBF8F1; border:1px solid var(--line-strong); box-shadow:0 1px 2px rgba(41,43,38,.12); }
+  .card .msg { max-width:56%; font-size:14px; line-height:1.8; }
+  .card .adr { position:absolute; left:22px; right:22px; bottom:18px; border-top:1px solid var(--line); padding-top:8px; font:12px var(--mono); color:var(--mute); }
+  .stamp { position:absolute; top:14px; right:16px; width:92px; height:112px; padding:7px; background:radial-gradient(circle at 0 0, transparent 3.5px, var(--tab-note) 4px) -6px -6px/12px 12px; }
+  .stamp .in { height:100%; background:var(--tab-note); border:1px solid rgba(77,89,63,.55); outline:3px solid var(--tab-note); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--olive); }
+  .stamp .in b { font:600 11px var(--sans); letter-spacing:.2em; }
+  .stamp svg { width:34px; height:46px; }
+  .postmark { position:absolute; top:70px; right:54px; width:86px; height:86px; color:var(--olive); opacity:.62; transform:rotate(-12deg); pointer-events:none; }
+  .lower .btn { margin-top:12px; padding:9px 16px; font-size:14px; }
+  .srcnote { margin:clamp(28px,4vw,48px) 0 0; font-size:12px; line-height:1.7; color:var(--mute); }
+  .back { margin-top:18px; }
+
+  /* ---------- 소개 ---------- */
+  .about { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.6fr); gap:clamp(28px,6vw,96px); }
   .about h2 { margin:0; font-size:clamp(26px,3vw,40px); line-height:1.25; letter-spacing:-.035em; font-weight:700; }
   .about ol { list-style:none; margin:0; padding:0; }
-  .about li { display:grid; grid-template-columns:64px 1fr; gap:16px; padding:22px 0; border-top:1px solid var(--line); }
+  .about li { display:grid; grid-template-columns:64px 1fr; gap:16px; padding:20px 0; border-top:1px solid var(--line); }
   .about li:last-child { border-bottom:1px solid var(--line); }
   .about li .n { font:300 40px/1 var(--serif); font-variant-numeric:lining-nums; }
   .about li b { display:block; font-size:17px; letter-spacing:-.02em; }
   .about li span { color:var(--mute); font-size:15px; }
-  @media (max-width:860px) { .about { grid-template-columns:1fr; } }
-  .foot { border-top:1px solid var(--line); padding:22px var(--gutter) 40px; font-size:12px; line-height:1.7; color:var(--mute); }
+  .foot { margin:28px 0 0; font-size:12px; line-height:1.7; color:var(--mute); }
+
+  /* ---------- 모바일: 가로 인덱스 탭, 파일은 화면 폭 전체 ---------- */
+  @media (max-width:900px) {
+    .note-grid { grid-template-columns:1fr; }
+    .m-only { display:inline-block; }
+    .step { grid-template-columns:44px minmax(0,1fr); } .step figure.ph { grid-column:2; width:100%; height:170px; } .step figure.ph.empty { height:44px; } .step .col { grid-column:2; }
+    .about { grid-template-columns:1fr; }
+  }
+  @media (max-width:760px) {
+    .top { height:46px; }
+    .binder { margin:0; padding:0; display:flex; flex-direction:column; }
+    .tabs { order:-1; position:static; width:auto; flex:none; flex-direction:row; overflow-x:auto; padding:0 12px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .tabs::-webkit-scrollbar { display:none; }
+    .tab { width:auto; flex:1 0 auto; min-width:104px; height:44px; margin:0 -6px 0 0; padding:0 18px; border:1px solid rgba(41,43,38,.22); border-bottom:0; border-radius:9px 9px 0 0; flex-direction:row; justify-content:center; align-items:center; gap:8px; box-shadow:none; }
+    .tab:hover,.tab[aria-selected="true"] { width:auto; margin-left:0; }
+    .tab .tx { writing-mode:horizontal-tb; letter-spacing:0; }
+    .tab[aria-selected="true"] { height:48px; margin-top:-4px; }
+    .kbd .tabs { display:none; }   /* 입력 중 키보드가 올라오면 탭을 숨긴다 */
+    .stack { flex:1; min-height:0; } .stack::before,.stack::after { display:none; }
+    .sheet { border-radius:0; transform:translateX(18px); }
+    .scroll { padding:20px 18px 28px; }
+    .course { display:block; padding:0; }
+    .cover-text { padding:20px 18px 8px; justify-content:flex-start; }
+    h1.lead { font-size:34px; } .field { gap:10px; } .btn { padding:11px 16px; }
+    .photo { margin:14px 18px 34px; height:160px; } .frame { min-height:0; } .clip { right:18px; top:-16px; width:28px; height:70px; }
+    .mast .big { font-size:48px; }
+    .today-cols { grid-template-columns:1fr; gap:26px; }
+    .toc-row { grid-template-columns:84px minmax(0,1fr); } .toc-row .lv { grid-column:2; } .th { width:84px; }
+    .sel { grid-template-columns:1fr; gap:4px; } .sel-note { margin-left:0; }
+    .vibe { grid-template-columns:1fr; } .mates-note { grid-template-columns:1fr; }
+    .card .msg { max-width:100%; padding-top:112px; }
+    .receipt-wrap { max-width:420px; }
+  }
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
-  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
-  <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 14.5a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 5a4.75 4.75 0 0 1 .5 9.5H7z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/></symbol>
-  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1.5A4.5 4.5 0 0 1 7.5 14h3A4.5 4.5 0 0 1 15 18.5V20M16 5.2a3 3 0 0 1 0 5.6M18 14.3A4.5 4.5 0 0 1 21 18.5V20"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 </defs></svg>
 
 <header class="top">
@@ -230,130 +283,176 @@
     <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M3 12c5-.5 8-3 11-7 3 4 6 6.5 11 7"/><path d="M6 13v9h16v-9"/><path d="M12 22v-5h4v5"/></svg>
     서울 메이트
   </button>
-  <nav><a href="#about">서비스 소개</a></nav>
+  <a class="about-link" id="about-link" href="#about">소개</a>
 </header>
 
-<main>
-  <!-- 첫 화면: 잡지 표지 -->
-  <div id="front">
-  <section class="cover" id="home">
-    <div class="cover-text">
-      <h1 class="lead"><span class="l1">오늘은,</span>어떤 서울을 걸을까요?</h1>
-      <p class="desc">날씨와 붐빔을 살펴, 지금 당신에게 어울리는 코스를 찾아요.</p>
+<main class="binder" id="binder">
+  <div class="stack" id="stack">
 
-      <div id="askwrap">
-        <form class="ask" id="form">
-          <div class="field">
-            <label class="sr" for="q">어떤 코스를 원하는지 적어 주세요</label>
-            <textarea id="q" rows="2" maxlength="500" placeholder="어디서 출발하고, 어떤 시간을 보내고 싶나요?"></textarea>
-            <button class="btn" id="go" type="submit">코스 찾기</button>
-          </div>
-          <div class="moods" role="group" aria-label="분위기 고르기">
-            <button type="button" class="mood" aria-pressed="false">조용한 오후</button>
-            <button type="button" class="mood" aria-pressed="false">비 오는 날</button>
-            <button type="button" class="mood" aria-pressed="false">전시와 커피</button>
-          </div>
-          <div class="sels">
-            <div class="sel" data-key="with">
-              <span class="sel-label" id="pk-with">WITH</span>
-              <div class="sel-opts" role="group" aria-labelledby="pk-with">
-              <button type="button" class="opt" aria-pressed="false">혼자</button>
-              <button type="button" class="opt" aria-pressed="false">친구와</button>
-              <button type="button" class="opt" aria-pressed="false">연인과</button>
-              <button type="button" class="opt" aria-pressed="false">가족과</button>
+    <!-- 01 코스 만들기 -->
+    <section class="sheet on" data-k="course" id="p-course" role="tabpanel" aria-labelledby="t-course">
+      <div class="scroll course">
+        <div class="cover-text">
+          <div class="kicker">Seoul Mate · 01 Course</div>
+          <h1 class="lead"><span class="l1">오늘은,</span>어떤 서울을 걸을까요?</h1>
+          <p class="desc">날씨와 붐빔을 살펴, 지금 당신에게 어울리는 코스를 찾아요.</p>
+          <form class="ask" id="form">
+            <div class="field">
+              <label class="sr" for="q">어떤 코스를 원하는지 적어 주세요</label>
+              <textarea id="q" rows="2" maxlength="500" placeholder="어디서 출발하고, 어떤 시간을 보내고 싶나요?"></textarea>
+              <button class="btn" id="go" type="submit">코스 찾기</button>
+            </div>
+            <div class="moods" role="group" aria-label="분위기 고르기">
+              <button type="button" class="mood" aria-pressed="false">조용한 오후</button>
+              <button type="button" class="mood" aria-pressed="false">비 오는 날</button>
+              <button type="button" class="mood" aria-pressed="false">전시와 커피</button>
+            </div>
+            <div class="sels">
+              <div class="sel" data-key="with">
+                <span class="sel-label" id="pk-with">WITH</span>
+                <div class="sel-opts" role="group" aria-labelledby="pk-with">
+                  <button type="button" class="opt" aria-pressed="false">혼자</button>
+                  <button type="button" class="opt" aria-pressed="false">친구와</button>
+                  <button type="button" class="opt" aria-pressed="false">연인과</button>
+                  <button type="button" class="opt" aria-pressed="false">가족과</button>
+                </div>
+              </div>
+              <div class="sel" data-key="when">
+                <span class="sel-label" id="pk-when">WHEN</span>
+                <div class="sel-opts" role="group" aria-labelledby="pk-when">
+                  <button type="button" class="opt" aria-pressed="false">오늘</button>
+                  <button type="button" class="opt" aria-pressed="false">내일</button>
+                  <button type="button" class="opt" aria-pressed="false">주말</button>
+                </div>
+              </div>
+              <div class="sel" data-key="time">
+                <span class="sel-label" id="pk-time">TIME</span>
+                <div class="sel-opts" role="group" aria-labelledby="pk-time">
+                  <button type="button" class="opt" aria-pressed="false">오전</button>
+                  <button type="button" class="opt" aria-pressed="false">오후</button>
+                  <button type="button" class="opt" aria-pressed="false">저녁</button>
+                </div>
               </div>
             </div>
-            <div class="sel" data-key="when">
-              <span class="sel-label" id="pk-when">WHEN</span>
-              <div class="sel-opts" role="group" aria-labelledby="pk-when">
-              <button type="button" class="opt" aria-pressed="false">오늘</button>
-              <button type="button" class="opt" aria-pressed="false">내일</button>
-              <button type="button" class="opt" aria-pressed="false">주말</button>
-              </div>
+            <p class="sel-note" id="pick-note" role="status" hidden>내일·주말 날씨는 기상청 예보로 살펴보고, 붐빔은 지금 기준이에요.</p>
+            <button type="button" class="textlink" id="gacha-link">아직 모르겠다면, 오늘의 산책지를 골라드릴까요?</button>
+          </form>
+          <div class="mini" id="gacha-out" aria-live="polite"></div>
+          <p class="notice" id="notice" role="status" hidden></p>
+        </div>
+        <aside class="photo">
+          <svg class="clip" viewBox="0 0 34 84" fill="none" aria-hidden="true">
+            <path d="M24 30V64a8 8 0 0 1-16 0V16a10 10 0 0 1 20 0V60a5 5 0 0 1-10 0V26" stroke="#292B26" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M24 30V64a8 8 0 0 1-16 0V16a10 10 0 0 1 20 0V60a5 5 0 0 1-10 0V26" stroke="#FFFFFF" stroke-opacity=".5" stroke-width=".9" stroke-linecap="round" transform="translate(-.9 -.4)"/>
+          </svg>
+          <div class="frame">
+            <div class="mast"><small>SEOUL MATE</small><div class="big">SEOUL</div></div>
+            <img id="cover-img" alt="">
+          </div>
+          <div class="caption" id="cover-cap"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 02 오늘의 서울: 질문하기 전에도 볼 수 있는 실시간 지면 -->
+    <section class="sheet" data-k="today" id="p-today" role="tabpanel" aria-labelledby="t-today">
+      <div class="scroll today" id="today">
+        <div class="kicker">Today in Seoul · 02</div>
+        <h2 id="today-title">오늘의 서울</h2>
+        <p class="today-sub">지금 서울을 살펴봤어요. 장소를 누르면 입력창에 담아 드려요. 사진은 한국관광공사 자료이고, 없는 곳은 비워 둬요.</p>
+        <p class="state" id="today-state" role="status">오늘의 서울을 살펴보는 중이에요.</p>
+        <div class="today-cols" id="today-cols" hidden>
+          <div class="toc" id="toc-calm" hidden><h3>지금 한산한 곳</h3><ol></ol></div>
+          <div class="toc" id="toc-busy" hidden><h3>지금 붐비는 곳</h3><ol></ol></div>
+        </div>
+        <p class="today-foot" id="today-foot"></p>
+        <p class="today-added" id="today-added" role="status"></p>
+      </div>
+    </section>
+
+    <!-- 03 산책 노트: 빈 상태 · 확인 중 · 결과 -->
+    <section class="sheet" data-k="note" id="p-note" role="tabpanel" aria-labelledby="t-note">
+      <div class="scroll note" id="note-scroll">
+        <div class="empty" id="note-empty"><b>아직 펼쳐 본 산책이 없어요</b><span>01 코스 만들기에서 질문을 보내면 이곳에 산책 노트가 펼쳐져요.</span></div>
+        <div class="working" id="working" hidden aria-live="polite">
+          <p class="q"><b>QUESTION</b><span id="working-q"></span></p>
+          <ul class="steps" id="steps"></ul>
+        </div>
+        <article id="result" hidden>
+          <div class="note-grid">
+            <div>
+              <div class="receipt-wrap"><div class="receipt" id="receipt">
+                <div class="band">SEOUL MATE · WALKING RECEIPT</div>
+                <div class="ttl" id="receipt-title"></div>
+                <hr>
+                <div id="receipt-stops"></div>
+                <hr>
+                <div id="receipt-info"></div>
+                <hr>
+                <div class="thanks">THANK YOU FOR WALKING</div>
+              </div></div>
+              <section class="vibe" id="vibe" aria-label="오늘의 분위기" hidden>
+                <div class="mn-label">오늘의 분위기</div>
+                <ul id="vibe-list"></ul>
+              </section>
             </div>
-            <div class="sel" data-key="time">
-              <span class="sel-label" id="pk-time">TIME</span>
-              <div class="sel-opts" role="group" aria-labelledby="pk-time">
-              <button type="button" class="opt" aria-pressed="false">오전</button>
-              <button type="button" class="opt" aria-pressed="false">오후</button>
-              <button type="button" class="opt" aria-pressed="false">저녁</button>
-              </div>
+            <div class="right">
+              <div class="kicker">Walking Note · <span id="date"></span></div>
+              <h1 id="note-title" tabindex="-1"></h1>
+              <p class="sum" id="sum"></p>
+              <section class="mates-note" id="mates-note" aria-label="이 코스를 고른 이유" hidden>
+                <div class="mn-label">Mate's Note</div>
+                <p id="mn-text"></p>
+              </section>
+              <ol class="timeline" id="timeline"></ol>
+              <aside class="mapcol" id="mapcol">
+                <div id="map" role="img" aria-label="코스 경로 지도"></div>
+                <p class="mapcap">지도 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors · 장소를 직선으로 이은 경로예요(실제 도보 경로와 다를 수 있어요).<span id="map-miss"></span></p>
+                <button class="textlink to-list m-only" id="to-list" type="button">일정으로 돌아가기</button>
+              </aside>
             </div>
           </div>
-          <p class="sel-note" id="pick-note" role="status" hidden>내일·주말 날씨는 기상청 예보로 살펴보고, 붐빔은 지금 기준이에요.</p>
-          <button type="button" class="textlink" id="gacha-link">아직 모르겠다면, 오늘의 산책지를 골라드릴까요?</button>
-        </form>
-        <div class="mini" id="gacha-out" aria-live="polite"></div>
-        <p class="notice" id="notice" role="status" hidden></p>
+          <section class="lower" aria-label="서울 엽서">
+            <h3>서울 엽서</h3>
+            <div class="card" id="card">
+              <div class="msg" id="card-msg"></div>
+              <div class="stamp" aria-hidden="true"><div class="in"><svg viewBox="0 0 34 46" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2v9M15 11h4M13 16l4-5 4 5M12 16h10l-1 6H13zM13 22l-3 14M21 22l3 14M10 36h14M14 28h6M12 36v4M22 36v4M7 44h20"/></svg><b>SEOUL MATE</b></div></div>
+              <svg class="postmark" viewBox="0 0 90 90" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="45" cy="45" r="42" stroke-width="2"/><circle cx="45" cy="45" r="30" stroke-width="1.2"/><defs><path id="arc" d="M45 45m-36 0a36 36 0 1 1 72 0"/></defs><text font-size="8.5" font-weight="700" letter-spacing="2" fill="currentColor" stroke="none"><textPath href="#arc" startOffset="50%" text-anchor="middle">SEOUL · KOREA</textPath></text><text id="pm-year" x="45" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor" stroke="none"></text><text id="pm-day" x="45" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor" stroke="none"></text></svg>
+              <div class="adr">TO. 나에게 &nbsp;·&nbsp; FROM. SEOUL MATE</div>
+            </div>
+            <button class="btn" id="save-card" type="button">엽서 저장하기 (PNG)</button>
+          </section>
+          <p class="srcnote">날씨·혼잡도는 서울시 실시간 도시데이터의 조회 시점 값이며, 방문 시간대와 다를 수 있어요. 내일·주말 날씨는 기상청 단기예보입니다. 장소 정보와 사진은 한국관광공사에서 제공합니다. 확인하지 못한 정보는 지어내지 않고 “정보 없음”으로 표시합니다.</p>
+          <button class="textlink back" id="back" type="button">← 새 코스 만들기</button>
+        </article>
       </div>
+    </section>
 
-      <div class="working" id="working" hidden aria-live="polite">
-        <p class="q"><b>QUESTION</b><span id="working-q"></span></p>
-        <ul class="steps" id="steps"></ul>
+    <!-- 소개: 탭이 아니라 로고 옆 작은 링크로 여는 지면 -->
+    <section class="sheet" data-k="about" id="p-about" role="region" aria-label="서비스 소개">
+      <div class="scroll">
+        <div class="about" id="about">
+          <h2>서울을 잘 아는 친구가<br>건네는 산책 코스.</h2>
+          <ol>
+            <li><span class="n">01</span><div><b>지금을 확인해요</b><span>서울시 실시간 도시데이터로 날씨와 지역 혼잡도를 그때그때 살펴봅니다.</span></div></li>
+            <li><span class="n">02</span><div><b>걷기 좋은 순서로 엮어요</b><span>확인한 정보를 바탕으로, 붐비는 곳은 피해 시간순 코스를 제안합니다.</span></div></li>
+          </ol>
+        </div>
+        <footer class="foot">
+          날씨·혼잡도는 서울시 실시간 도시데이터의 조회 시점 값이며, 방문 시간대와 다를 수 있어요. 장소 정보와 사진은 한국관광공사에서 제공합니다.
+          확인하지 못한 정보는 지어내지 않고 “정보 없음”으로 표시합니다.
+        </footer>
+        <button class="textlink back" id="about-close" type="button">← 돌아가기</button>
       </div>
-    </div>
-
-    <aside class="cover-photo">
-      <div class="frame">
-        <div class="mast"><small>SEOUL MATE</small><div class="big">SEOUL</div></div>
-        <img id="cover-img" alt="">
-      </div>
-      <div class="caption" id="cover-cap"></div>
-    </aside>
-  </section>
-
-  <!-- 오늘의 서울: 질문하기 전에도 볼 수 있는 실시간 지면. 데이터를 받지 못하면 영역째 숨긴다 -->
-  <section class="today" id="today" aria-labelledby="today-title" hidden>
-    <div class="kicker">Today in Seoul</div>
-    <h2 id="today-title">오늘의 서울</h2>
-    <p class="today-sub">지금 서울을 살펴봤어요. 장소를 누르면 입력창에 담아 드려요.</p>
-    <div class="today-cols" id="today-cols">
-      <div class="toc" id="toc-calm" hidden><h3>지금 한산한 곳</h3><ol></ol></div>
-      <div class="toc" id="toc-busy" hidden><h3>지금 붐비는 곳</h3><ol></ol></div>
-    </div>
-    <p class="today-foot" id="today-foot"></p>
-    <p class="today-added" id="today-added" role="status"></p>
-  </section>
+    </section>
   </div>
 
-  <!-- 결과: 나만의 서울 산책 노트 -->
-  <article class="note" id="result" hidden>
-    <div class="kicker">Walking Note · <span id="date"></span></div>
-    <h1 id="note-title" tabindex="-1"></h1>
-    <p class="sum" id="sum"></p>
-    <section class="vibe" id="vibe" aria-label="오늘의 분위기" hidden>
-      <div class="mn-label">오늘의 분위기</div>
-      <ul id="vibe-list"></ul>
-    </section>
-    <section class="mates-note" id="mates-note" aria-label="이 코스를 고른 이유" hidden>
-      <div class="mn-label">Mate's Note</div>
-      <p id="mn-text"></p>
-    </section>
-    <div class="status" id="status"></div>
-    <div class="body" id="body">
-      <ol id="timeline" style="margin:0;padding:0"></ol>
-      <aside class="mapcol" id="mapcol">
-        <div id="map" role="img" aria-label="코스 경로 지도"></div>
-        <p class="mapcap">지도 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors · 장소를 직선으로 이은 경로예요(실제 도보 경로와 다를 수 있어요).<span id="map-miss"></span></p>
-        <button class="textlink to-list m-only" id="to-list" type="button">일정으로 돌아가기</button>
-        <button class="back" id="back" type="button">← 다른 산책 찾아보기</button>
-      </aside>
-    </div>
-  </article>
-
-  <section class="about" id="about">
-    <h2>서울을 잘 아는 친구가<br>건네는 산책 코스.</h2>
-    <ol>
-      <li><span class="n">01</span><div><b>지금을 확인해요</b><span>서울시 실시간 도시데이터로 날씨와 지역 혼잡도를 그때그때 살펴봅니다.</span></div></li>
-      <li><span class="n">02</span><div><b>걷기 좋은 순서로 엮어요</b><span>확인한 정보를 바탕으로, 붐비는 곳은 피해 시간순 코스를 제안합니다.</span></div></li>
-    </ol>
-  </section>
+  <div class="tabs" id="tabs" role="tablist" aria-label="파일 탭" aria-orientation="vertical">
+    <button class="tab" role="tab" id="t-course" data-k="course" aria-controls="p-course" aria-selected="true" style="--c:var(--tab-course)"><span class="no">01</span><span class="tx">코스 만들기</span></button>
+    <button class="tab" role="tab" id="t-today" data-k="today" aria-controls="p-today" aria-selected="false" tabindex="-1" style="--c:var(--tab-today)"><span class="no">02</span><span class="tx">오늘의 서울</span></button>
+    <button class="tab" role="tab" id="t-note" data-k="note" aria-controls="p-note" aria-selected="false" tabindex="-1" style="--c:var(--tab-note)"><span class="no">03</span><span class="tx">산책 노트</span></button>
+  </div>
 </main>
-
-<footer class="foot">
-  날씨·혼잡도는 서울시 실시간 도시데이터의 조회 시점 값이며, 방문 시간대와 다를 수 있어요. 장소 정보와 사진은 한국관광공사에서 제공합니다.
-  확인하지 못한 정보는 지어내지 않고 “정보 없음”으로 표시합니다.
-</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
@@ -364,6 +463,7 @@ const COVER = { src: '/static/images/cover.jpg', place: '북촌', season: '가�
 // 지도 타일: OpenStreetMap 타일에 CSS(.leaflet-tile-pane)로 저채도 회색 톤을 입힌다.
 const TILES = { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxZoom: 19 };
 const FALLBACK_TITLE = '나만의 서울 산책 노트';
+const COLORS = { ink: '#292B26', paper: '#FBF8F1', olive: '#4D593F', lilac: '#C5B8CD', mute: '#5E6057' };   // 캔버스(PNG)용. CSS 변수와 같은 값
 
 const $ = (id) => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -371,10 +471,55 @@ const NS = 'http://www.w3.org/2000/svg';
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const icon = (name) => { const s = document.createElementNS(NS, 'svg'); s.setAttribute('class', 'ic'); const u = document.createElementNS(NS, 'use'); u.setAttribute('href', '#i-' + name); s.append(u); return s; };
 const pad2 = (n) => String(n).padStart(2, '0');
+const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- 표지 ----------
 $('cover-img').src = COVER.src; $('cover-img').alt = COVER.alt;
 $('cover-cap').textContent = [COVER.place, COVER.season, COVER.credit].join(' · ');
+
+// ---------- 파일철: 탭 전환 · 해시 · 키보드 · 스와이프 ----------
+const FILES = ['course', 'today', 'note'];
+let curFile = 'course', lastFile = 'course';
+function showFile(k, opt = {}) {
+  if (!FILES.includes(k) && k !== 'about') k = 'course';
+  if (k !== 'about') lastFile = k;
+  curFile = k;
+  document.querySelectorAll('.sheet').forEach(s => s.classList.toggle('on', s.dataset.k === k));
+  document.querySelectorAll('.tab').forEach(t => { const on = t.dataset.k === k; t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on || (k === 'about' && t.dataset.k === lastFile) ? 0 : -1; if (on && opt.focus) t.focus(); });
+  if (location.hash.slice(1) !== k) history.replaceState(null, '', '#' + k);   // 새로고침해도 같은 파일이 열린다
+  if (k === 'note' && map) setTimeout(() => map && map.invalidateSize(), 320);
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showFile(t.dataset.k)));
+$('tabs').addEventListener('keydown', (e) => {   // 화살표(좌우·상하)로 탭 이동
+  const i = FILES.indexOf(e.target.closest('.tab')?.dataset.k); if (i < 0) return;
+  const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+  if (e.key === 'Home') { e.preventDefault(); showFile(FILES[0], { focus: true }); }
+  else if (e.key === 'End') { e.preventDefault(); showFile(FILES[FILES.length - 1], { focus: true }); }
+  else if (step) { e.preventDefault(); showFile(FILES[(i + step + FILES.length) % FILES.length], { focus: true }); }
+});
+window.addEventListener('hashchange', () => showFile(location.hash.slice(1)));
+$('about-link').addEventListener('click', (e) => { e.preventDefault(); showFile('about'); });
+$('about-close').addEventListener('click', () => showFile(lastFile));
+$('home-btn').addEventListener('click', () => showFile('course'));
+$('back').addEventListener('click', () => { showFile('course'); q.focus(); });
+// 모바일: 탭이 가로로 놓인다
+const mobileMQ = window.matchMedia('(max-width: 760px)');
+const syncOrientation = () => $('tabs').setAttribute('aria-orientation', mobileMQ.matches ? 'horizontal' : 'vertical');
+mobileMQ.addEventListener('change', syncOrientation); syncOrientation();
+// 모바일: 파일을 좌우로 밀어서 넘긴다(지도·입력창 위의 가로 제스처는 넘기지 않는다)
+let sx = null, sy = null, swipeOk = true;
+$('stack').addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; swipeOk = !e.target.closest('#map, textarea, .tabs'); }, { passive: true });
+$('stack').addEventListener('touchend', (e) => {
+  if (sx == null || !mobileMQ.matches || !swipeOk || curFile === 'about') { sx = null; return; }
+  const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { const i = FILES.indexOf(curFile); showFile(FILES[Math.max(0, Math.min(FILES.length - 1, i + (dx < 0 ? 1 : -1)))]); }
+});
+// 모바일: 입력 중 키보드가 올라오면(보이는 화면 높이가 크게 줄면) 탭을 숨긴다
+if (window.visualViewport) {
+  const vv = window.visualViewport;
+  const sync = () => document.body.classList.toggle('kbd', mobileMQ.matches && vv.height < window.innerHeight * 0.75);
+  vv.addEventListener('resize', sync); window.addEventListener('orientationchange', sync);
+}
 
 // ---------- SSE ----------
 async function stream(url, body, onEvent) {
@@ -437,8 +582,12 @@ function compose() {
   return ((q.value.trim() || '오늘 서울 어디 갈까?').slice(0, 500 - t.length) + t).slice(0, 500);
 }
 
+// 03 산책 노트의 세 가지 상태: empty(아직 없음) · working(확인 중) · result. 오류는 01로 돌아가 안내한다.
+function setNote(state) {
+  $('note-empty').hidden = state !== 'empty'; $('working').hidden = state !== 'working'; $('result').hidden = state !== 'result';
+  $('note-scroll').scrollTop = 0;
+}
 function setBusy(busy, message) {
-  $('askwrap').hidden = busy; $('working').hidden = !busy;
   $('go').disabled = busy;
   const n = $('notice'); n.hidden = !message; n.textContent = message || '';
 }
@@ -447,9 +596,10 @@ const chatProgress = makeProgress($('steps'), ['오늘의 서울을 천천히 �
 $('form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const message = compose();
-  $('working-q').textContent = message.replace(/\n\(실시간[^\n]*\)$/, '');   // 모델에게만 가는 안내 문장은 화면에 보이지 않는다
-  setBusy(true); chatProgress.start();
+  $('working-q').textContent = message.replace(/\n\(내일·주말 날씨는 get_forecast[^\n]*\)$/, '');   // 모델에게만 가는 안내 문장은 화면에 보이지 않는다
+  setBusy(true); chatProgress.start(); setNote('working'); showFile('note');   // 질문을 보내면 03 산책 노트로 넘어가 그 안에서 확인 중을 보여 준다
   const checkedAtOf = () => { const d = new Date(); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
+  const fail = (msg) => { chatProgress.stop(); setBusy(false, msg); setNote(hasResult ? 'result' : 'empty'); showFile('course'); };
   try {
     let done = false;
     await stream('/chat', { message }, (ev, data) => {
@@ -457,11 +607,11 @@ $('form').addEventListener('submit', async (e) => {
       else if (ev === 'result') {
         done = true; chatProgress.stop();
         if (data.course && data.course.stops && data.course.stops.length) { setBusy(false); showResult(data.course, checkedAtOf()); }
-        else setBusy(false, '코스를 만들지 못했어요. 장소나 시간을 조금 더 구체적으로 적어 다시 시도해 주세요.');
-      } else if (ev === 'error') { done = true; chatProgress.stop(); setBusy(false, data.message); }
+        else fail('코스를 만들지 못했어요. 장소나 시간을 조금 더 구체적으로 적어 다시 시도해 주세요.');
+      } else if (ev === 'error') { done = true; fail(data.message); }
     });
-    if (!done) { chatProgress.stop(); setBusy(false, '응답이 끝나지 않았어요. 잠시 후 다시 시도해 주세요.'); }
-  } catch (err) { chatProgress.stop(); setBusy(false, err.message); }
+    if (!done) fail('응답이 끝나지 않았어요. 잠시 후 다시 시도해 주세요.');
+  } catch (err) { fail(err.message); }
 });
 
 // ---------- 오늘의 산책지(가챠): 작은 텍스트 링크 → 인라인 결과 ----------
@@ -497,8 +647,7 @@ const dry = (p) => !p || /없|none|^-$/i.test(String(p));
 const meters = (a, b) => { const R = 6371000, r = Math.PI / 180, dLa = (b.lat - a.lat) * r, dLo = (b.lng - a.lng) * r;
   const h = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
 const hasPos = (s) => typeof s.lat === 'number' && typeof s.lng === 'number';
-let map = null, markers = [], steps = [], selected = -1, curStops = [];
-const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let map = null, markers = [], steps = [], selected = -1, curStops = [], hasResult = false, lastCard = null;
 
 // 오늘의 분위기: 응답 값(날씨·혼잡도·장소 분류)에서 근거가 확인될 때만 키워드를 만든다. 근거가 없으면 빈 배열.
 const SLOT_OF = { '오전': 'morning', '오후': 'afternoon', '저녁': 'evening' };
@@ -527,13 +676,19 @@ function vibeKeywords(stops, w, f) {
   return out.slice(0, 3);
 }
 
-function showResult(course, checkedAt) {
-  const stops = course.stops, w = course.weather;
-  curStops = stops; steps = []; markers = []; selected = -1;
-  $('front').hidden = true; $('result').hidden = false;
+// 영수증 한 줄. 값이 없는 항목은 만들지 않는다(생략).
+const rrow = (k, v) => { const r = el('div', 'r'); r.append(el('span', null, k), el('b', null, v)); return r; };
+const clip = (s, n) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
 
-  const d = new Date(); $('date').textContent = `${d.getFullYear()}. ${pad2(d.getMonth() + 1)}. ${pad2(d.getDate())}`;
+function showResult(course, checkedAt) {
+  const stops = course.stops, w = course.weather, fc = forecastSlot(course.forecast);
+  curStops = stops; steps = []; markers = []; selected = -1; hasResult = true;
+  setNote('result'); showFile('note');
+
+  const d = new Date(), ymd = `${d.getFullYear()}. ${pad2(d.getMonth() + 1)}. ${pad2(d.getDate())}`;
+  $('date').textContent = ymd;
   $('note-title').textContent = FALLBACK_TITLE;
+  $('receipt-title').textContent = FALLBACK_TITLE;
   $('sum').textContent = [w && w.area ? `${w.area} 일대` : null, `${stops.length}곳`, `${stops[0].time} – ${stops[stops.length - 1].time}`].filter(Boolean).join(' · ');
   // 이 코스를 고른 이유: 응답에 설명(summary)이 있을 때만 보여 주고, 없으면 영역째 생략한다. 프런트에서 문장을 만들지 않는다.
   const vibe = vibeKeywords(stops, w, course.forecast), vl = $('vibe-list'); vl.replaceChildren(...vibe.map(k => el('li', null, k)));
@@ -541,27 +696,25 @@ function showResult(course, checkedAt) {
   const why = (course.summary || '').trim();
   $('mates-note').hidden = !why; $('mn-text').textContent = why;
 
-  // 상태 줄: 값이 없으면 지어내지 않고 "정보 없음"
-  const st = $('status'); st.replaceChildren();
-  const wEl = el('span'), fc = forecastSlot(course.forecast);
+  // 산책 영수증: 방문지 · 시간 · 날씨 · 혼잡도 · 확인 시각. 데이터가 없는 항목은 생략한다.
+  const rs = $('receipt-stops'); rs.replaceChildren(...stops.map((s, i) => rrow(`${pad2(i + 1)} ${clip(s.place, 14)}`, s.time)));
+  const ri = $('receipt-info'); ri.replaceChildren();
   if (fc) {   // 내일·주말: 기상청 예보. 지금 날씨를 그날의 날씨처럼 보여 주지 않는다
-    const sl = fc.slot, rainy = (sl.precip && sl.precip !== '없음') || (sl.pop != null && sl.pop >= 50);
-    const range = sl.temp_min === sl.temp_max ? `${sl.temp_min}°` : `${sl.temp_min}–${sl.temp_max}°`;
-    wEl.append(icon(rainy ? 'rain' : 'sun'), `${fc.label} 예보 ${range}${sl.sky ? ' ' + sl.sky : ''}${sl.pop != null ? ' · 강수확률 ' + sl.pop + '%' : ''}`);
+    const sl = fc.slot, range = sl.temp_min === sl.temp_max ? `${sl.temp_min}°` : `${sl.temp_min}–${sl.temp_max}°`;
+    ri.append(rrow('날씨', `${fc.label} 예보 ${range}${sl.sky ? ' ' + sl.sky : ''}${sl.pop != null ? ' · 강수확률 ' + sl.pop + '%' : ''}`));
   } else if (w && w.temp_c != null) {
-    wEl.append(icon(dry(w.precip) ? 'sun' : 'rain'), `날씨 ${Math.round(w.temp_c)}° ${dry(w.precip) ? '강수 없음' : w.precip}${w.pm10_grade ? ' · 미세먼지 ' + w.pm10_grade : ''}`);
-  } else wEl.append(icon('sun'), '날씨 정보 없음');
+    ri.append(rrow('날씨', `${Math.round(w.temp_c)}° ${dry(w.precip) ? '강수 없음' : w.precip}${w.pm10_grade ? ' · 미세먼지 ' + w.pm10_grade : ''}`));
+  }
   const known = stops.map(s => s.crowd).filter(Boolean);
   const mode = known.sort((a, b) => known.filter(v => v === b).length - known.filter(v => v === a).length)[0];
-  const cEl = el('span'); cEl.append(icon('people'), mode ? `지역 혼잡도 ${mode}` : '지역 혼잡도 정보 없음');
-  const tEl = el('span'); tEl.append(icon('clock'), `${checkedAt} 확인`);
-  st.append(wEl, cEl, tEl);
+  if (mode) ri.append(rrow('혼잡도', mode));
+  ri.append(rrow('확인 시각', `${ymd.replace(/ /g, '')} ${checkedAt}`));
 
   const tl = $('timeline'); tl.replaceChildren();
   stops.forEach((s, i) => {
     const li = el('li', 'step');
     const rail = el('div', 'rail'); rail.append(el('div', 'n', pad2(i + 1)));
-    const col = el('div');
+    const col = el('div', 'col');
     // 사진: 외부 주소를 직접 부르지 않고 백엔드(/place-image)만 부른다
     const fig = el('figure', 'ph'), photoDd = el('dd', null, '확인 중');
     const img = new Image(); img.alt = `${s.place} 사진`; img.loading = 'lazy';
@@ -587,27 +740,33 @@ function showResult(course, checkedAt) {
       li.classList.add('has-pos');
       li.addEventListener('click', (e) => { if (!e.target.closest('a, .to-map')) select(i); });
     } else title = el('h3', null, s.place);
-    col.append(fig, when, title, el('p', 'why', s.reason), meta);
+    col.append(when, title, el('p', 'why', s.reason), meta);
     if (pos) { const tm = el('button', 'textlink to-map m-only', '지도에서 보기'); tm.type = 'button'; tm.addEventListener('click', () => select(i, { reveal: 'map' })); col.append(tm); }
     steps[i] = { li, btn };
-    li.append(rail, col); tl.append(li);
+    li.append(rail, fig, col); tl.append(li);
   });
 
+  // 서울 엽서: 우표 도장의 소인에는 코스를 만든 날짜가 들어간다. 문구는 응답의 요약만 쓴다(없으면 장소 목록).
+  $('pm-year').textContent = String(d.getFullYear()); $('pm-day').textContent = `${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}`;
+  const msg = why || stops.map(s => s.place).join(' → ');
+  $('card-msg').textContent = msg;
+  lastCard = { msg, stops, date: d };
+
   drawMap(stops);
-  $('note-title').focus({ preventScroll: true }); window.scrollTo(0, 0);
+  $('note-title').focus({ preventScroll: true });
 }
 
 function drawMap(stops) {
   if (map) { map.remove(); map = null; }
   const pts = stops.map((s, i) => ({ s, n: i + 1 })).filter(p => hasPos(p.s));
   const canMap = pts.length > 0 && typeof L !== 'undefined';   // 좌표가 없거나 지도 라이브러리를 못 불러오면 지도 없이 일정만 보여 준다
-  $('mapcol').hidden = !canMap; $('body').classList.toggle('nomap', !canMap);
+  $('mapcol').hidden = !canMap;
   $('map-miss').textContent = canMap && pts.length < stops.length ? ' 일부 장소는 위치 정보가 없어 지도에 표시하지 않았어요.' : '';
   if (!canMap) return;
   map = L.map('map', { scrollWheelZoom: false, attributionControl: false });
   L.tileLayer(TILES.url, { maxZoom: TILES.maxZoom }).addTo(map);
   const latlngs = pts.map(p => [p.s.lat, p.s.lng]);
-  if (latlngs.length > 1) L.polyline(latlngs, { color: '#737B52', weight: 3, opacity: .95 }).addTo(map);
+  if (latlngs.length > 1) L.polyline(latlngs, { color: '#4D593F', weight: 3, opacity: .95 }).addTo(map);
   pts.forEach(p => {
     const m = L.marker([p.s.lat, p.s.lng], { title: p.s.place, keyboard: true, icon: L.divIcon({ className: '', html: `<span class="pin">${p.n}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(map);
     m.on('click', () => select(p.n - 1, { scroll: true }));   // 핀 클릭 → 해당 일정으로 스크롤하고 장소명을 강조
@@ -620,7 +779,7 @@ function drawMap(stops) {
     node.setAttribute('aria-label', `${p.n}번 ${p.s.place}`);
     node.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(p.n - 1, { scroll: true }); } });
   });
-  setTimeout(() => map && map.invalidateSize(), 0);
+  setTimeout(() => map && map.invalidateSize(), 340);
 }
 
 // 선택: 일정 카드 ↔ 지도 핀을 같은 상태로 맞춘다. opt.scroll=핀에서 와서 일정으로 이동, opt.reveal='map'=지도로 이동(모바일)
@@ -634,19 +793,66 @@ function select(i, opt = {}) {
   if (opt.reveal === 'map' && markers[i]) { $('mapcol').scrollIntoView({ behavior, block: 'center' }); markers[i].getElement()?.focus({ preventScroll: true }); }
   if (opt.scroll && steps[i]) { steps[i].li.scrollIntoView({ behavior, block: 'center' }); steps[i].btn?.focus({ preventScroll: true }); }
 }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && selected >= 0 && !$('result').hidden) select(-1); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && selected >= 0 && curFile === 'note') select(-1); });
 $('to-list').addEventListener('click', () => {
   const st = steps[selected] || steps.find(Boolean);
   (st ? st.li : $('timeline')).scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
   st?.btn?.focus({ preventScroll: true });
 });
 
-function goHome() {
-  if (map) { map.remove(); map = null; }
-  markers = []; steps = []; selected = -1;
-  $('result').hidden = true; $('front').hidden = false; setBusy(false); window.scrollTo(0, 0); q.focus();
+// ---------- 서울 엽서 PNG 저장: 같은 내용을 캔버스에 다시 그린다(외부 사진을 쓰지 않아 저장이 막히지 않는다) ----------
+function wrapLines(ctx, text, maxW) {
+  const lines = []; let cur = '';
+  for (const ch of text) { const next = cur + ch; if (ctx.measureText(next).width > maxW && cur) { lines.push(cur); cur = ch.trim() ? ch : ''; } else cur = next; }
+  if (cur) lines.push(cur); return lines;
 }
-// ---------- 오늘의 서울: /seoul-now(기존 get_crowd 도구 결과) → 번호 + 장소명 + 혼잡도 목차 ----------
+async function saveCard() {
+  if (!lastCard) return;
+  try { await document.fonts.ready; } catch { /* 폰트가 없어도 기본 글꼴로 그린다 */ }
+  const W = 1200, H = 800, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'), sans = '"Pretendard Variable", Pretendard, "Malgun Gothic", sans-serif', mono = 'Consolas, "Courier New", monospace';
+  x.fillStyle = COLORS.paper; x.fillRect(0, 0, W, H);
+  x.strokeStyle = 'rgba(41,43,38,.42)'; x.lineWidth = 2; x.strokeRect(24, 24, W - 48, H - 48);
+  // 문구
+  x.fillStyle = COLORS.ink; x.textBaseline = 'top';
+  x.font = `700 40px ${sans}`; x.fillText(FALLBACK_TITLE, 80, 90);
+  x.font = `400 30px ${sans}`;
+  const lines = wrapLines(x, lastCard.msg, 640).slice(0, 7);
+  lines.forEach((ln, i) => x.fillText(ln, 80, 170 + i * 52));
+  // 우표(톱니 테두리) + 소인
+  const sx0 = W - 80 - 220, sy0 = 80, sw = 220, sh = 270;
+  x.fillStyle = COLORS.lilac; x.fillRect(sx0, sy0, sw, sh);
+  x.fillStyle = COLORS.paper;   // 가장자리 톱니: 일정 간격으로 종이색 원을 얹어 우표처럼 파인 모양을 만든다
+  for (let px = sx0; px <= sx0 + sw; px += 20) for (const py of [sy0, sy0 + sh]) { x.beginPath(); x.arc(px, py, 7, 0, Math.PI * 2); x.fill(); }
+  for (let py = sy0; py <= sy0 + sh; py += 20) for (const px of [sx0, sx0 + sw]) { x.beginPath(); x.arc(px, py, 7, 0, Math.PI * 2); x.fill(); }
+  x.strokeStyle = COLORS.olive; x.lineWidth = 2; x.strokeRect(sx0 + 18, sy0 + 18, sw - 36, sh - 36);
+  x.fillStyle = COLORS.olive; x.textAlign = 'center'; x.font = `700 26px ${sans}`; x.fillText('SEOUL MATE', sx0 + sw / 2, sy0 + sh - 70);
+  x.strokeStyle = COLORS.olive; x.lineWidth = 3; x.lineCap = 'round'; x.lineJoin = 'round';   // 남산타워 라인
+  const cx = sx0 + sw / 2, ty = sy0 + 50;
+  x.beginPath(); x.moveTo(cx, ty); x.lineTo(cx, ty + 36); x.moveTo(cx - 8, ty + 36); x.lineTo(cx + 8, ty + 36);
+  x.moveTo(cx - 20, ty + 56); x.lineTo(cx, ty + 36); x.lineTo(cx + 20, ty + 56); x.moveTo(cx - 24, ty + 56); x.lineTo(cx + 24, ty + 56); x.lineTo(cx + 20, ty + 80); x.lineTo(cx - 20, ty + 80); x.closePath();
+  x.moveTo(cx - 18, ty + 80); x.lineTo(cx - 34, ty + 120); x.moveTo(cx + 18, ty + 80); x.lineTo(cx + 34, ty + 120); x.moveTo(cx - 44, ty + 120); x.lineTo(cx + 44, ty + 120); x.stroke();
+  const mx = sx0 - 30, my = sy0 + 250, d = lastCard.date;   // 원형 소인: 코스 생성 날짜
+  x.save(); x.translate(mx, my); x.rotate(-0.21); x.globalAlpha = .62; x.strokeStyle = COLORS.olive; x.fillStyle = COLORS.olive;
+  x.lineWidth = 4; x.beginPath(); x.arc(0, 0, 92, 0, Math.PI * 2); x.stroke(); x.lineWidth = 2; x.beginPath(); x.arc(0, 0, 66, 0, Math.PI * 2); x.stroke();
+  x.textAlign = 'center'; x.font = `700 22px ${sans}`; x.fillText(String(d.getFullYear()), 0, -22); x.font = `700 28px ${sans}`; x.fillText(`${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}`, 0, 8);
+  const arcText = 'SEOUL · KOREA'; x.font = `700 17px ${sans}`;
+  [...arcText].forEach((ch, i) => { const a = -Math.PI / 2 + (i - (arcText.length - 1) / 2) * 0.19; x.save(); x.rotate(a); x.fillText(ch, 0, -80); x.restore(); });
+  x.restore();
+  // 주소 줄
+  x.textAlign = 'left'; x.fillStyle = COLORS.mute; x.font = `400 24px ${mono}`;
+  x.strokeStyle = 'rgba(41,43,38,.16)'; x.lineWidth = 2; x.beginPath(); x.moveTo(80, H - 120); x.lineTo(W - 80, H - 120); x.stroke();
+  x.fillText('TO. 나에게   ·   FROM. SEOUL MATE', 80, H - 96);
+  c.toBlob((blob) => {
+    if (!blob) return;
+    const a = document.createElement('a'), url = URL.createObjectURL(blob);
+    a.href = url; a.download = `seoul-mate-postcard-${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}.png`;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+}
+$('save-card').addEventListener('click', saveCard);
+
+// ---------- 오늘의 서울: /seoul-now(기존 get_crowd 도구 결과) → 사진 + 번호 + 장소명 + 혼잡도 ----------
 const todayDots = (level) => { const n = LV[level] || 0, w = el('span', 'dots' + (n ? '' : ' none')); for (let k = 1; k <= 4; k++) w.append(el('i', k <= n ? 'on' : '')); return w; };
 
 // 입력창에 "○○ 근처로 코스 짜기"를 이어 붙인다. 기존 내용은 지우지 않고, 같은 문장은 두 번 넣지 않는다.
@@ -660,9 +866,14 @@ function addToQuestion(name, row) {
   }
   document.querySelectorAll('.toc-row.added').forEach(r => r.classList.remove('added'));
   row.classList.add('added');
-  note.textContent = `“${line}”를 입력창에 담았어요.`;
-  q.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
-  q.focus({ preventScroll: true }); q.setSelectionRange(q.value.length, q.value.length);
+  note.textContent = `“${line}”를 입력창에 담았어요. 01 코스 만들기에서 확인할 수 있어요.`;
+}
+
+// 장소 사진: 외부 주소를 직접 부르지 않고 /place-image만 부른다. 없으면 비워 두고 다른 장소 사진으로 대신하지 않는다.
+function placeThumb(name) {
+  const box = el('span', 'th'), img = new Image(); img.alt = `${name} 사진`; img.loading = 'lazy';
+  img.onerror = () => { img.remove(); box.classList.add('none'); box.textContent = '사진 정보 없음'; };
+  img.src = '/place-image?name=' + encodeURIComponent(name); box.append(img); return box;
 }
 
 function renderToday(d) {
@@ -672,7 +883,8 @@ function renderToday(d) {
       const li = el('li'), b = el('button', 'toc-row'); b.type = 'button';
       b.setAttribute('aria-label', `${i + 1}번 ${it.name}, 혼잡도 ${it.level}. 입력창에 담기`);
       const lv = el('span', 'lv'); lv.append(todayDots(it.level), document.createTextNode(it.level));
-      b.append(el('span', 'no', pad2(i + 1)), el('span', 'nm', it.name), lv);
+      const ttl = el('span', 'ttl2'); ttl.append(el('span', 'no', pad2(i + 1)), el('span', 'nm', it.name));
+      b.append(placeThumb(it.name), ttl, lv);
       b.addEventListener('click', () => addToQuestion(it.name, b));
       li.append(b); list.append(li);
     });
@@ -680,18 +892,18 @@ function renderToday(d) {
     return items.length > 0;
   };
   const a = fill('toc-calm', d.calm || []), b = fill('toc-busy', d.busy || []);
-  if (!a && !b) return;   // 보여 줄 값이 없으면 지면 자체를 숨긴다
+  if (!a && !b) { $('today-state').textContent = '지금은 오늘의 서울을 불러오지 못했어요.'; return; }   // 보여 줄 값이 없으면 지어내지 않는다
+  $('today-state').hidden = true; $('today-cols').hidden = false;
   $('today-cols').classList.toggle('one', !(a && b));
   const t = new Date(), today = `${t.getFullYear()}-${pad2(t.getMonth() + 1)}-${pad2(t.getDate())}`;
   const when = d.observed_date && d.observed_date !== today ? `${+d.observed_date.slice(5, 7)}.${+d.observed_date.slice(8, 10)} ` : '';
   $('today-foot').textContent = `서울시 실시간 도시데이터${d.observed_at ? ' · ' + when + d.observed_at + ' 기준' : ''}`;
-  $('today').hidden = false;
 }
-// 실패·샘플 모드(ok=false)면 아무것도 보이지 않는다. 지면은 부가 정보라 오류 문구도 띄우지 않는다.
-fetch('/seoul-now').then(r => (r.ok ? r.json() : null)).then(d => { if (d && d.ok) renderToday(d); }).catch(() => {});
+// 실패·샘플 모드(ok=false)면 목록을 만들지 않고 차분한 안내만 둔다.
+fetch('/seoul-now').then(r => (r.ok ? r.json() : null)).then(d => { if (d && d.ok) renderToday(d); else $('today-state').textContent = '지금은 오늘의 서울을 불러오지 못했어요.'; })
+  .catch(() => { $('today-state').textContent = '지금은 오늘의 서울을 불러오지 못했어요.'; });
 
-$('back').addEventListener('click', goHome);
-$('home-btn').addEventListener('click', goHome);
+showFile(location.hash.slice(1));   // 주소의 #course · #today · #note로 같은 파일을 다시 연다
 </script>
 </body>
 </html>
