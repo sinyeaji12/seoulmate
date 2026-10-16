@@ -66,6 +66,16 @@
   .mood { padding:9px 16px; border:1px solid var(--line-strong); border-radius:var(--r); background:transparent; font-size:15px; letter-spacing:-.01em; }
   .mood:hover { border-color:var(--ink); }
   .mood[aria-pressed="true"] { background:var(--olive); border-color:var(--olive); color:#fff; font-size:16px; font-weight:700; }
+  .sels { margin-top:26px; display:grid; gap:14px; }
+  .sel { display:grid; grid-template-columns:56px minmax(0,1fr); align-items:center; gap:12px; }
+  .sel-label { font-size:11px; font-weight:600; letter-spacing:.16em; color:var(--mute); }
+  .sel-opts { display:flex; flex-wrap:wrap; gap:8px; }
+  .opt { padding:7px 14px; border:1px solid var(--line-strong); border-radius:var(--r); background:transparent; font-size:14px; letter-spacing:-.01em; }
+  .opt:hover { border-color:var(--ink); }
+  .opt:focus-visible { outline:2px solid var(--olive); outline-offset:2px; }
+  .opt[aria-pressed="true"] { border-color:var(--olive); background:var(--olive); color:#fff; font-weight:700; }
+  .sel-note { margin:10px 0 0 68px; font-size:13px; color:var(--mute); }
+  @media (max-width:520px) { .sel { grid-template-columns:1fr; gap:6px; } .sel-note { margin-left:0; } }
   .textlink { margin-top:26px; padding:0; border:0; background:none; font-size:14px; color:var(--mute); text-decoration:underline; text-underline-offset:5px; text-decoration-color:var(--line-strong); text-align:left; }
   .textlink:hover { color:var(--ink); text-decoration-color:var(--ink); }
   .textlink:disabled { cursor:default; text-decoration:none; }
@@ -238,6 +248,34 @@
             <button type="button" class="mood" aria-pressed="false">비 오는 날</button>
             <button type="button" class="mood" aria-pressed="false">전시와 커피</button>
           </div>
+          <div class="sels">
+            <div class="sel" data-key="with">
+              <span class="sel-label" id="pk-with">WITH</span>
+              <div class="sel-opts" role="group" aria-labelledby="pk-with">
+              <button type="button" class="opt" aria-pressed="false">혼자</button>
+              <button type="button" class="opt" aria-pressed="false">친구와</button>
+              <button type="button" class="opt" aria-pressed="false">연인과</button>
+              <button type="button" class="opt" aria-pressed="false">가족과</button>
+              </div>
+            </div>
+            <div class="sel" data-key="when">
+              <span class="sel-label" id="pk-when">WHEN</span>
+              <div class="sel-opts" role="group" aria-labelledby="pk-when">
+              <button type="button" class="opt" aria-pressed="false">오늘</button>
+              <button type="button" class="opt" aria-pressed="false">내일</button>
+              <button type="button" class="opt" aria-pressed="false">주말</button>
+              </div>
+            </div>
+            <div class="sel" data-key="time">
+              <span class="sel-label" id="pk-time">TIME</span>
+              <div class="sel-opts" role="group" aria-labelledby="pk-time">
+              <button type="button" class="opt" aria-pressed="false">오전</button>
+              <button type="button" class="opt" aria-pressed="false">오후</button>
+              <button type="button" class="opt" aria-pressed="false">저녁</button>
+              </div>
+            </div>
+          </div>
+          <p class="sel-note" id="pick-note" role="status" hidden>미래 날씨는 아직 확인할 수 없어요. 지금의 날씨와 붐빔을 기준으로 살펴드려요.</p>
           <button type="button" class="textlink" id="gacha-link">아직 모르겠다면, 오늘의 산책지를 골라드릴까요?</button>
         </form>
         <div class="mini" id="gacha-out" aria-live="polite"></div>
@@ -369,11 +407,25 @@ function makeProgress(list, [first, second]) {
 const q = $('q');
 document.querySelectorAll('.mood').forEach(b => b.addEventListener('click', () =>
   b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true')));
+const PICK_LABEL = { with: '함께', when: '언제', time: '시간대' };
+document.querySelectorAll('.sel').forEach(g => g.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => {
+  const on = b.getAttribute('aria-pressed') !== 'true';
+  g.querySelectorAll('.opt').forEach(o => o.setAttribute('aria-pressed', 'false'));   // 한 줄에서는 하나만, 다시 누르면 해제
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  $('pick-note').hidden = !isFuture();
+})));
+const picked = (key) => { const b = document.querySelector(`.sel[data-key="${key}"] .opt[aria-pressed="true"]`); return b ? b.textContent : ''; };
+// 날씨 도구는 지금 상태만 알려 준다. 내일·주말을 골랐다면 미래 날씨를 지어내지 않도록 질문에 함께 적어 보낸다.
+const isFuture = () => ['내일', '주말'].includes(picked('when'));
 function compose() {
   const moods = [...document.querySelectorAll('.mood[aria-pressed="true"]')].map(b => b.textContent);
-  let m = q.value.trim() || '오늘 서울 어디 갈까?';
-  if (moods.length) m += `\n(원하는 분위기: ${moods.join(', ')})`;
-  return m.slice(0, 500);
+  const tail = [];
+  if (moods.length) tail.push(`(원하는 분위기: ${moods.join(', ')})`);
+  const sel = Object.keys(PICK_LABEL).filter(k => picked(k)).map(k => `${PICK_LABEL[k]}: ${picked(k)}`);
+  if (sel.length) tail.push(`(${sel.join(', ')})`);
+  if (isFuture()) tail.push('(실시간 도구는 지금 상태만 알려 주니, 내일·주말 날씨는 단정하지 말고 지금 기준임을 밝혀 주세요)');
+  const t = tail.length ? '\n' + tail.join('\n') : '';
+  return ((q.value.trim() || '오늘 서울 어디 갈까?').slice(0, 500 - t.length) + t).slice(0, 500);
 }
 
 function setBusy(busy, message) {
@@ -386,7 +438,7 @@ const chatProgress = makeProgress($('steps'), ['오늘의 서울을 천천히 �
 $('form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const message = compose();
-  $('working-q').textContent = message;
+  $('working-q').textContent = message.replace(/\n\(실시간[^\n]*\)$/, '');   // 모델에게만 가는 안내 문장은 화면에 보이지 않는다
   setBusy(true); chatProgress.start();
   const checkedAtOf = () => { const d = new Date(); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
   try {

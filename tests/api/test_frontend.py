@@ -185,3 +185,22 @@ def test_today_places_are_appended_to_the_question_never_overwrite_it():
 
 def test_today_lives_with_the_cover_and_hides_with_it_in_the_result_view():
     assert '<div id="front">' in HTML and "$('front').hidden = true" in HTML and "$('front').hidden = false" in HTML
+
+
+def test_with_when_time_are_single_choice_rows_sent_with_the_question():
+    for label in ("WITH", "WHEN", "TIME"):
+        assert f'id="pk-{label.lower()}">{label}</span>' in HTML, label
+    for opt in ("혼자", "친구와", "연인과", "가족과", "오늘", "내일", "주말", "오전", "오후", "저녁"):
+        assert f'class="opt" aria-pressed="false">{opt}</button>' in HTML, opt
+    assert HTML.count('class="opt"') == 10 and 'role="group" aria-labelledby="pk-' in HTML
+    assert "const PICK_LABEL = { with: '함께', when: '언제', time: '시간대' }" in HTML
+    assert "o.setAttribute('aria-pressed', 'false')" in HTML  # 한 줄에 하나만, 다시 누르면 해제
+    rule = re.search(r"\.opt \{([^}]*)\}", HTML).group(1)
+    assert "border:1px solid var(--line-strong)" in rule and "box-shadow" not in rule  # 얇은 선
+
+
+def test_future_dates_never_pretend_to_have_a_forecast():
+    assert "미래 날씨는 아직 확인할 수 없어요" in HTML and re.search(r'id="pick-note"[^>]*\bhidden>', HTML)
+    assert "['내일', '주말'].includes(picked('when'))" in HTML
+    assert "내일·주말 날씨는 단정하지 말고 지금 기준임을 밝혀 주세요" in HTML  # 모델에게도 알린다
+    assert "slice(0, 500 - t.length)" in HTML  # 선택 문장이 500자 제한에 잘려 나가지 않는다
