@@ -1,0 +1,30 @@
+[project]
+name = "seoulmate"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "anthropic>=0.40",
+  "openai>=1.40",
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "httpx>=0.27",
+  "pydantic>=2.8",
+  "pydantic-settings>=2.4",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "respx>=0.21", "ruff>=0.6", "pyyaml>=6"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+
+[tool.ruff]
+line-length = 100

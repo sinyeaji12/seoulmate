@@ -1,0 +1,83 @@
+[
+ {
+  "name": "경복궁",
+  "area": "종로",
+  "category": "outdoor",
+  "tags": [
+   "역사",
+   "산책"
+  ]
+ },
+ {
+  "name": "북촌한옥마을",
+  "area": "종로",
+  "category": "outdoor",
+  "tags": [
+   "산책",
+   "사진"
+  ]
+ },
+ {
+  "name": "국립중앙박물관",
+  "area": "용산",
+  "category": "indoor",
+  "tags": [
+   "전시",
+   "역사"
+  ]
+ },
+ {
+  "name": "서울숲",
+  "area": "성동",
+  "category": "outdoor",
+  "tags": [
+   "공원",
+   "산책"
+  ]
+ },
+ {
+  "name": "코엑스 별마당도서관",
+  "area": "강남",
+  "category": "indoor",
+  "tags": [
+   "쇼핑",
+   "책"
+  ]
+ },
+ {
+  "name": "DDP",
+  "area": "중구",
+  "category": "indoor",
+  "tags": [
+   "전시",
+   "디자인"
+  ]
+ },
+ {
+  "name": "한강공원 여의도",
+  "area": "영등포",
+  "category": "outdoor",
+  "tags": [
+   "공원",
+   "피크닉"
+  ]
+ },
+ {
+  "name": "토속촌 삼계탕",
+  "area": "종로",
+  "district": "종로구",
+  "category": "food",
+  "tags": [
+   "삼계탕"
+  ]
+ },
+ {
+  "name": "통인시장 도시락카페",
+  "area": "종로",
+  "district": "종로구",
+  "category": "food",
+  "tags": [
+   "시장"
+  ]
+ }
+]
