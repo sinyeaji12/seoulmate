@@ -204,3 +204,14 @@ def test_future_dates_never_pretend_to_have_a_forecast():
     assert "['내일', '주말'].includes(picked('when'))" in HTML
     assert "내일·주말 날씨는 단정하지 말고 지금 기준임을 밝혀 주세요" in HTML  # 모델에게도 알린다
     assert "slice(0, 500 - t.length)" in HTML  # 선택 문장이 500자 제한에 잘려 나가지 않는다
+
+
+def test_vibe_keywords_come_only_from_evidence_in_the_response():
+    assert re.search(r'<section class="vibe" id="vibe"[^>]*\bhidden>', HTML) and "오늘의 분위기" in HTML
+    assert "$('vibe').hidden = vibe.length === 0" in HTML  # 근거가 없으면 영역째 숨김
+    for kw in ("걷기 좋음", "한적함", "붐빔 주의", "실내 위주"):
+        assert f"out.push('{kw}')" in HTML, kw
+    assert "return out.slice(0, 3)" in HTML
+    for invented in ("사진 많", "감성", "힙", "데이트"):  # 데이터가 없는 분위기는 만들지 않는다
+        assert invented not in HTML.split("function vibeKeywords")[1].split("function showResult")[0], invented
+    assert HTML.index('id="vibe"') < HTML.index('id="mates-note"')  # MATE'S NOTE 위

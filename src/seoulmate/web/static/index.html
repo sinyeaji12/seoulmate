@@ -118,6 +118,11 @@
   .note h1:focus { outline:none; }
   .sum { margin:22px 0 0; font-size:16px; color:var(--mute); }
   /* MATE'S NOTE: 따옴표·카드 없이 작은 라벨 + 여백 + 얇은 구분선 */
+  .vibe { display:grid; grid-template-columns:132px minmax(0,40em); gap:8px 24px; margin-top:30px; padding-top:20px; border-top:1px solid var(--line); align-items:baseline; }
+  .vibe .mn-label { font:400 15px/1.9 var(--serif); letter-spacing:.2em; color:var(--mute); text-transform:uppercase; }
+  .vibe ul { display:flex; flex-wrap:wrap; margin:0; padding:0; list-style:none; font-size:20px; font-weight:700; letter-spacing:-.03em; }
+  .vibe li + li::before { content:""; display:inline-block; width:1px; height:.8em; margin:0 16px; background:var(--line-strong); vertical-align:-.05em; }
+  @media (max-width:640px) { .vibe { grid-template-columns:1fr; } }
   .mates-note { display:grid; grid-template-columns:132px minmax(0,40em); gap:8px 24px; margin-top:30px; padding-top:20px; border-top:1px solid var(--line); }
   .mates-note .mn-label { font:400 15px/1.9 var(--serif); letter-spacing:.2em; color:var(--mute); text-transform:uppercase; }
   .mates-note p { margin:0; font-size:16px; line-height:1.85; }
@@ -316,6 +321,10 @@
     <div class="kicker">Walking Note · <span id="date"></span></div>
     <h1 id="note-title" tabindex="-1"></h1>
     <p class="sum" id="sum"></p>
+    <section class="vibe" id="vibe" aria-label="오늘의 분위기" hidden>
+      <div class="mn-label">오늘의 분위기</div>
+      <ul id="vibe-list"></ul>
+    </section>
     <section class="mates-note" id="mates-note" aria-label="이 코스를 고른 이유" hidden>
       <div class="mn-label">Mate's Note</div>
       <p id="mn-text"></p>
@@ -491,6 +500,18 @@ const hasPos = (s) => typeof s.lat === 'number' && typeof s.lng === 'number';
 let map = null, markers = [], steps = [], selected = -1, curStops = [];
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// 오늘의 분위기: 응답 값(날씨·혼잡도·장소 분류)에서 근거가 확인될 때만 키워드를 만든다. 근거가 없으면 빈 배열.
+function vibeKeywords(stops, w) {
+  const out = [];
+  const t = w && w.temp_c, rainless = w && typeof w.precip === 'string' && /없/.test(w.precip), airOk = w && ['좋음', '보통'].includes(w.pm10_grade);
+  if (typeof t === 'number' && t >= 10 && t <= 26 && rainless && airOk) out.push('걷기 좋음');   // 선선~쾌적한 기온 + 강수 없음 + 미세먼지 좋음/보통
+  const known = stops.map(s => s.crowd).filter(c => LV[c]);
+  if (known.length && known.filter(c => LV[c] === 1).length * 2 > known.length) out.push('한적함');
+  if (known.length && known.filter(c => LV[c] >= 3).length * 2 > known.length) out.push('붐빔 주의');
+  if (stops.filter(s => s.category === 'indoor').length * 2 > stops.length) out.push('실내 위주');
+  return out.slice(0, 3);
+}
+
 function showResult(course, checkedAt) {
   const stops = course.stops, w = course.weather;
   curStops = stops; steps = []; markers = []; selected = -1;
@@ -500,6 +521,8 @@ function showResult(course, checkedAt) {
   $('note-title').textContent = FALLBACK_TITLE;
   $('sum').textContent = [w && w.area ? `${w.area} 일대` : null, `${stops.length}곳`, `${stops[0].time} – ${stops[stops.length - 1].time}`].filter(Boolean).join(' · ');
   // 이 코스를 고른 이유: 응답에 설명(summary)이 있을 때만 보여 주고, 없으면 영역째 생략한다. 프런트에서 문장을 만들지 않는다.
+  const vibe = vibeKeywords(stops, w), vl = $('vibe-list'); vl.replaceChildren(...vibe.map(k => el('li', null, k)));
+  $('vibe').hidden = vibe.length === 0;
   const why = (course.summary || '').trim();
   $('mates-note').hidden = !why; $('mn-text').textContent = why;
 
