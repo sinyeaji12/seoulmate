@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, Query
 from fastapi.responses import FileResponse, Response, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from seoulmate.agent.enrich import make_enricher
@@ -37,6 +38,7 @@ def create_app(settings: Settings | None = None, llm_factory=build_llm,
     # 샘플 모드에서는 외부 호출을 하지 않는다(키를 비운 PlaceImages는 항상 '사진 없음')
     images = images or PlaceImages("" if s.seoulmate_mock_tools else s.tour_api_key)
     app = FastAPI(title="서울 메이트")
+    app.mount("/static", StaticFiles(directory=STATIC), name="static")  # 표지 사진 등 정적 파일만
 
     @app.get("/health")
     def health():

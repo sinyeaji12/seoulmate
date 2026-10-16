@@ -46,12 +46,14 @@ def find_match(place: str, category: str, catalog: list[dict]) -> dict | None:
 
 def enrich_course(course: Course, catalog: list[dict]) -> Course:
     for s in course.stops:
-        if s.image:
+        if s.image and s.lat is not None:
             continue
         m = find_match(s.place, s.category, catalog)
         if m:
-            s.image = m["image"]
+            s.image = s.image or m["image"]
             s.category = s.category or _CATEGORY.get(m["content_type_id"], "")
+            if s.lat is None and m.get("lat") is not None and m.get("lng") is not None:
+                s.lat, s.lng = m["lat"], m["lng"]
     return course
 
 

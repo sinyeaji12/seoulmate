@@ -21,6 +21,8 @@ class Stop(ModelStop):
     crowd: str = ""  # 조회하지 못했으면 빈 문자열
     crowd_next: str = ""  # 다음 시간 혼잡 예보
     category: str = ""  # outdoor | indoor | food | festival | ""(미확인)
+    lat: float | None = None  # 지도용 좌표. TourAPI에 없는 장소는 None(지도에서 빠진다)
+    lng: float | None = None
 
 
 class Course(BaseModel):
@@ -53,6 +55,7 @@ def build_course(answer: str, tool_calls: list[dict]) -> Course | None:
     crowd: dict[str, str] = {}
     crowd_next: dict[str, str] = {}
     category: dict[str, str] = {}
+    coords: dict[str, tuple[float, float]] = {}
     weather: dict | None = None
     for c in tool_calls:
         res = c["result"]
@@ -64,6 +67,8 @@ def build_course(answer: str, tool_calls: list[dict]) -> Course | None:
                 if p.get("image"):
                     images[p["name"]] = p["image"]
                 category[p["name"]] = p.get("category") or ("festival" if c["name"] == "list_festivals" else "")
+                if p.get("lat") is not None and p.get("lng") is not None:
+                    coords[p["name"]] = (p["lat"], p["lng"])
         elif c["name"] == "get_crowd":
             crowd[data["place"]] = data["level"]
             crowd_next[data["place"]] = (data.get("next_hour") or {}).get("level") or ""
@@ -72,7 +77,8 @@ def build_course(answer: str, tool_calls: list[dict]) -> Course | None:
     return Course(
         summary=parsed.summary,
         stops=[Stop(**s.model_dump(), image=images.get(s.place, ""), crowd=crowd.get(s.place, ""),
-                    crowd_next=crowd_next.get(s.place, ""), category=category.get(s.place, ""))
+                    crowd_next=crowd_next.get(s.place, ""), category=category.get(s.place, ""),
+                    lat=coords.get(s.place, (None, None))[0], lng=coords.get(s.place, (None, None))[1])
                for s in parsed.stops],
         weather=weather,
     )
