@@ -2,168 +2,271 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>서울 메이트</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>서울 메이트 · 서울메이트</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%23C6FF00' stroke='%23111' stroke-width='5'/%3E%3Cg fill='%23111' stroke='%23111' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='31' y='8' width='2' height='9'/%3E%3Cpath d='M23 24Q23 17 32 17Q41 17 41 24L39 29H25Z'/%3E%3Cpath d='M29 29H35L37 50H27Z'/%3E%3Cpath d='M22 50H42L46 57H18Z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:#f3f5f9; --surface:#ffffff; --ink:#18212f; --mute:#64708a; --line:#e2e7f0;
-    --brand:#1f4fd8; --brand-soft:#e8eefc; --brand-ink:#ffffff;
-    --c-relax:#17915f; --c-normal:#1f4fd8; --c-busy:#d98a0b; --c-full:#d03a30; --c-none:#8a94a8;
-    --c-relax-bg:#e3f5ec; --c-normal-bg:#e8eefc; --c-busy-bg:#fdf1dc; --c-full-bg:#fde7e5; --c-none-bg:#eef0f4;
-    --shadow:0 1px 2px rgba(20,30,50,.06), 0 6px 20px rgba(20,30,50,.06);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg:#0f141c; --surface:#171e29; --ink:#e9eef7; --mute:#93a0b8; --line:#263042;
-      --brand:#7ea2ff; --brand-soft:#1d2a47; --brand-ink:#0b1020;
-      --c-relax:#46c98c; --c-normal:#7ea2ff; --c-busy:#f0b04a; --c-full:#ff7a6e; --c-none:#8f9ab0;
-      --c-relax-bg:#15301f; --c-normal-bg:#1d2a47; --c-busy-bg:#3a2b10; --c-full-bg:#3d1c1a; --c-none-bg:#222a38;
-      --shadow:0 1px 2px rgba(0,0,0,.4);
-    }
+    --bg:#FFF8E7; --lime:#C6FF00; --pink:#FF5FA2; --sky:#6EC6FF; --ink:#111111; --paper:#ffffff;
+    --yellow:#FFE45C; --gray:#e4dfd0;
+    --bd:3px solid var(--ink); --sh:4px 4px 0 var(--ink);
+    --title:"Black Han Sans","Malgun Gothic",sans-serif;
+    --body:"Gowun Dodum","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
   }
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; }
-  svg.ic { width:1.15em; height:1.15em; flex:none; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; vertical-align:-.2em; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    margin:0; color:var(--ink); font:16px/1.6 var(--body); min-height:100vh; min-height:100dvh;
+    background-color:var(--bg);
+    background-image:radial-gradient(rgba(17,17,17,.12) 1.2px, transparent 1.4px);
+    background-size:18px 18px;
+  }
+  svg.ic { width:1.15em; height:1.15em; flex:none; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; vertical-align:-.2em; }
 
-  /* top bar */
-  header { background:var(--surface); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
-  .bar { max-width:1180px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:12px; }
-  .logo { width:34px; height:34px; border-radius:10px; background:var(--brand); color:var(--brand-ink); display:grid; place-items:center; }
-  .logo svg { width:20px; height:20px; }
-  .brand b { display:block; font-size:1.05rem; line-height:1.2; }
-  .brand span { color:var(--mute); font-size:.78rem; }
+  /* ---------- header ---------- */
+  header { position:sticky; top:0; z-index:10; background:var(--bg); border-bottom:var(--bd); }
+  .bar { max-width:820px; margin:0 auto; padding:8px 16px; display:flex; align-items:center; gap:12px; }
+  .logo { height:62px; width:auto; flex:none; overflow:visible; }
+  .tagline { font-size:.82rem; line-height:1.3; color:#444; }
   .spacer { flex:1; }
-  .pill { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:.78rem; background:var(--c-none-bg); color:var(--mute); }
-  .pill i { width:8px; height:8px; border-radius:50%; background:var(--c-none); }
-  .pill.live { background:var(--c-relax-bg); color:var(--c-relax); } .pill.live i { background:var(--c-relax); }
-  .pill.demo { background:var(--c-busy-bg); color:var(--c-busy); } .pill.demo i { background:var(--c-busy); }
+  .badge { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; font-size:.8rem; font-weight:700; background:var(--paper); border:2px solid var(--ink); border-radius:99px; box-shadow:2px 2px 0 var(--ink); white-space:nowrap; }
+  .badge b { font-weight:400; font-size:.7rem; line-height:1; }
 
-  /* layout */
-  .wrap { max-width:1180px; margin:0 auto; padding:20px; display:grid; grid-template-columns:340px 1fr; gap:20px; align-items:start; }
-  @media (max-width:900px) { .wrap { grid-template-columns:1fr; padding:16px; } }
-  .panel { background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); }
-  .side { padding:18px; position:sticky; top:78px; }
-  @media (max-width:900px) { .side { position:static; } }
-  h2 { font-size:.8rem; letter-spacing:.04em; color:var(--mute); margin:0 0 10px; font-weight:700; }
+  /* ---------- chat ---------- */
+  main { max-width:820px; margin:0 auto; padding:18px 16px 12px; }
+  #log { display:flex; flex-direction:column; gap:18px; }
+  .msg { display:flex; gap:10px; max-width:100%; }
+  .msg.me { justify-content:flex-end; }
+  .avatar { width:40px; height:40px; flex:none; border:var(--bd); border-radius:50%; background:var(--lime); display:grid; place-items:center; box-shadow:2px 2px 0 var(--ink); }
+  .avatar svg { width:20px; height:26px; }
+  .bubble { position:relative; padding:12px 16px; border:var(--bd); box-shadow:var(--sh); min-width:0; max-width:min(100%, 560px); overflow-wrap:anywhere; }
+  .me .bubble { background:var(--pink); color:var(--ink); border-radius:18px 18px 4px 18px; font-weight:700; transform:rotate(.6deg); }
+  .mate .bubble { background:var(--lime); border-radius:18px 18px 18px 4px; }
+  .mate .bubble.wide { max-width:100%; flex:1; }
+  .mate .name { font-family:var(--title); font-size:.95rem; margin-bottom:2px; }
+  .mate-col { min-width:0; flex:1; }
+  .msg.mate:not(.has-wide) .mate-col { flex:0 1 auto; }
 
-  form.ask { display:flex; flex-direction:column; gap:10px; }
-  textarea { width:100%; resize:none; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font:inherit; min-height:84px; }
-  textarea:focus { outline:2px solid var(--brand); border-color:transparent; }
-  button.primary { display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; border:0; border-radius:12px; background:var(--brand); color:var(--brand-ink); font:inherit; font-weight:700; cursor:pointer; }
-  button.primary:disabled { opacity:.5; cursor:default; }
-  .chips { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 4px; }
-  .chip { display:inline-flex; align-items:center; gap:6px; padding:7px 11px; border-radius:99px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font:inherit; font-size:.82rem; cursor:pointer; }
-  .chip:hover { background:var(--brand-soft); border-color:var(--brand); }
+  .steps { list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; }
+  .steps li { display:flex; align-items:center; gap:8px; font-size:.88rem; padding:5px 10px; background:var(--paper); border:2px solid var(--ink); border-radius:10px; }
+  .steps li.fail { background:var(--gray); }
+  .steps small { margin-left:auto; font-weight:700; }
+  .dots span { display:inline-block; animation:bounce 1s infinite; }
+  .dots span:nth-child(2) { animation-delay:.15s; } .dots span:nth-child(3) { animation-delay:.3s; }
+  @keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-5px); } }
 
-  .steps { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
-  .steps li { display:flex; align-items:center; gap:10px; font-size:.86rem; padding:8px 10px; border-radius:10px; background:var(--bg); }
-  .steps li.ok svg.ic { color:var(--c-relax); } .steps li.fail { color:var(--mute); } .steps li.fail svg.ic { color:var(--c-busy); }
-  .steps small { color:var(--mute); margin-left:auto; }
-  .legend { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:.8rem; color:var(--mute); }
-  .legend div { display:flex; align-items:center; gap:8px; }
-
-  /* results */
-  .empty { padding:48px 24px; text-align:center; color:var(--mute); }
-  .empty .big { width:64px; height:64px; margin:0 auto 14px; border-radius:20px; background:var(--brand-soft); color:var(--brand); display:grid; place-items:center; }
-  .empty .big svg { width:34px; height:34px; }
-  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
-  @media (max-width:640px) { .kpis { grid-template-columns:repeat(2,1fr); } }
-  .kpi { padding:14px; display:flex; flex-direction:column; gap:4px; }
-  .kpi .lab { color:var(--mute); font-size:.76rem; display:flex; align-items:center; gap:6px; }
-  .kpi .val { font-size:1.35rem; font-weight:800; display:flex; align-items:center; gap:8px; }
-  .kpi .val svg.ic { width:1.5rem; height:1.5rem; }
-  .brief { padding:16px 18px; margin-bottom:16px; display:flex; gap:12px; }
-  .brief .ic { color:var(--brand); margin-top:3px; }
-
-  .timeline { position:relative; display:flex; flex-direction:column; gap:16px; }
-  .stop { display:grid; grid-template-columns:64px 1fr; gap:12px; }
-  .when { text-align:center; position:relative; }
-  .when b { display:inline-block; padding:4px 8px; border-radius:10px; background:var(--brand-soft); color:var(--brand); font-size:.9rem; }
-  .when::after { content:""; position:absolute; left:50%; top:34px; bottom:-18px; width:2px; background:var(--line); transform:translateX(-50%); }
-  .stop:last-child .when::after { display:none; }
-  .card { overflow:hidden; display:grid; grid-template-columns:200px 1fr; }
-  @media (max-width:640px) { .stop { grid-template-columns:1fr; } .when { text-align:left; } .when::after { display:none; } .card { grid-template-columns:1fr; } }
-  .photo { position:relative; min-height:170px; background:var(--brand-soft); }
+  /* ---------- result inside mate bubble ---------- */
+  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0 12px; }
+  @media (max-width:560px) { .kpis { grid-template-columns:repeat(2,1fr); } }
+  .kpi { background:var(--paper); border:2px solid var(--ink); box-shadow:3px 3px 0 var(--ink); padding:8px 10px; border-radius:10px; }
+  .kpi .lab { font-size:.74rem; color:#444; display:flex; gap:5px; align-items:center; }
+  .kpi .val { font-family:var(--title); font-size:1.2rem; display:flex; gap:6px; align-items:center; }
+  .brief { background:var(--paper); border:2px solid var(--ink); border-radius:10px; padding:10px 12px; margin-bottom:14px; display:flex; gap:8px; }
+  .timeline { display:flex; flex-direction:column; gap:16px; }
+  .stop { position:relative; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; display:grid; grid-template-columns:170px 1fr; overflow:visible; }
+  @media (max-width:560px) { .stop { grid-template-columns:1fr; } }
+  .time { position:absolute; left:-8px; top:-12px; z-index:2; padding:1px 10px; background:var(--sky); border:2px solid var(--ink); box-shadow:2px 2px 0 var(--ink); font-family:var(--title); font-size:1.05rem; transform:rotate(-4deg); border-radius:6px; }
+  .photo { position:relative; min-height:150px; background:var(--sky); border-right:var(--bd); border-radius:11px 0 0 11px; overflow:hidden; }
+  @media (max-width:560px) { .photo { border-right:0; border-bottom:var(--bd); border-radius:11px 11px 0 0; min-height:140px; } }
   .photo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .photo .ph { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--brand); font-size:.78rem; }
-  .photo .ph svg { width:44px; height:44px; stroke-width:1.4; }
-  .tag { position:absolute; left:10px; top:10px; display:inline-flex; align-items:center; gap:6px; padding:4px 9px; border-radius:99px; background:rgba(255,255,255,.92); color:#18212f; font-size:.76rem; font-weight:700; }
-  .info { padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0; }
-  .info h3 { margin:0; font-size:1.08rem; }
-  .why { color:var(--mute); font-size:.88rem; margin:0; }
+  .photo .ph { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:.8rem; }
+  .photo .ph svg { width:38px; height:38px; }
+  .tag { position:absolute; left:8px; bottom:8px; display:inline-flex; align-items:center; gap:5px; padding:2px 8px; background:var(--yellow); border:2px solid var(--ink); border-radius:99px; font-size:.76rem; font-weight:700; }
+  .info { padding:16px 14px 12px; display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .info h3 { margin:0; font-family:var(--title); font-weight:400; font-size:1.15rem; }
+  .why { margin:0; font-size:.92rem; }
+  .crowd { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:5px 10px; border:2px solid var(--ink); border-radius:10px; }
+  .crowd .people { display:flex; gap:1px; }
+  .crowd .people svg { width:18px; height:18px; stroke:var(--ink); stroke-width:1.5; fill:var(--ink); }
+  .crowd .lvl { font-weight:700; font-size:.88rem; }
+  .crowd .nx { font-size:.78rem; margin-left:auto; display:flex; gap:4px; align-items:center; }
+  .lv-1 { background:var(--lime); } .lv-2 { background:var(--sky); } .lv-3 { background:var(--yellow); } .lv-4 { background:var(--pink); } .lv-0 { background:var(--gray); }
+  .note { margin-top:12px; font-size:.78rem; display:flex; gap:6px; align-items:flex-start; }
 
-  .crowd { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:8px 10px; border-radius:12px; }
-  .crowd .people { display:flex; gap:2px; }
-  .crowd .people svg { width:20px; height:20px; stroke:none; }
-  .crowd .lvl { font-weight:700; font-size:.86rem; }
-  .crowd .nx { color:var(--mute); font-size:.78rem; margin-left:auto; display:flex; align-items:center; gap:4px; }
-  .lv-1 { background:var(--c-relax-bg); color:var(--c-relax); } .lv-2 { background:var(--c-normal-bg); color:var(--c-normal); }
-  .lv-3 { background:var(--c-busy-bg); color:var(--c-busy); } .lv-4 { background:var(--c-full-bg); color:var(--c-full); } .lv-0 { background:var(--c-none-bg); color:var(--c-none); }
-  .note { color:var(--mute); font-size:.78rem; margin-top:12px; display:flex; gap:6px; align-items:flex-start; }
-  .err { padding:20px; display:flex; gap:12px; color:var(--c-full); }
-  .loading { padding:28px; display:flex; align-items:center; gap:12px; color:var(--mute); }
-  .spin { width:20px; height:20px; border:3px solid var(--line); border-top-color:var(--brand); border-radius:50%; animation:sp 1s linear infinite; }
-  @keyframes sp { to { transform:rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .spin { animation:none; } }
+  /* ---------- gacha ---------- */
+  .gacha { position:relative; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:18px; padding:16px; margin-bottom:18px; text-align:center; overflow:hidden; }
+  .gacha::before { content:""; position:absolute; inset:0; background:repeating-linear-gradient(-45deg, rgba(255,95,162,.10) 0 12px, transparent 12px 24px); pointer-events:none; }
+  .gacha > * { position:relative; }
+  .gacha h2 { margin:0; font-family:var(--title); font-weight:400; font-size:1.7rem; line-height:1.2; }
+  .gacha .sub { margin:2px 0 0; font-size:.9rem; }
+  .g-stage { position:relative; height:140px; margin:6px auto 4px; width:180px; }
+  .cap { position:absolute; left:50%; top:10px; width:120px; height:120px; margin-left:-60px; overflow:visible; filter:drop-shadow(4px 4px 0 #111); }
+  .cap .top, .cap .bot { transform-box:fill-box; transform-origin:center; transition:transform .5s cubic-bezier(.2,1.4,.4,1), opacity .5s; }
+  .cap.shake { animation:capShake .42s ease-in-out infinite; transform-origin:50% 90%; }
+  @keyframes capShake { 0%,100% { transform:rotate(0) translateX(0); } 20% { transform:rotate(-14deg) translateX(-6px); } 50% { transform:rotate(12deg) translateX(6px); } 75% { transform:rotate(-8deg) translateX(-3px); } }
+  .cap.pop .top { transform:translate(-34px,-58px) rotate(-38deg); opacity:0; }
+  .cap.pop .bot { transform:translate(14px,26px) rotate(14deg); opacity:0; }
+  .pang { position:absolute; left:50%; top:30px; margin-left:-50px; width:100px; font-family:var(--title); font-size:2.6rem; color:var(--pink); -webkit-text-stroke:2px var(--ink); paint-order:stroke fill; text-shadow:3px 3px 0 var(--ink); opacity:0; pointer-events:none; }
+  .pang.go { animation:pang .8s ease-out forwards; }
+  @keyframes pang { 0% { opacity:0; transform:scale(.2) rotate(-15deg); } 25% { opacity:1; transform:scale(1.25) rotate(6deg); } 100% { opacity:0; transform:scale(1.5) rotate(-4deg) translateY(-14px); } }
+  .burst { position:absolute; left:50%; top:70px; width:0; height:0; }
+  .burst i { position:absolute; left:-6px; top:-6px; width:12px; height:12px; border:2px solid var(--ink); border-radius:50%; animation:spark .75s ease-out forwards; }
+  .burst i:nth-child(3n) { border-radius:2px; }
+  @keyframes spark { from { transform:translate(0,0) scale(1); opacity:1; } to { transform:translate(var(--dx),var(--dy)) scale(.3) rotate(240deg); opacity:0; } }
+  .gbtn { width:100%; max-width:420px; padding:14px 18px; border:var(--bd); border-radius:16px; background:var(--lime); box-shadow:6px 6px 0 var(--ink); font-family:var(--title); font-size:1.5rem; line-height:1.2; }
+  .gbtn:active:not(:disabled) { transform:translate(4px,4px); box-shadow:2px 2px 0 var(--ink); }
+  .gbtn:disabled { background:var(--gray); cursor:default; box-shadow:6px 6px 0 var(--ink); }
+  .g-left { margin:8px 0 0; font-size:.82rem; }
+  #gout { margin-top:12px; }
+  .g-msg { display:inline-block; padding:8px 14px; background:var(--yellow); border:2px solid var(--ink); border-radius:12px; box-shadow:3px 3px 0 var(--ink); }
+  .gres { position:relative; text-align:left; display:grid; grid-template-columns:auto 1fr; gap:6px 14px; align-items:center; padding:16px 14px 12px; background:var(--bg); border:var(--bd); border-radius:14px; box-shadow:var(--sh); animation:rise .5s cubic-bezier(.2,1.3,.4,1); }
+  @keyframes rise { from { opacity:0; transform:translateY(24px) scale(.9) rotate(-2deg); } to { opacity:1; transform:none; } }
+  .stamp { grid-row:span 2; width:78px; height:78px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:var(--bd); border-radius:50%; font-family:var(--title); font-size:1.5rem; line-height:1; transform:rotate(-8deg); box-shadow:3px 3px 0 var(--ink); }
+  .stamp small { font-size:1rem; }
+  .stamp.SSR { background:linear-gradient(135deg,var(--yellow),var(--pink) 55%,var(--sky)); }
+  .stamp.SR { background:var(--sky); } .stamp.R { background:var(--paper); }
+  .gres h3 { margin:0; font-family:var(--title); font-weight:400; font-size:1.3rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .gres .why1 { grid-column:1 / -1; margin:4px 0 0; padding:8px 12px; background:var(--lime); border:2px solid var(--ink); border-radius:10px; font-weight:700; }
+  .gres .why1 b { font-family:var(--title); font-weight:400; margin-right:6px; }
+  .gres .verify { grid-column:1 / -1; font-size:.78rem; display:flex; gap:6px; align-items:center; }
+
+  /* ---------- traffic light ---------- */
+  .tl { position:relative; display:inline-flex; vertical-align:middle; padding:3px 4px; margin:0 2px; background:#2a2a2a; border:2px solid var(--ink); border-radius:99px; cursor:help; }
+  .tl svg { width:12px; height:30px; display:block; }
+  button.tl:not(:disabled):hover { animation:none; }
+  .tl .tip { display:none; position:absolute; left:0; top:calc(100% + 8px); z-index:20; width:max-content; max-width:min(240px, 70vw); padding:8px 10px; background:var(--yellow); color:var(--ink); border:2px solid var(--ink); border-radius:10px; box-shadow:3px 3px 0 var(--ink); font:400 .82rem/1.45 var(--body); text-align:left; white-space:normal; }
+  .tl .tip b { display:block; font-weight:700; }
+  .tl:hover .tip, .tl:focus-visible .tip, .tl.open .tip { display:block; }
+  .legend-box { background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; margin-bottom:18px; }
+  .legend-box summary { cursor:pointer; padding:10px 14px; font-family:var(--title); font-size:1.05rem; list-style:none; }
+  .legend-box summary::-webkit-details-marker { display:none; }
+  .legend-box summary::after { content:" ▾"; }
+  .legend-box[open] summary::after { content:" ▴"; }
+  .legend-box .rows { padding:2px 14px 12px; display:flex; flex-direction:column; gap:8px; }
+  .legend-box .row { display:flex; gap:10px; align-items:center; font-size:.9rem; }
+  .legend-box .row .tl { cursor:default; flex:none; }
+  .legend-box .row b { display:block; }
+
+  @media (prefers-reduced-motion:reduce) { .cap.shake, .pang.go, .gres { animation:none; } .burst i { animation-duration:.01s; } }
+  @media (max-width:560px) { .gres { grid-template-columns:1fr; } .stamp { grid-row:auto; } .gbtn { font-size:1.3rem; } }
+
+  /* ---------- composer ---------- */
+  .composer { position:sticky; bottom:0; z-index:9; background:var(--bg); border-top:var(--bd); padding:10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .composer-in { max-width:820px; margin:0 auto; }
+  .chips { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; scrollbar-width:none; }
+  .chips::-webkit-scrollbar { display:none; }
+  form.ask { display:flex; gap:10px; align-items:stretch; }
+  textarea { flex:1; resize:none; min-width:0; height:50px; padding:11px 14px; border:var(--bd); border-radius:14px; background:var(--paper); color:var(--ink); font:inherit; font-size:16px; box-shadow:var(--sh); }
+  textarea:focus { outline:3px solid var(--sky); outline-offset:2px; }
+  textarea::placeholder { color:#777; }
+
+  button { font:inherit; color:var(--ink); cursor:pointer; }
+  button.primary { display:flex; align-items:center; gap:6px; padding:0 18px; border:var(--bd); border-radius:14px; background:var(--lime); box-shadow:var(--sh); font-family:var(--title); font-size:1.05rem; white-space:nowrap; }
+  button.primary:active, .chip:active { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
+  button.primary:disabled { background:var(--gray); cursor:default; transform:none; box-shadow:var(--sh); animation:none; }
+  .chip { display:inline-flex; align-items:center; gap:6px; flex:none; padding:6px 13px; border:2px solid var(--ink); border-radius:99px; background:var(--paper); box-shadow:3px 3px 0 var(--ink); font-size:.9rem; font-weight:700; }
+  .chip:nth-child(3n+1) { background:var(--pink); } .chip:nth-child(3n+2) { background:var(--sky); } .chip:nth-child(3n) { background:var(--yellow); }
+
+  /* hover wiggle */
+  @keyframes wiggle { 0%,100% { transform:rotate(0); } 20% { transform:rotate(-4deg); } 40% { transform:rotate(3.5deg); } 60% { transform:rotate(-2.5deg); } 80% { transform:rotate(2deg); } }
+  @media (hover:hover) { button:not(:disabled):hover { animation:wiggle .45s ease-in-out; } }
+  button:focus-visible { outline:3px solid var(--sky); outline-offset:2px; }
+  @media (prefers-reduced-motion:reduce) { button:hover { animation:none !important; } .dots span { animation:none; } }
+
+  @media (max-width:560px) {
+    .tagline { display:none; }
+    .logo { height:54px; }
+    .avatar { width:34px; height:34px; }
+    .avatar svg { width:16px; height:22px; }
+    button.primary span.t { display:none; }
+    button.primary { padding:0 16px; }
+  }
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 20h18M5 20V11l7-6 7 6v9M9 20v-5h6v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="tower" viewBox="0 0 40 80">
+      <g fill="#111" stroke="#111" stroke-width="2" stroke-linejoin="round">
+        <rect x="19" y="0" width="2" height="16"/>
+        <path d="M9 24 Q9 15 20 15 Q31 15 31 24 L28 30 L12 30 Z"/>
+        <path d="M16 30 L24 30 L26.5 66 L13.5 66 Z"/>
+        <path d="M8 66 L32 66 L37 78 L3 78 Z"/>
+      </g>
+      <rect x="13" y="20" width="14" height="3" fill="#FFF8E7"/>
+    </symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
-    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 8.5a4.75 4.75 0 0 1 .5 9.5H7z"/></symbol>
     <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 15a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 5.5 4.75 4.75 0 0 1 17.5 15H7z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/></symbol>
     <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></symbol>
     <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
     <symbol id="i-air" viewBox="0 0 24 24"><path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
-    <symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 22v-6M12 16c-4 0-6-2.5-6-5 0-1.6.9-3 2.2-3.7A4 4 0 0 1 12 2a4 4 0 0 1 3.8 5.3C17.1 8 18 9.400 18 11c0 2.500-2 5-6 5z"/></symbol>
-    <symbol id="i-museum" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5M5 9v9M9.500 9v9M14.500 9v9M19 9v9M3 21h18M3 18h18"/></symbol>
-    <symbol id="i-food" viewBox="0 0 24 24"><path d="M6 3v7a2 2 0 0 0 2 2v9M10 3v7a2 2 0 0 1-2 2M6 3v7M17 21V3c-2.200 1.500-3 4-3 7 0 2 1 3 3 3"/></symbol>
-    <symbol id="i-festival" viewBox="0 0 24 24"><path d="M4 21l4-12 8 8-12 4zM14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM19 12l.7 1.300 1.300.7-1.300.7L19 16l-.7-1.300L17 14l1.300-.7z"/></symbol>
-    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="1.800"/><path d="M21 16l-5-5-8 8"/></symbol>
+    <symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 22v-6M12 16c-4 0-6-2.5-6-5 0-1.6.9-3 2.2-3.7A4 4 0 0 1 12 2a4 4 0 0 1 3.8 5.3C17.1 8 18 9.4 18 11c0 2.5-2 5-6 5z"/></symbol>
+    <symbol id="i-museum" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5M5 9v9M9.5 9v9M14.5 9v9M19 9v9M3 21h18M3 18h18"/></symbol>
+    <symbol id="i-food" viewBox="0 0 24 24"><path d="M6 3v7a2 2 0 0 0 2 2v9M10 3v7a2 2 0 0 1-2 2M6 3v7M17 21V3c-2.2 1.5-3 4-3 7 0 2 1 3 3 3"/></symbol>
+    <symbol id="i-festival" viewBox="0 0 24 24"><path d="M4 21l4-12 8 8-12 4zM14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM19 12l.7 1.3 1.3.7-1.3.7L19 16l-.7-1.3L17 14l1.3-.7z"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="1.8"/><path d="M21 16l-5-5-8 8"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.500l4.500 4.500L19 7.500"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2zM12 10v5M12 18v.5"/></symbol>
-    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.800 5.200L19 10l-5.200 1.800L12 17l-1.800-5.200L5 10l5.200-1.800zM19 17l.8 2.200L22 20l-2.200.8L19 23l-.8-2.200L16 20l2.200-.8z"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/></symbol>
     <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L3 11l7 3 3 7zM10 14l11-11"/></symbol>
-    <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="6" r="3.500" fill="currentColor"/><path d="M5 21v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3z" fill="currentColor"/></symbol>
+    <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="6" r="3.5"/><path d="M5 21v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3z"/></symbol>
+    <filter id="sticker" x="-20%" y="-20%" width="150%" height="150%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-color="#111"/></filter>
   </defs>
 </svg>
 
 <header>
   <div class="bar">
-    <div class="logo"><svg class="ic" style="width:20px;height:20px"><use href="#i-logo"/></svg></div>
-    <div class="brand"><b>서울 메이트</b><span>실시간 날씨·붐빔 기반 나들이 코스</span></div>
+    <!-- 로고 A: 말풍선 스티커 (직접 그린 SVG) -->
+    <svg class="logo" viewBox="0 0 300 240" role="img" aria-label="서울메이트">
+      <defs>
+        <text id="wmA" x="150" y="212" text-anchor="middle" font-size="52" style="font-family:var(--title)">서울메이트</text>
+      </defs>
+      <g transform="rotate(-4 150 120)" filter="url(#sticker)">
+        <path d="M150 14 C84 14 38 54 38 108 C38 140 56 164 84 178 L72 198 L112 182 C124 185 137 186 150 186 C216 186 262 146 262 108 C262 54 216 14 150 14 Z" fill="#fff" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+        <path d="M150 14 C84 14 38 54 38 108 C38 140 56 164 84 178 L72 198 L112 182 C124 185 137 186 150 186 C216 186 262 146 262 108 C262 54 216 14 150 14 Z" fill="#C6FF00" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+        <use href="#tower" x="120" y="42" width="60" height="120"/>
+        <path d="M214 56 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5 z" fill="#FF5FA2" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+        <use href="#wmA" stroke="#fff" stroke-width="16" stroke-linejoin="round" fill="#fff"/>
+        <use href="#wmA" stroke="#111" stroke-width="7" stroke-linejoin="round" fill="#111"/>
+        <use href="#wmA" fill="#FF5FA2"/>
+      </g>
+    </svg>
+    <div class="tagline">친구가 카톡으로<br>코스 짜주는 느낌</div>
     <div class="spacer"></div>
-    <span id="mode" class="pill"><i></i><span>연결 확인 중</span></span>
+    <span id="mode" class="badge" role="status" title="서버 연결 상태"><b id="mode-dot">🟡</b><span id="mode-txt">확인 중</span></span>
   </div>
 </header>
 
-<div class="wrap">
-  <aside class="panel side">
-    <h2>무엇을 도와드릴까요?</h2>
-    <form class="ask" id="form">
-      <textarea id="q" maxlength="500" placeholder="예) 경복궁 근처 맛집 포함해서 코스 짜줘" required></textarea>
-      <button class="primary" id="send"><svg class="ic"><use href="#i-send"/></svg>코스 만들기</button>
-    </form>
-    <div class="chips" id="chips"></div>
-
-    <h2 style="margin-top:20px">확인 진행 상황</h2>
-    <ul class="steps" id="steps"><li><svg class="ic"><use href="#i-clock"/></svg>질문을 기다리고 있어요</li></ul>
-
-    <h2 style="margin-top:20px">혼잡도 보는 법</h2>
-    <div class="legend" id="legend"></div>
-  </aside>
-
-  <main id="out" aria-live="polite">
-    <div class="panel empty">
-      <div class="big"><svg class="ic"><use href="#i-spark"/></svg></div>
-      <b style="color:var(--ink)">오늘 서울 어디 갈까요?</b><br>
-      날씨와 붐빔을 직접 확인한 뒤, 사진과 함께 시간순 코스를 보여 드려요.
+<main>
+  <section class="gacha" aria-label="서울 가챠">
+    <h2>🎰 서울 가챠</h2>
+    <p class="sub">고르기 귀찮을 땐 뽑아! 날씨랑 붐빔 확인하고 알려줄게</p>
+    <div class="g-stage">
+      <svg id="cap" class="cap" viewBox="0 0 120 120" aria-hidden="true">
+        <g class="bot"><path d="M18 60 H102 A42 42 0 0 1 18 60 Z" fill="#6EC6FF" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M34 74 Q42 90 58 94" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/></g>
+        <g class="top"><path d="M18 60 A42 42 0 0 1 102 60 Z" fill="#FF5FA2" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+          <ellipse cx="42" cy="36" rx="9" ry="5" transform="rotate(-35 42 36)" fill="#fff" opacity=".85"/></g>
+      </svg>
+      <div class="pang" id="pang" aria-hidden="true">팡!</div>
+      <div class="burst" id="burst" aria-hidden="true"></div>
     </div>
-  </main>
+    <button class="gbtn" id="gbtn" type="button">서울 가챠 돌리기</button>
+    <p class="g-left" id="gleft">연속 3번까지 돌릴 수 있어</p>
+    <div id="gout" aria-live="polite"></div>
+  </section>
+
+  <details class="legend-box">
+    <summary>🚦 혼잡도 보는 법</summary>
+    <div class="rows" id="legend"></div>
+  </details>
+
+  <div id="log" aria-live="polite"></div>
+</main>
+
+<div class="composer">
+  <div class="composer-in">
+    <div class="chips" id="chips"></div>
+    <form class="ask" id="form">
+      <textarea id="q" maxlength="500" rows="1" placeholder="어디 가고 싶어? 편하게 말해줘" required></textarea>
+      <button class="primary" id="send"><svg class="ic"><use href="#i-send"/></svg><span class="t">보내기</span></button>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -177,41 +280,90 @@ function safeUrl(u) { try { const x = new URL(u); return (x.protocol === 'http:'
 
 const TOOL = { get_weather:['sun','날씨'], get_crowd:['person','혼잡도'], list_places:['pin','장소 목록'], list_festivals:['festival','오늘 행사'] };
 const CAT = { outdoor:['tree','야외'], indoor:['museum','실내'], food:['food','음식점'], festival:['festival','행사'] };
-const LEVELS = [ ['여유',1,'붐비지 않아 여유로워요'], ['보통',2,'적당히 사람이 있어요'], ['약간 붐빔',3,'조금 붐벼요'], ['붐빔',4,'매우 붐벼요'] ];
-function levelOf(c) { const f = LEVELS.find(l => l[0] === c); return f ? f[1] : 0; }
+const LEVELS = ['여유', '보통', '약간 붐빔', '붐빔'];
+function levelOf(c) { const i = LEVELS.indexOf(c); return i + 1; }
 
-// 범례
-for (const [name, n, desc] of LEVELS) { const d = el('div'); d.append(crowdIcons(n, true), el('span', null, name)); d.title = desc; $('legend').append(d); }
-const nd = el('div'); nd.append(crowdIcons(0, true), el('span', null, '미확인')); $('legend').append(nd);
-
-function crowdIcons(n, small) {
-  const w = el('span', 'people lv-' + n); w.style.background = 'none';
-  for (let i = 1; i <= 4; i++) { const p = icon('person'); if (i > n) p.style.opacity = '.22'; if (small) { p.style.width = '14px'; p.style.height = '14px'; } w.append(p); }
+function towerAvatar() {
+  const a = el('div', 'avatar'); const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 40 80');
+  const u = document.createElementNS(NS, 'use'); u.setAttribute('href', '#tower'); s.append(u); a.append(s); return a;
+}
+function crowdIcons(n) {
+  const w = el('span', 'people');
+  for (let i = 1; i <= 4; i++) { const p = icon('person'); if (i > n) p.style.opacity = '.2'; w.append(p); }
   return w;
 }
-
-// 날씨 아이콘/문구
 function weatherView(w) {
   const p = String(w.precip || ''); const dry = !p || /없|none|^-$/.test(p);
   if (dry) return ['sun', '맑음·강수 없음']; if (/눈/.test(p)) return ['snow', p]; return ['rain', p];
 }
 
-// 상태 표시줄
-fetch('/health').then(r => r.json()).then(h => {
-  const m = $('mode'); m.className = 'pill ' + (h.mock_tools ? 'demo' : 'live');
-  m.lastChild.textContent = h.mock_tools ? '샘플 데이터 모드' : '서울시 실시간 데이터';
-}).catch(() => { $('mode').lastChild.textContent = '서버 연결 안 됨'; });
+// ---------- 혼잡도 신호등 ----------
+let MOCK = false;
+// 4단계 혼잡도를 신호 3색으로: 여유=초록, 보통·약간 붐빔=노랑, 붐빔=빨강, 미확인=모두 꺼짐
+const LAMP = { '여유':'g', '보통':'y', '약간 붐빔':'y', '붐빔':'r' };
+const LAMP_COLOR = { r:'#FF5FA2', y:'#FFE45C', g:'#C6FF00' };
+function lampSvg(level) {
+  const on = LAMP[level], s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 12 30');
+  [['r', 5], ['y', 15], ['g', 25]].forEach(([k, cy]) => {
+    const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', 6); c.setAttribute('cy', cy); c.setAttribute('r', 4.2);
+    c.setAttribute('fill', on === k ? LAMP_COLOR[k] : '#555'); c.setAttribute('stroke', on === k ? '#111' : '#3a3a3a'); c.setAttribute('stroke-width', on === k ? 1 : .5); s.append(c);
+  });
+  return s;
+}
+function trafficLight(level, next) {
+  const b = el('button', 'tl'); b.type = 'button'; b.append(lampSvg(level));
+  const tip = el('span', 'tip'); tip.append(el('b', null, '방금 확인한 실시간 정보'));
+  tip.append(level ? '현재 ' + level : '혼잡도를 확인하지 못했어요');
+  if (next) { tip.append(document.createElement('br'), '다음 시간 예상 ' + next); }
+  if (MOCK) { tip.append(document.createElement('br'), '(샘플 데이터예요)'); }
+  b.append(tip); b.setAttribute('aria-label', '혼잡도 신호등: ' + (level || '미확인'));
+  b.addEventListener('click', (e) => { e.stopPropagation(); const was = b.classList.contains('open'); closeTips(); if (!was) b.classList.add('open'); });
+  return b;
+}
+function closeTips() { document.querySelectorAll('.tl.open').forEach(x => x.classList.remove('open')); }
+document.addEventListener('click', closeTips);
 
-// 추천 질문
-for (const t of ['오늘 서울 어디 갈까?', '비 와도 갈 만한 실내 코스', '경복궁 근처 맛집 포함해서 코스 짜줘', '사진 찍기 좋은 야외 위주로']) {
-  const b = el('button', 'chip', t); b.type = 'button'; b.prepend(icon('spark')); b.onclick = () => { $('q').value = t; $('form').requestSubmit(); }; $('chips').append(b);
+// 혼잡도 보는 법(신호등 설명)
+for (const [lv, name, desc] of [
+  ['여유', '여유', '사람이 적어서 편하게 둘러볼 수 있어요.'],
+  ['보통', '보통 · 약간 붐빔', '적당히 사람이 있어요. 조금 붐비는 곳도 여기에 포함돼요.'],
+  ['붐빔', '붐빔', '매우 붐벼요. 서울 가챠에서는 이런 곳을 빼고 뽑아요.'],
+  ['', '미확인', '조회하지 못했어요. 지어내지 않고 확인 불가로 보여줘요.'],
+]) {
+  const row = el('div', 'row'); const t = el('span', 'tl'); t.append(lampSvg(lv));
+  const d = el('div'); d.append(el('b', null, name), desc); row.append(t, d); $('legend').append(row);
 }
 
-function renderCourse(course) {
-  const out = $('out'); out.replaceChildren();
+// ---------- 연결 상태 배지 ----------
+function setStatus(dot, txt, tip) { $('mode-dot').textContent = dot; $('mode-txt').textContent = txt; $('mode').title = tip; }
+fetch('/health').then(r => { if (!r.ok) throw 0; return r.json(); }).then(h => {
+  MOCK = !!h.mock_tools;
+  setStatus('🟢', '연결됨', h.mock_tools ? '샘플 데이터 모드' : '서울시 실시간 데이터');
+}).catch(() => setStatus('🔴', '연결 안 됨', '서버에 연결할 수 없어요'));
+
+// ---------- 채팅 ----------
+const log = $('log');
+function scrollDown() { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }
+function addMe(text) { const m = el('div', 'msg me'); m.append(el('div', 'bubble', text)); log.append(m); scrollDown(); }
+function addMate(wide) {
+  const m = el('div', 'msg mate' + (wide ? ' has-wide' : '')); const col = el('div', 'mate-col');
+  const b = el('div', 'bubble' + (wide ? ' wide' : '')); b.append(el('div', 'name', '서울메이트'));
+  col.append(b); m.append(towerAvatar(), col); log.append(m); scrollDown();
+  return { msg: m, bubble: b };
+}
+function say(bubble, text) { bubble.append(el('div', null, text)); }
+
+addMate(false).bubble.append(el('div', null, '안녕! 나는 서울메이트야 🗼 오늘 어디 갈지 말만 해. 날씨랑 붐빔 확인해서 코스 짜줄게!'));
+
+// 예시 질문 칩
+for (const t of ['비 와도 갈 데 있어?', '덜 붐비는 데이트 코스', '혼자 2시간 산책']) {
+  const b = el('button', 'chip', t); b.type = 'button'; b.onclick = () => ask(t); $('chips').append(b);
+}
+
+function renderCourse(bubble, course) {
   const w = course.weather;
   const kp = el('div', 'kpis');
-  const tile = (ic, lab, val) => { const k = el('div', 'panel kpi'); const l = el('div', 'lab'); l.append(icon(ic), lab); const v = el('div', 'val'); v.append(...val); k.append(l, v); return k; };
+  const tile = (ic, lab, val) => { const k = el('div', 'kpi'); const l = el('div', 'lab'); l.append(icon(ic), lab); const v = el('div', 'val'); v.append(...val); k.append(l, v); return k; };
   if (w) {
     const [wi, wt] = weatherView(w);
     kp.append(tile('sun', '현재 기온', [icon(wi), document.createTextNode(w.temp_c != null ? Math.round(w.temp_c) + '°C' : '-')]),
@@ -221,14 +373,13 @@ function renderCourse(course) {
     kp.append(tile('sun', '날씨', [document.createTextNode('미확인')]));
   }
   kp.append(tile('pin', '추천 장소', [document.createTextNode(course.stops.length + '곳')]));
-  const brief = el('div', 'panel brief'); brief.append(icon('spark'), el('div', null, course.summary));
-  out.append(kp, brief);
+  const brief = el('div', 'brief'); brief.append(icon('spark'), el('div', null, course.summary));
+  bubble.append(kp, brief);
 
   const tl = el('div', 'timeline');
   for (const s of course.stops) {
-    const row = el('div', 'stop');
-    const when = el('div', 'when'); when.append(el('b', null, s.time)); row.append(when);
-    const card = el('div', 'panel card');
+    const card = el('div', 'stop');
+    card.append(el('span', 'time', s.time));
     const photo = el('div', 'photo'); const [ci, cl] = CAT[s.category] || ['pin', '장소'];
     const ph = el('div', 'ph'); ph.append(icon(CAT[s.category] ? ci : 'image'), el('span', null, '사진 준비 중'));
     photo.append(ph);
@@ -236,27 +387,92 @@ function renderCourse(course) {
     if (url) { const img = new Image(); img.alt = s.place; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer'; img.onload = () => ph.remove(); img.onerror = () => img.remove(); img.src = url; photo.prepend(img); }
     const tag = el('span', 'tag'); tag.append(icon(ci), cl); photo.append(tag);
     const info = el('div', 'info');
-    const h = el('h3'); h.append(icon('pin'), ' ', s.place);
-    const n = levelOf(s.crowd), cr = el('div', 'crowd lv-' + n);
-    cr.append(crowdIcons(n), el('span', 'lvl', s.crowd ? '현재 ' + s.crowd : '혼잡도 미확인'));
+    const h = el('h3'); h.append(icon('pin'), ' ', s.place, ' ', trafficLight(s.crowd, s.crowd_next));
+    const n = levelOf(s.crowd), cr = el('div', 'crowd lv-' + (n > 0 ? n : 0));
+    cr.append(crowdIcons(n > 0 ? n : 0), el('span', 'lvl', s.crowd ? '현재 ' + s.crowd : '혼잡도 미확인'));
     if (s.crowd_next) { const nx = el('span', 'nx'); nx.append(icon('clock'), '다음 시간 예상 ' + s.crowd_next); cr.append(nx); }
     info.append(h, cr, el('p', 'why', s.reason));
-    card.append(photo, info); row.append(card); tl.append(row);
+    card.append(photo, info); tl.append(card);
   }
-  out.append(tl);
-  const note = el('div', 'note'); note.append(icon('clock'), '혼잡도·날씨는 조회 시점의 값이에요. 방문 시간대와 다를 수 있어요. 사진 출처: 한국관광공사.'); out.append(note);
+  bubble.append(tl);
+  const note = el('div', 'note'); note.append(icon('clock'), '혼잡도·날씨는 조회 시점의 값이야. 방문 시간대와 다를 수 있어. 사진 출처: 한국관광공사.');
+  bubble.append(note);
 }
 
-function showMsg(text, cls, ic) { const d = el('div', 'panel ' + cls); d.append(icon(ic)); d.append(el('div', null, text)); $('out').replaceChildren(d); }
+// ---------- 서울 가챠 ----------
+const MAX_SPINS = 3, drawn = [];
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const GRADE = { SSR:['🌟', 'SSR', '날씨 좋음 + 한산'], SR:['⭐', 'SR', '보통'], R:['', 'R', '무난'] };
+let gBusy = false;
 
-$('form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const text = $('q').value.trim(); if (!text) return;
-  $('send').disabled = true; $('steps').replaceChildren();
-  const ld = el('div', 'panel loading'); ld.append(el('div', 'spin'), '날씨와 붐빔을 확인하고 있어요…'); $('out').replaceChildren(ld);
+function burst() {
+  const b = $('burst'); b.replaceChildren();
+  const colors = ['#FF5FA2', '#C6FF00', '#6EC6FF', '#FFE45C'];
+  for (let i = 0; i < 16; i++) {
+    const p = document.createElement('i'), a = (Math.PI * 2 * i) / 16, d = 60 + Math.random() * 40;
+    p.style.setProperty('--dx', Math.cos(a) * d + 'px'); p.style.setProperty('--dy', Math.sin(a) * d + 'px'); p.style.background = colors[i % 4]; b.append(p);
+  }
+  const g = $('pang'); g.classList.remove('go'); void g.offsetWidth; g.classList.add('go');
+}
+
+function renderGacha(p, checked) {
+  const [emo, name, hint] = GRADE[p.grade] || GRADE.R;
+  const card = el('div', 'gres');
+  const st = el('div', 'stamp ' + p.grade); st.append(emo ? el('small', null, emo) : '', name); st.title = hint;
+  const h = el('h3'); h.append(p.place, trafficLight(p.crowd, p.crowd_next));
+  const [ci, cl] = CAT[p.category] || ['pin', '장소'];
+  const tag = el('span', 'tag'); tag.style.position = 'static'; tag.append(icon(ci), cl);
+  const head = el('div'); head.append(h, tag);
+  const why = el('p', 'why1'); why.append(el('b', null, '왜 여기?'), p.reason);
+  const ok = (n) => checked.some(c => c.name === n && c.ok);
+  const v = el('div', 'verify'); v.append(icon('check'), ok('get_weather') && ok('get_crowd') ? '날씨·혼잡도 확인 완료' + (MOCK ? ' (샘플 데이터)' : '') : '확인 정보 없음');
+  card.append(st, head, why, v);
+  $('gout').replaceChildren(card);
+}
+
+function updateGachaBtn() {
+  const left = MAX_SPINS - drawn.length, b = $('gbtn');
+  if (left <= 0) { b.disabled = true; b.textContent = '연속 3번 다 돌렸어!'; $('gleft').textContent = '새로고침하면 다시 돌릴 수 있어'; return; }
+  b.disabled = false;
+  b.textContent = drawn.length ? '🔁 다시 돌리기' : '서울 가챠 돌리기';
+  $('gleft').textContent = drawn.length ? '남은 횟수 ' + left + '번 (연속 ' + MAX_SPINS + '번까지)' : '연속 ' + MAX_SPINS + '번까지 돌릴 수 있어';
+}
+
+async function spinGacha() {
+  if (gBusy || drawn.length >= MAX_SPINS) return;
+  gBusy = true; $('gbtn').disabled = true; $('gout').replaceChildren();
+  const cap = $('cap'); cap.setAttribute('class', 'cap shake');
+  const t0 = Date.now(); let data;
+  try {
+    const r = await fetch('/gacha', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ exclude: drawn }) });
+    data = r.status === 429 ? { ok:false, message:'너무 빨리 돌렸어! 잠깐 쉬었다가 다시 해줘.' } : r.ok ? await r.json() : { ok:false, message:'앗, 가챠 기계가 잠깐 멈췄어. 다시 돌려줘!' };
+  } catch { data = { ok:false, message:'앗, 가챠 기계에 연결이 안 돼. 다시 돌려줘!' }; }
+  if (!REDUCED) await sleep(Math.max(0, 1500 - (Date.now() - t0)));
+  if (data.ok && data.pick) {
+    cap.setAttribute('class', 'cap pop'); burst();
+    if (!REDUCED) await sleep(600);
+    drawn.push(data.pick.place); renderGacha(data.pick, data.checked || []);
+    await sleep(REDUCED ? 0 : 400); cap.setAttribute('class', 'cap');
+  } else {
+    cap.setAttribute('class', 'cap');
+    $('gout').replaceChildren(el('span', 'g-msg', data.message || '이번엔 못 뽑았어. 다시 돌려줘!'));
+  }
+  gBusy = false; updateGachaBtn();
+}
+$('gbtn').addEventListener('click', spinGacha);
+
+let busy = false;
+async function ask(text) {
+  text = text.trim(); if (!text || busy) return;
+  busy = true; $('send').disabled = true; $('q').value = '';
+  addMe(text);
+  const { msg, bubble } = addMate(false);
+  const wait = el('div', 'dots'); wait.append('날씨랑 붐빔 확인하는 중', ...[1,2,3].map(() => el('span', null, '.')));
+  const steps = el('ul', 'steps'); bubble.append(wait, steps);
   try {
     const resp = await fetch('/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message: text }) });
-    if (!resp.ok) throw new Error(resp.status === 429 ? '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.' : '요청에 실패했어요.');
+    if (!resp.ok) throw new Error(resp.status === 429 ? '요청이 너무 많아! 잠깐 쉬었다가 다시 해줘.' : '앗, 요청에 실패했어.');
     const reader = resp.body.getReader(), dec = new TextDecoder(); let buf = '';
     while (true) {
       const { value, done } = await reader.read(); if (done) break;
@@ -266,18 +482,23 @@ $('form').addEventListener('submit', async (e) => {
         const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
         const ev = /event: (\w+)/.exec(chunk)?.[1], data = JSON.parse(/data: (.*)/s.exec(chunk)[1]);
         if (ev === 'tool') {
-          const [ti, tl] = TOOL[data.name] || ['spark', data.name];
+          const [, tl] = TOOL[data.name] || ['spark', data.name];
           const target = data.input.place || data.input.area || data.input.keyword || data.input.district || '';
           const li = el('li', data.ok ? 'ok' : 'fail'); li.append(icon(data.ok ? 'check' : 'warn'), el('span', null, tl + (target ? ' · ' + target : '')), el('small', null, data.ok ? '완료' : '건너뜀'));
-          $('steps').append(li);
+          steps.append(li); scrollDown();
         } else if (ev === 'result') {
-          data.course ? renderCourse(data.course) : showMsg(data.answer, 'brief', 'spark');
-        } else if (ev === 'error') showMsg(data.message, 'err', 'warn');
+          wait.remove(); steps.remove();
+          if (data.course) { msg.classList.add('has-wide'); bubble.classList.add('wide'); renderCourse(bubble, data.course); }
+          else say(bubble, data.answer);
+        } else if (ev === 'error') { wait.remove(); steps.remove(); say(bubble, data.message); }
       }
     }
-  } catch (err) { showMsg(err.message, 'err', 'warn'); }
-  $('send').disabled = false;
-});
+  } catch (err) { wait.remove(); steps.remove(); say(bubble, err.message); }
+  busy = false; $('send').disabled = false; scrollDown();
+}
+
+$('form').addEventListener('submit', (e) => { e.preventDefault(); ask($('q').value); });
+$('q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('form').requestSubmit(); } });
 </script>
 </body>
 </html>

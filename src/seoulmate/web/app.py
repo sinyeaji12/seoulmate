@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from seoulmate.agent.enrich import make_enricher
+from seoulmate.agent.gacha import spin
 from seoulmate.agent.loop import run_agent
 from seoulmate.clients.llm import build_llm
 from seoulmate.config import Settings, get_settings
@@ -23,6 +24,10 @@ class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=500)
 
 
+class GachaRequest(BaseModel):
+    exclude: list[str] = Field(default_factory=list, max_length=10)  # 이미 뽑은 장소(다시 돌리기)
+
+
 def create_app(settings: Settings | None = None, llm_factory=build_llm) -> FastAPI:
     s = settings or get_settings()
     app = FastAPI(title="서울 메이트")
@@ -34,6 +39,13 @@ def create_app(settings: Settings | None = None, llm_factory=build_llm) -> FastA
     @app.get("/")
     def index():
         return FileResponse(STATIC / "index.html")
+
+    @app.post("/gacha", dependencies=[Depends(limiter.check)])
+    def gacha(req: GachaRequest):
+        try:
+            return spin(build_registry(s), exclude=req.exclude).to_dict()
+        except Exception:  # noqa: BLE001 - 내부 오류는 클라이언트에 노출하지 않는다
+            return {"ok": False, "message": "앗, 가챠 기계가 잠깐 멈췄어. 다시 돌려줘!", "pick": None, "checked": []}
 
     @app.post("/chat", dependencies=[Depends(limiter.check)])
     def chat(req: ChatRequest):

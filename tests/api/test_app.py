@@ -44,6 +44,20 @@ def test_chat_streams_tool_then_result():
     assert ev[1][1]["course"]["stops"][0]["crowd"] == "여유"
 
 
+def test_gacha_endpoint_uses_tools_and_skips_crowded():
+    c = make_client(FakeLLM([]))
+    for _ in range(8):
+        d = c.post("/gacha", json={}).json()
+        assert d["ok"] and d["pick"]["place"] != "경복궁"  # mock: 경복궁은 '붐빔'
+        assert d["pick"]["grade"] in ("SSR", "SR", "R")
+        assert {x["name"] for x in d["checked"]} >= {"list_places", "get_weather", "get_crowd"}
+        webapp.limiter._hits.clear()
+
+
+def test_gacha_rejects_too_many_excludes():
+    assert make_client(FakeLLM([])).post("/gacha", json={"exclude": ["a"] * 11}).status_code == 422
+
+
 def test_rejects_empty_and_too_long():
     c = make_client(FakeLLM([]))
     assert c.post("/chat", json={"message": ""}).status_code == 422
