@@ -162,3 +162,26 @@ def test_mobile_can_hop_between_schedule_and_map_and_attribution_stays():
     assert re.search(r"\.m-only \{ display:none; \}\s*@media \(max-width:900px\) \{ \.m-only \{ display:inline-block; \} \}", HTML)
     assert "지도에서 보기" in HTML and 'id="to-list"' in HTML and "일정으로 돌아가기" in HTML
     assert "OpenStreetMap" in HTML and 'class="mapcap"' in HTML  # 기존 지도 출처 표기 유지
+
+
+def test_today_in_seoul_is_hidden_until_real_data_arrives_and_is_a_magazine_toc():
+    assert re.search(r'<section class="today" id="today"[^>]*\bhidden>', HTML)  # 기본은 숨김
+    for text in ("Today in Seoul", "오늘의 서울", "지금 한산한 곳", "지금 붐비는 곳", "서울시 실시간 도시데이터"):
+        assert text in HTML, text
+    assert "fetch('/seoul-now')" in HTML and "if (d && d.ok) renderToday(d)" in HTML  # 실패·샘플 모드면 아무것도 보이지 않는다
+    assert "if (!a && !b) return;" in HTML and "box.hidden = items.length === 0" in HTML  # 빈 쪽·빈 지면은 숨김
+    assert "pad2(i + 1)" in HTML and "' 기준'" in HTML  # 번호 + 기준 시각
+    rule = re.search(r"\.toc li \{([^}]*)\}", HTML).group(1)
+    assert "border-bottom:1px solid var(--line)" in rule and "box-shadow" not in rule  # 얇은 구분선, 카드 아님
+
+
+def test_today_places_are_appended_to_the_question_never_overwrite_it():
+    assert "근처로 코스 짜기" in HTML and "function addToQuestion(name, row)" in HTML
+    assert "q.value = next;" in HTML and r"`${cur}\n${line}`" in HTML  # 기존 내용 뒤에 줄을 이어 붙인다
+    assert "if (!cur.includes(line))" in HTML  # 같은 문장은 중복해서 넣지 않는다
+    assert "next.length > 480" in HTML  # 500자 제한을 넘지 않게
+    assert re.search(r"\.toc-row\.added \.nm \{[^}]*var\(--olive\)", HTML)  # 담은 곳은 올리브
+
+
+def test_today_lives_with_the_cover_and_hides_with_it_in_the_result_view():
+    assert '<div id="front">' in HTML and "$('front').hidden = true" in HTML and "$('front').hidden = false" in HTML

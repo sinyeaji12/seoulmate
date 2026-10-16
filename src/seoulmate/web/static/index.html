@@ -167,6 +167,27 @@
   .back { display:inline-block; margin-top:6px; padding:0; border:0; background:none; font-size:14px; text-decoration:underline; text-underline-offset:5px; }
   @media (max-width:900px) { .body { grid-template-columns:1fr; } .mapcol { position:static; } .step { grid-template-columns:52px minmax(0,1fr); } .rail::after { left:12px; } }
 
+  /* ---------- 오늘의 서울: 잡지 목차 ---------- */
+  .today { border-top:1px solid var(--line); padding:clamp(48px,8vw,110px) var(--gutter); }
+  .today h2 { margin:12px 0 0; font-size:clamp(34px,5vw,64px); line-height:1.1; letter-spacing:-.045em; font-weight:700; }
+  .today-sub { margin:14px 0 0; font-size:15px; color:var(--mute); }
+  .today-cols { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(32px,6vw,96px); margin-top:clamp(28px,4vw,48px); max-width:1100px; }
+  .today-cols.one { grid-template-columns:minmax(0,520px); }
+  .toc h3 { margin:0; padding-bottom:12px; border-bottom:1px solid var(--ink); font-size:14px; font-weight:600; letter-spacing:-.01em; }
+  .toc ol { list-style:none; margin:0; padding:0; }
+  .toc li { border-bottom:1px solid var(--line); }
+  .toc-row { display:grid; grid-template-columns:52px minmax(0,1fr) auto; align-items:baseline; gap:12px; width:100%; min-height:56px; padding:16px 0; border:0; background:none; text-align:left; cursor:pointer; }
+  .toc-row .no { font:300 32px/1 var(--serif); font-variant-numeric:lining-nums; }
+  .toc-row .nm { font-size:20px; font-weight:700; letter-spacing:-.03em; line-height:1.35; text-decoration:underline transparent 1px; text-underline-offset:6px; transition:text-decoration-color .15s; }
+  .toc-row .lv { font-size:13px; color:var(--mute); white-space:nowrap; }
+  .toc-row:hover .nm { text-decoration-color:var(--ink); }
+  .toc-row:focus-visible { outline:2px solid var(--olive); outline-offset:2px; }
+  .toc-row.added .nm { text-decoration-color:var(--olive); text-decoration-thickness:3px; }   /* 입력창에 담은 곳: 올리브 */
+  .today-foot { margin:26px 0 0; font-size:12px; color:var(--mute); }
+  .today-added { margin:8px 0 0; min-height:1.5em; font-size:13px; color:var(--mute); }
+  @media (max-width:860px) { .today-cols { grid-template-columns:1fr; } .toc-row { grid-template-columns:44px minmax(0,1fr) auto; } }
+  @media (prefers-reduced-motion:reduce) { .toc-row .nm { transition:none; } }
+
   /* ---------- 서비스 소개 · 푸터 ---------- */
   .about { border-top:1px solid var(--line); padding:clamp(48px,8vw,110px) var(--gutter); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.6fr); gap:clamp(28px,6vw,96px); scroll-margin-top:0; }
   .about h2 { margin:0; font-size:clamp(26px,3vw,40px); line-height:1.25; letter-spacing:-.035em; font-weight:700; }
@@ -199,6 +220,7 @@
 
 <main>
   <!-- 첫 화면: 잡지 표지 -->
+  <div id="front">
   <section class="cover" id="home">
     <div class="cover-text">
       <h1 class="lead"><span class="l1">오늘은,</span>어떤 서울을 걸을까요?</h1>
@@ -236,6 +258,20 @@
       <div class="caption" id="cover-cap"></div>
     </aside>
   </section>
+
+  <!-- 오늘의 서울: 질문하기 전에도 볼 수 있는 실시간 지면. 데이터를 받지 못하면 영역째 숨긴다 -->
+  <section class="today" id="today" aria-labelledby="today-title" hidden>
+    <div class="kicker">Today in Seoul</div>
+    <h2 id="today-title">오늘의 서울</h2>
+    <p class="today-sub">지금 서울을 살펴봤어요. 장소를 누르면 입력창에 담아 드려요.</p>
+    <div class="today-cols" id="today-cols">
+      <div class="toc" id="toc-calm" hidden><h3>지금 한산한 곳</h3><ol></ol></div>
+      <div class="toc" id="toc-busy" hidden><h3>지금 붐비는 곳</h3><ol></ol></div>
+    </div>
+    <p class="today-foot" id="today-foot"></p>
+    <p class="today-added" id="today-added" role="status"></p>
+  </section>
+  </div>
 
   <!-- 결과: 나만의 서울 산책 노트 -->
   <article class="note" id="result" hidden>
@@ -406,7 +442,7 @@ const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matc
 function showResult(course, checkedAt) {
   const stops = course.stops, w = course.weather;
   curStops = stops; steps = []; markers = []; selected = -1;
-  $('home').hidden = true; $('result').hidden = false;
+  $('front').hidden = true; $('result').hidden = false;
 
   const d = new Date(); $('date').textContent = `${d.getFullYear()}. ${pad2(d.getMonth() + 1)}. ${pad2(d.getDate())}`;
   $('note-title').textContent = FALLBACK_TITLE;
@@ -514,8 +550,52 @@ $('to-list').addEventListener('click', () => {
 function goHome() {
   if (map) { map.remove(); map = null; }
   markers = []; steps = []; selected = -1;
-  $('result').hidden = true; $('home').hidden = false; setBusy(false); window.scrollTo(0, 0); q.focus();
+  $('result').hidden = true; $('front').hidden = false; setBusy(false); window.scrollTo(0, 0); q.focus();
 }
+// ---------- 오늘의 서울: /seoul-now(기존 get_crowd 도구 결과) → 번호 + 장소명 + 혼잡도 목차 ----------
+const todayDots = (level) => { const n = LV[level] || 0, w = el('span', 'dots' + (n ? '' : ' none')); for (let k = 1; k <= 4; k++) w.append(el('i', k <= n ? 'on' : '')); return w; };
+
+// 입력창에 "○○ 근처로 코스 짜기"를 이어 붙인다. 기존 내용은 지우지 않고, 같은 문장은 두 번 넣지 않는다.
+function addToQuestion(name, row) {
+  const line = `${name} 근처로 코스 짜기`, note = $('today-added');
+  const cur = q.value.replace(/\s+$/, '');
+  if (!cur.includes(line)) {
+    const next = cur ? `${cur}\n${line}` : line;
+    if (next.length > 480) { note.textContent = '입력창이 가득 차서 담지 못했어요. 내용을 조금 줄여 주세요.'; return; }
+    q.value = next;
+  }
+  document.querySelectorAll('.toc-row.added').forEach(r => r.classList.remove('added'));
+  row.classList.add('added');
+  note.textContent = `“${line}”를 입력창에 담았어요.`;
+  q.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
+  q.focus({ preventScroll: true }); q.setSelectionRange(q.value.length, q.value.length);
+}
+
+function renderToday(d) {
+  const fill = (id, items) => {
+    const box = $(id), list = box.querySelector('ol'); list.replaceChildren();
+    items.forEach((it, i) => {
+      const li = el('li'), b = el('button', 'toc-row'); b.type = 'button';
+      b.setAttribute('aria-label', `${i + 1}번 ${it.name}, 혼잡도 ${it.level}. 입력창에 담기`);
+      const lv = el('span', 'lv'); lv.append(todayDots(it.level), document.createTextNode(it.level));
+      b.append(el('span', 'no', pad2(i + 1)), el('span', 'nm', it.name), lv);
+      b.addEventListener('click', () => addToQuestion(it.name, b));
+      li.append(b); list.append(li);
+    });
+    box.hidden = items.length === 0;
+    return items.length > 0;
+  };
+  const a = fill('toc-calm', d.calm || []), b = fill('toc-busy', d.busy || []);
+  if (!a && !b) return;   // 보여 줄 값이 없으면 지면 자체를 숨긴다
+  $('today-cols').classList.toggle('one', !(a && b));
+  const t = new Date(), today = `${t.getFullYear()}-${pad2(t.getMonth() + 1)}-${pad2(t.getDate())}`;
+  const when = d.observed_date && d.observed_date !== today ? `${+d.observed_date.slice(5, 7)}.${+d.observed_date.slice(8, 10)} ` : '';
+  $('today-foot').textContent = `서울시 실시간 도시데이터${d.observed_at ? ' · ' + when + d.observed_at + ' 기준' : ''}`;
+  $('today').hidden = false;
+}
+// 실패·샘플 모드(ok=false)면 아무것도 보이지 않는다. 지면은 부가 정보라 오류 문구도 띄우지 않는다.
+fetch('/seoul-now').then(r => (r.ok ? r.json() : null)).then(d => { if (d && d.ok) renderToday(d); }).catch(() => {});
+
 $('back').addEventListener('click', goHome);
 $('home-btn').addEventListener('click', goHome);
 </script>
