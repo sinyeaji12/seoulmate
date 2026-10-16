@@ -199,11 +199,13 @@ def test_with_when_time_are_single_choice_rows_sent_with_the_question():
     assert "border:1px solid var(--line-strong)" in rule and "box-shadow" not in rule  # 얇은 선
 
 
-def test_future_dates_never_pretend_to_have_a_forecast():
-    assert "미래 날씨는 아직 확인할 수 없어요" in HTML and re.search(r'id="pick-note"[^>]*\bhidden>', HTML)
+def test_future_dates_use_the_forecast_and_never_pass_current_weather_off_as_it():
+    assert "내일·주말 날씨는 기상청 예보로 살펴보고, 붐빔은 지금 기준이에요" in HTML and re.search(r'id="pick-note"[^>]*\bhidden>', HTML)
     assert "['내일', '주말'].includes(picked('when'))" in HTML
-    assert "내일·주말 날씨는 단정하지 말고 지금 기준임을 밝혀 주세요" in HTML  # 모델에게도 알린다
+    assert "get_forecast 예보로 확인하고, 혼잡도는 지금 기준임을 밝혀 주세요" in HTML  # 모델에게도 알린다
     assert "slice(0, 500 - t.length)" in HTML  # 선택 문장이 500자 제한에 잘려 나가지 않는다
+    assert "function forecastSlot(f)" in HTML and "예보 ${range}" in HTML and "강수확률" in HTML
+    assert "} else if (w && w.temp_c != null) {" in HTML  # 예보가 있으면 현재 날씨 대신 예보를 보여 준다
 
 
 def test_vibe_keywords_come_only_from_evidence_in_the_response():

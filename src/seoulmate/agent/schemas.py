@@ -29,6 +29,7 @@ class Course(BaseModel):
     summary: str
     stops: list[Stop]
     weather: dict | None = None  # get_weather 결과 중 화면에 쓰는 값
+    forecast: dict | None = None  # get_forecast 결과(내일·주말 질문일 때만). 없으면 None
 
 
 def _extract_json(text: str) -> dict | None:
@@ -57,6 +58,7 @@ def build_course(answer: str, tool_calls: list[dict]) -> Course | None:
     category: dict[str, str] = {}
     coords: dict[str, tuple[float, float]] = {}
     weather: dict | None = None
+    forecast: dict | None = None
     for c in tool_calls:
         res = c["result"]
         if not res.get("ok"):
@@ -74,6 +76,8 @@ def build_course(answer: str, tool_calls: list[dict]) -> Course | None:
             crowd_next[data["place"]] = (data.get("next_hour") or {}).get("level") or ""
         elif c["name"] == "get_weather" and weather is None:
             weather = {k: data.get(k) for k in ("area", "temp_c", "precip", "pm10_grade")}
+        elif c["name"] == "get_forecast" and forecast is None:
+            forecast = {k: data.get(k) for k in ("district", "date", "when", "slots")}
     return Course(
         summary=parsed.summary,
         stops=[Stop(**s.model_dump(), image=images.get(s.place, ""), crowd=crowd.get(s.place, ""),
@@ -81,4 +85,5 @@ def build_course(answer: str, tool_calls: list[dict]) -> Course | None:
                     lat=coords.get(s.place, (None, None))[0], lng=coords.get(s.place, (None, None))[1])
                for s in parsed.stops],
         weather=weather,
+        forecast=forecast,
     )
