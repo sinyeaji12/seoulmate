@@ -89,31 +89,56 @@
   .lv-1 { background:var(--lime); } .lv-2 { background:var(--sky); } .lv-3 { background:var(--yellow); } .lv-4 { background:var(--pink); } .lv-0 { background:var(--gray); }
   .note { margin-top:12px; font-size:.78rem; display:flex; gap:6px; align-items:flex-start; }
 
-  /* ---------- gacha (라임 키치) ---------- */
-  .gacha { position:relative; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:18px; padding:16px; margin-bottom:18px; text-align:center; overflow:hidden; }
-  .gacha::before { content:""; position:absolute; inset:0; background:repeating-linear-gradient(-45deg, rgba(255,95,162,.10) 0 12px, transparent 12px 24px); pointer-events:none; }
-  .gacha > * { position:relative; }
-  .gacha h2 { margin:0; font-family:var(--title); font-weight:400; font-size:1.7rem; line-height:1.2; }
-  .gacha .sub { margin:2px 0 0; font-size:.9rem; }
+  /* ---------- gacha: 작은 카드 메시지 + 팝업(라임 키치) ---------- */
+  .mate-col.stack { display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:1; }
+  .gcard { position:relative; display:flex; align-items:center; gap:14px; width:min(100%, 440px); min-height:100px; padding:12px 14px; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:16px; overflow:hidden; }
+  .gcard::before { content:""; position:absolute; inset:0; background:repeating-linear-gradient(-45deg, rgba(255,95,162,.09) 0 10px, transparent 10px 20px); pointer-events:none; }
+  .gcard > * { position:relative; }
+  .gcard .cap-wrap { flex:none; width:64px; display:grid; place-items:center; animation:bob 2.6s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform:translateY(2px) rotate(-5deg); } 50% { transform:translateY(-6px) rotate(5deg); } }
+  .gtext { flex:1; min-width:0; }
+  .gtext h3 { margin:0; font-family:var(--title); font-weight:400; font-size:1.4rem; line-height:1.15; }
+  .gtext p { margin:2px 0 0; font-size:.86rem; line-height:1.35; }
+  .pull { flex:none; padding:10px 18px; border:var(--bd); border-radius:14px; background:var(--lime); box-shadow:var(--sh); font-family:var(--title); font-size:1.25rem; line-height:1.1; }
+  .pull:active:not(:disabled) { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
+  .pull:disabled { background:var(--gray); cursor:default; }
 
-  /* 한 칸(grid 1/1)에 캡슐·그림자·쪽지 카드를 겹쳐 둔다 → 카드가 길어지면 영역이 함께 늘어난다 */
-  .play { display:grid; justify-items:center; min-height:332px; max-width:380px; margin:8px auto 0; }
-  .play > * { grid-area:1 / 1; }
-  .floor { align-self:start; margin-top:296px; width:100px; height:14px; border-radius:50%; background:rgba(17,17,17,.25); filter:blur(3px); transition:opacity .3s; }
-  .capsule { position:relative; align-self:start; margin-top:178px; width:120px; height:120px; transform-origin:50% 100%; filter:drop-shadow(4px 4px 0 var(--ink)); transition:opacity .3s, transform .3s; }
-  .half { position:absolute; left:0; width:100%; height:60px; border:3px solid var(--ink); }
-  .top { top:0; border-radius:60px 60px 6px 6px; background:var(--pink); transform-origin:12% 100%; transition:transform .32s cubic-bezier(.3,1.5,.5,1); }
-  .top::after { content:""; position:absolute; left:15px; top:9px; width:28px; height:14px; border-radius:50%; background:rgba(255,255,255,.85); transform:rotate(-30deg); }
-  .top::before { content:""; position:absolute; left:50px; top:8px; width:9px; height:6px; border-radius:50%; background:rgba(255,255,255,.6); transform:rotate(-30deg); }
-  .bot { bottom:0; border-radius:6px 6px 60px 60px; background:var(--sky); overflow:hidden; }
-  .bot::after { content:"★"; position:absolute; left:50%; top:4px; transform:translateX(-50%); font-size:26px; line-height:1; color:var(--lime); -webkit-text-stroke:2px var(--ink); paint-order:stroke fill; }
-  .slip { position:absolute; left:50%; top:24px; width:34px; height:44px; margin-left:-17px; background:var(--lime); border:2px solid var(--ink); border-radius:4px; opacity:0; z-index:-1; transform:translateY(24px) rotate(-6deg); }
+  /* 캡슐: em 기준이라 font-size만 바꿔 카드(작게)·팝업(크게)에서 같이 쓴다 */
+  .capsule { position:relative; font-size:120px; width:1em; height:1em; transform-origin:50% 100%; filter:drop-shadow(.033em .033em 0 var(--ink)); }
+  .capsule.sm { font-size:58px; }
+  .half { position:absolute; left:0; width:100%; height:.5em; border:max(2.5px,.025em) solid var(--ink); }
+  .top { top:0; border-radius:.5em .5em .05em .05em; background:var(--pink); transform-origin:12% 100%; transition:transform .32s cubic-bezier(.3,1.5,.5,1); }
+  .top::after { content:""; position:absolute; left:.125em; top:.075em; width:.233em; height:.117em; border-radius:50%; background:rgba(255,255,255,.85); transform:rotate(-30deg); }
+  .bot { bottom:0; border-radius:.05em .05em .5em .5em; background:var(--sky); overflow:hidden; }
+  .bot::after { content:"★"; position:absolute; left:50%; top:.03em; transform:translateX(-50%); font-size:.22em; line-height:1; color:var(--lime); -webkit-text-stroke:max(1.5px,.017em) var(--ink); paint-order:stroke fill; }
+  .slip { position:absolute; left:50%; top:.2em; width:.28em; height:.37em; margin-left:-.14em; background:var(--lime); border:2px solid var(--ink); border-radius:4px; opacity:0; z-index:-1; transform:translateY(24px) rotate(-6deg); }
   .slip::after { content:""; position:absolute; left:6px; right:6px; top:10px; height:2px; background:var(--ink); box-shadow:0 7px 0 var(--ink), 0 14px 0 var(--ink); }
 
+  /* 팝업: 데스크톱은 가운데 모달, 모바일은 화면 전체를 덮는 바텀시트 (상태 클래스 이름이 서로 겹치지 않게 on / lid 로 구분) */
+  body.noscroll { overflow:hidden; }
+  .overlay { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(17,17,17,.55); }
+  .overlay.on { display:flex; animation:fadeIn .2s ease both; }
+  .dialog { position:relative; display:flex; flex-direction:column; width:min(100%, 440px); max-height:min(100%, 780px); background:var(--paper); border:var(--bd); box-shadow:6px 6px 0 var(--ink); border-radius:20px; overflow:hidden; animation:dlg .3s cubic-bezier(.2,1.2,.4,1) both; }
+  .dialog:focus { outline:none; }
+  @keyframes dlg { from { opacity:0; transform:translateY(24px) scale(.94); } to { opacity:1; transform:none; } }
+  .dialog::before { content:""; position:absolute; inset:0; background:repeating-linear-gradient(-45deg, rgba(255,95,162,.09) 0 12px, transparent 12px 24px); pointer-events:none; }
+  .dialog > * { position:relative; }
+  .dhead { display:flex; align-items:center; padding:12px 14px 0 18px; }
+  .dhead h2 { margin:0; flex:1; font-family:var(--title); font-weight:400; font-size:1.4rem; }
+  .xbtn { width:38px; height:38px; border:var(--bd); border-radius:12px; background:var(--paper); box-shadow:2px 2px 0 var(--ink); font-size:1.1rem; line-height:1; }
+  .xbtn:disabled { opacity:.35; cursor:default; }
+  .dbody { flex:1; overflow:auto; padding:0 18px 8px; text-align:center; }
+  .dbody .sub { margin:0; font-size:.9rem; }
+
+  /* 연출 무대: 한 칸(grid 1/1)에 캡슐·그림자·쪽지 카드를 겹쳐 둔다 → 카드가 길어지면 영역이 함께 늘어난다 */
+  .play { display:grid; justify-items:center; min-height:300px; margin:4px auto 0; }
+  .play > * { grid-area:1 / 1; }
+  .floor { align-self:start; margin-top:262px; width:100px; height:14px; border-radius:50%; background:rgba(17,17,17,.25); filter:blur(3px); transition:opacity .3s; }
+  .play .capsule { align-self:start; margin-top:144px; transition:opacity .3s, transform .3s; }
   .shaking .capsule { animation:rattle .5s ease-in-out infinite; }
   .hopping .capsule { animation:hop .48s linear both; }
   .hopping .floor { animation:floorHop .48s linear both; }
-  .open .top { transform:translate(-18px,-42px) rotate(-24deg); }
+  .lid .top { transform:translate(-18px,-42px) rotate(-24deg); }
   .slipOut .slip { animation:slipUp .36s cubic-bezier(.2,.9,.3,1) both; }
   .done .capsule { opacity:0; transform:translateY(18px) scale(.88); }
   .done .floor { opacity:0; }
@@ -131,26 +156,36 @@
   .ticket { align-self:start; width:100%; text-align:left; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; opacity:0; pointer-events:none; transform-origin:50% 45%; }
   .showTicket .ticket { pointer-events:auto; animation:unfold .48s cubic-bezier(.2,.9,.3,1.08) both; }
   @keyframes unfold { from { opacity:0; transform:translateY(80px) scale(.16,.22); } 35% { opacity:1; } to { opacity:1; transform:none; } }
-  .ticket .photo-wrap { border-right:0; border-bottom:var(--bd); border-radius:11px 11px 0 0; }
-  .ticket .photo { min-height:128px; }
+  .ticket .photo-wrap, .rcard .photo-wrap { border-right:0; border-bottom:var(--bd); border-radius:11px 11px 0 0; }
+  .ticket .photo { min-height:120px; }
   .tbody { padding:12px 14px 14px; display:flex; flex-direction:column; gap:8px; }
   .tname { font-family:var(--title); font-size:1.15rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .phrase { align-self:flex-start; font-family:var(--title); font-size:1.75rem; line-height:1.2; background:linear-gradient(transparent 58%, var(--lime) 58%); padding:0 4px; }
+  .phrase { align-self:flex-start; font-family:var(--title); font-size:1.7rem; line-height:1.2; background:linear-gradient(transparent 58%, var(--lime) 58%); padding:0 4px; }
   .cchips { display:flex; flex-wrap:wrap; gap:6px; }
   .cchip { padding:1px 10px; border:2px solid var(--ink); border-radius:99px; font-size:.84rem; font-weight:700; background:var(--paper); box-shadow:2px 2px 0 var(--ink); }
   .tnote { margin:0; font-size:.88rem; }
   .tnote b { font-family:var(--title); font-weight:400; }
   .verify { font-size:.76rem; display:flex; gap:6px; align-items:center; }
+  .phase { min-height:30px; margin:8px 0 0; font-family:var(--title); font-size:1.15rem; }
+  .g-msg { display:inline-block; margin-top:8px; padding:8px 14px; background:var(--yellow); border:2px solid var(--ink); border-radius:12px; box-shadow:3px 3px 0 var(--ink); }
 
-  .phase { min-height:30px; margin:10px 0 2px; font-family:var(--title); font-size:1.15rem; }
-  .gbtn { width:100%; max-width:420px; padding:14px 18px; border:var(--bd); border-radius:16px; background:var(--lime); box-shadow:6px 6px 0 var(--ink); font-family:var(--title); font-size:1.5rem; line-height:1.2; }
-  .gbtn:active:not(:disabled) { transform:translate(4px,4px); box-shadow:2px 2px 0 var(--ink); }
-  .gbtn:disabled { background:var(--gray); cursor:default; box-shadow:6px 6px 0 var(--ink); }
-  .g-left { display:flex; justify-content:center; align-items:center; gap:7px; margin:12px 0 0; font-size:.82rem; }
+  .dfoot { padding:8px 18px 18px; display:flex; flex-direction:column; gap:10px; }
+  .dfoot .row { display:flex; gap:10px; }
+  .dfoot .row > * { flex:1; }
+  .mbtn { padding:12px 10px; border:var(--bd); border-radius:14px; background:var(--paper); box-shadow:var(--sh); font-family:var(--title); font-size:1.1rem; line-height:1.15; }
+  .mbtn.cta { background:var(--lime); font-size:1.3rem; padding:14px 10px; }
+  .mbtn:active:not(:disabled) { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
+  .mbtn:disabled { background:var(--gray); cursor:default; }
+  .g-left { display:flex; justify-content:center; align-items:center; gap:7px; font-size:.8rem; }
   .mini { width:22px; height:22px; border-radius:50%; border:2px solid var(--ink); background:linear-gradient(180deg, var(--pink) 50%, var(--sky) 50%); box-shadow:2px 2px 0 var(--ink); transition:opacity .4s, transform .4s; }
   .mini.used { opacity:.2; transform:scale(.8); box-shadow:none; }
-  #gout { margin-top:10px; }
-  .g-msg { display:inline-block; padding:8px 14px; background:var(--yellow); border:2px solid var(--ink); border-radius:12px; box-shadow:3px 3px 0 var(--ink); }
+
+  /* 채팅으로 이어진 가챠 결과 카드 */
+  .rcard { width:min(100%, 360px); background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; overflow:hidden; animation:rise .4s cubic-bezier(.2,1.2,.4,1) both; }
+  @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+  .rcard .photo { min-height:96px; }
+  .rcard .tbody { padding:10px 12px 12px; gap:6px; }
+  .rcard .phrase { font-size:1.35rem; }
 
   /* ---------- traffic light ---------- */
   .tl { position:relative; display:inline-flex; vertical-align:middle; padding:3px 4px; margin:0 2px; background:#2a2a2a; border:2px solid var(--ink); border-radius:99px; cursor:help; }
@@ -169,9 +204,18 @@
   .legend-box .row .tl { cursor:default; flex:none; }
   .legend-box .row b { display:block; }
 
-  @media (prefers-reduced-motion:reduce) { .capsule, .top, .floor { animation:none !important; transition:none !important; } .showTicket .ticket { animation:fadeIn .3s ease both; } .mini { transition:none; } }
+  @media (prefers-reduced-motion:reduce) { .gcard .cap-wrap, .shaking .capsule, .hopping .capsule, .hopping .floor, .slipOut .slip, .dialog, .rcard { animation:none !important; } .top, .capsule, .floor, .mini { transition:none !important; } .showTicket .ticket { animation:fadeIn .3s ease both; } }
   @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-  @media (max-width:560px) { .gbtn { font-size:1.3rem; } .gacha h2 { font-size:1.5rem; } .phrase { font-size:1.5rem; } }
+  @media (max-width:560px) {
+    .overlay { padding:0; align-items:flex-end; }
+    .dialog { width:100%; height:100%; max-height:none; border-radius:0; border-width:0; box-shadow:none; animation:sheet .34s cubic-bezier(.2,.9,.3,1) both; }
+    @keyframes sheet { from { transform:translateY(100%); } to { transform:none; } }
+    .dhead { padding-top:calc(12px + env(safe-area-inset-top)); }
+    .dbody { display:flex; flex-direction:column; }
+    .dbody .play { margin:auto; }
+    .dfoot { padding:12px 18px calc(16px + env(safe-area-inset-bottom)); border-top:var(--bd); background:var(--paper); }
+    .gtext h3 { font-size:1.2rem; } .pull { padding:10px 14px; } .phrase { font-size:1.5rem; }
+  }
 
   /* ---------- composer ---------- */
   .composer { position:sticky; bottom:0; z-index:9; background:var(--bg); border-top:var(--bd); padding:10px 16px calc(10px + env(safe-area-inset-bottom)); }
@@ -263,19 +307,6 @@
 </header>
 
 <main>
-  <section class="gacha" aria-label="서울 가챠">
-    <h2>🎰 서울 가챠</h2>
-    <p class="sub">오늘의 서울, 운명에 맡겨 볼래?</p>
-    <div class="play" id="play">
-      <div class="floor"></div>
-      <div class="capsule" aria-hidden="true"><div class="slip"></div><div class="half bot"></div><div class="half top"></div></div>
-      <article class="ticket" id="ticket"></article>
-    </div>
-    <p class="phase" id="phase" aria-live="polite">버튼을 눌러 캡슐을 뽑아봐</p>
-    <button class="gbtn" id="gbtn" type="button">캡슐 뽑기 🎰</button>
-    <p class="g-left" id="gleft" aria-label="남은 캡슐 3개"><span>남은 캡슐</span><i class="mini"></i><i class="mini"></i><i class="mini"></i></p>
-    <div id="gout" aria-live="polite"></div>
-  </section>
 
   <details class="legend-box">
     <summary>🚦 혼잡도 보는 법</summary>
@@ -292,6 +323,24 @@
       <textarea id="q" maxlength="500" rows="1" placeholder="어디 가고 싶어? 편하게 말해줘" required></textarea>
       <button class="primary" id="send"><svg class="ic"><use href="#i-send"/></svg><span class="t">보내기</span></button>
     </form>
+  </div>
+</div>
+
+<!-- 가챠 팝업(모달 / 모바일 바텀시트). 평소 가챠는 첫 인사 아래 작은 카드 메시지로만 보인다. -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dtitle" tabindex="-1">
+    <div class="dhead"><h2 id="dtitle">🎰 서울 가챠</h2><button class="xbtn" id="xbtn" type="button" aria-label="닫기">✕</button></div>
+    <div class="dbody">
+      <p class="sub">오늘의 서울, 운명에 맡겨 볼래?</p>
+      <div class="play" id="play">
+        <div class="floor"></div>
+        <div class="capsule" aria-hidden="true"><div class="slip"></div><div class="half bot"></div><div class="half top"></div></div>
+        <article class="ticket" id="ticket"></article>
+      </div>
+      <p class="phase" id="phase" aria-live="polite"></p>
+      <div id="gout" aria-live="polite"></div>
+    </div>
+    <div class="dfoot" id="dfoot"></div>
   </div>
 </div>
 
@@ -378,7 +427,10 @@ function addMate(wide) {
 }
 function say(bubble, text) { bubble.append(el('div', null, text)); }
 
-addMate(false).bubble.append(el('div', null, '안녕! 나는 서울메이트야 🗼 오늘 어디 갈지 말만 해. 날씨랑 붐빔 확인해서 코스 짜줄게!'));
+{ // 첫 인사 + 바로 아래 가챠 카드 메시지
+  const w = addMate(false); w.bubble.append(el('div', null, '안녕! 나는 서울메이트야 🗼 오늘 어디 갈지 말만 해. 날씨랑 붐빔 확인해서 코스 짜줄게!'));
+  w.msg.classList.add('has-wide'); w.bubble.parentElement.classList.add('stack'); w.bubble.parentElement.append(gachaCard());
+}
 
 // 예시 질문 칩
 for (const t of ['비 와도 갈 데 있어?', '덜 붐비는 데이트 코스', '혼자 2시간 산책']) {
@@ -435,6 +487,7 @@ function renderCourse(bubble, course) {
 }
 
 // ---------- 서울 가챠 ----------
+// 평소: 첫 인사 아래 작은 카드 메시지. "뽑기"를 누르면 팝업이 떠서 연출이 진행된다.
 // 흐름: 덜컹(도구 호출 중) → 통 튀어 오름 → 뚜껑 열림 → 쪽지가 올라와 펼쳐지며 결과. 확인(날씨·혼잡도)이 끝난 장소만 나온다.
 const MAX_SPINS = 3, drawn = [];
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -444,7 +497,7 @@ const PHASES = ['서울 하늘 보는 중… ☁️', '사람 얼마나 있는�
 const PHASE_MIN = 420;  // 문구 하나를 최소 이만큼은 보여준다(도구가 빨리 끝나도 읽을 수 있게)
 const T = { hop:480, pop:320, slip:360, unfold:480 };
 const play = $('play');
-let gBusy = false;
+let gBusy = false, lastPick = null, lastChecked = [], lastFocus = null;
 function cls(...c) { play.className = 'play ' + c.join(' '); }
 function lampEmoji(level) { return { '여유':'🟢', '보통':'🟡', '약간 붐빔':'🟡', '붐빔':'🔴' }[level] || '⚪'; }
 function weatherChip(w) {
@@ -453,27 +506,74 @@ function weatherChip(w) {
   return (rain ? (/눈/.test(w.precip) ? '❄️' : '🌧️') : '☀️') + ' ' + t + (rain ? w.precip : '맑음');
 }
 
-function renderTicket(p, checked) {
-  const t = $('ticket'); t.replaceChildren();
+// 결과 카드(팝업 안 / 채팅방 공용). compact=true면 "왜 여기?"와 확인 문구를 뺀다.
+function ticketNode(p, checked, compact) {
   const body = el('div', 'tbody');
   const name = el('div', 'tname'); name.append(p.place, trafficLight(p.crowd, p.crowd_next));
   const chips = el('div', 'cchips');
   chips.append(el('span', 'cchip', weatherChip(p.weather || {})), el('span', 'cchip lv-' + Math.max(0, levelOf(p.crowd)), lampEmoji(p.crowd) + ' ' + p.crowd));
-  const why = el('p', 'tnote'); why.append(el('b', null, '왜 여기? '), p.reason);
-  const ok = (n) => checked.some(c => c.name === n && c.ok);
-  const v = el('div', 'verify'); v.append(icon('check'), ok('get_weather') && ok('get_crowd') ? '날씨·혼잡도 확인 완료' + (MOCK ? ' (샘플 데이터)' : '') : '확인 정보 없음');
-  body.append(name, el('div', 'phrase', PHRASE[p.grade] || PHRASE.R), chips, why, v);
-  t.append(placePhoto(p.place, p.category), body);
+  body.append(name, el('div', 'phrase', PHRASE[p.grade] || PHRASE.R), chips);
+  if (!compact) {
+    const why = el('p', 'tnote'); why.append(el('b', null, '왜 여기? '), p.reason);
+    const ok = (n) => checked.some(c => c.name === n && c.ok);
+    const v = el('div', 'verify'); v.append(icon('check'), ok('get_weather') && ok('get_crowd') ? '날씨·혼잡도 확인 완료' + (MOCK ? ' (샘플 데이터)' : '') : '확인 정보 없음');
+    body.append(why, v);
+  }
+  const f = document.createDocumentFragment(); f.append(placePhoto(p.place, p.category), body); return f;
 }
 
-function updateGachaBtn() {
-  const left = MAX_SPINS - drawn.length, b = $('gbtn');
-  document.querySelectorAll('.mini').forEach((m, i) => m.classList.toggle('used', i < drawn.length));
-  $('gleft').setAttribute('aria-label', '남은 캡슐 ' + left + '개');
-  b.disabled = left <= 0;
-  b.textContent = left <= 0 ? '오늘 캡슐은 끝!' : drawn.length ? '한 번 더 🔄' : '캡슐 뽑기 🎰';
-  if (left <= 0) $('phase').textContent = '새로고침하면 다시 뽑을 수 있어';
+// ----- 팝업 열기/닫기: 포커스 이동·Esc·바깥 클릭·배경 스크롤 잠금 -----
+function openModal() {
+  lastFocus = document.activeElement; $('overlay').classList.add('on'); $('overlay').setAttribute('aria-hidden', 'false');
+  document.body.classList.add('noscroll'); $('dialog').focus();
 }
+function closeModal() {
+  if (gBusy) return;  // 뽑는 중에는 닫지 않는다
+  $('overlay').classList.remove('on'); $('overlay').setAttribute('aria-hidden', 'true'); document.body.classList.remove('noscroll');
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+$('xbtn').addEventListener('click', closeModal);
+$('overlay').addEventListener('mousedown', (e) => { if (e.target === $('overlay')) closeModal(); });
+document.addEventListener('keydown', (e) => {
+  if (!$('overlay').classList.contains('on')) return;
+  if (e.key === 'Escape') { closeModal(); return; }
+  if (e.key === 'Tab') {  // 포커스가 팝업 밖으로 나가지 않게
+    const f = [...$('dialog').querySelectorAll('button:not(:disabled)')];
+    if (!f.length) { e.preventDefault(); $('dialog').focus(); return; }
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === $('dialog'))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
+
+function renderFoot(state) {
+  const f = $('dfoot'); f.replaceChildren();
+  const left = MAX_SPINS - drawn.length;
+  const mk = (txt, cb, c2, dis) => { const b = el('button', 'mbtn ' + (c2 || ''), txt); b.type = 'button'; b.disabled = !!dis; if (cb) b.onclick = cb; return b; };
+  if (state === 'busy') f.append(mk('뽑는 중…', null, 'cta', true));        // 로딩 중엔 비활성 + "뽑는 중…"
+  else {
+    const again = mk(left <= 0 ? '오늘 캡슐은 끝!' : '한 번 더 🔄', spinGacha, '', left <= 0);
+    if (state === 'result') {
+      f.append(mk('이걸로 코스 짜줘', useIt, 'cta', busy));  // 채팅이 진행 중이면 잠깐 비활성
+      const row = el('div', 'row'); row.append(again, mk('닫기', closeModal)); f.append(row);
+    } else { const row = el('div', 'row'); row.append(again, mk('닫기', closeModal)); f.append(row); }
+  }
+  const l = el('div', 'g-left'); l.append(el('span', null, '남은 캡슐'));
+  for (let i = 0; i < MAX_SPINS; i++) l.append(el('i', 'mini' + (i < drawn.length ? ' used' : '')));
+  l.setAttribute('aria-label', '남은 캡슐 ' + left + '개'); f.append(l);
+  $('xbtn').disabled = state === 'busy';
+}
+
+// 평소 상태의 작은 가챠 카드 메시지(첫 인사 바로 아래)
+function gachaCard() {
+  const card = el('div', 'gcard');
+  const wrap = el('div', 'cap-wrap');
+  const cap = el('div', 'capsule sm'); cap.setAttribute('aria-hidden', 'true'); cap.append(el('div', 'half bot'), el('div', 'half top')); wrap.append(cap);
+  const txt = el('div', 'gtext'); txt.append(el('h3', null, '🎰 서울 가챠'), el('p', null, '오늘의 서울, 운명에 맡겨 볼래?'));
+  const b = el('button', 'pull', '뽑기'); b.type = 'button'; b.id = 'pull'; b.addEventListener('click', () => { openModal(); spinGacha(); });
+  card.append(wrap, txt, b); return card;
+}
+function updateCardBtn() { const b = $('pull'); if (b) { b.disabled = drawn.length >= MAX_SPINS; b.textContent = b.disabled ? '끝' : '뽑기'; } }
 
 // /gacha/stream: 날씨·혼잡도 도구가 실제로 호출될 때마다 tool 이벤트가 오고, 마지막에 result가 온다.
 async function readGachaStream(onTool) {
@@ -495,7 +595,7 @@ async function readGachaStream(onTool) {
 
 async function spinGacha() {
   if (gBusy || drawn.length >= MAX_SPINS) return;
-  gBusy = true; $('gbtn').disabled = true; $('gout').replaceChildren(); cls();
+  gBusy = true; renderFoot('busy'); $('gout').replaceChildren(); cls();
   const rm = reducedMotion();
   let phaseAt = Date.now(), chain = Promise.resolve(), crowdShown = false;
   const show = (n) => { $('phase').textContent = PHASES[n]; phaseAt = Date.now(); };
@@ -509,23 +609,33 @@ async function spinGacha() {
   if (data.ok && data.pick) {
     if (!crowdShown) goPhase(1);
     await goPhase(2);                                   // 두구두구 (문구는 튀어 오르는 동안에도 보인다)
-    renderTicket(data.pick, data.checked || []);
+    lastPick = data.pick; lastChecked = data.checked || [];
+    $('ticket').replaceChildren(ticketNode(lastPick, lastChecked, false));
     if (rm) { cls('done', 'showTicket'); await sleep(300); }   // 모션 줄이기: 흔들림·튀어오름 없이 카드만 부드럽게
     else {
       cls('hopping'); await sleep(T.hop);
-      cls('open'); await sleep(T.pop);
-      cls('open', 'slipOut'); await sleep(T.slip);
-      cls('open', 'slipOut', 'done', 'showTicket'); await sleep(T.unfold);
+      cls('lid'); await sleep(T.pop);
+      cls('lid', 'slipOut'); await sleep(T.slip);
+      cls('lid', 'slipOut', 'done', 'showTicket'); await sleep(T.unfold);
     }
-    drawn.push(data.pick.place); $('phase').textContent = '짠! 오늘의 한 곳이야';
+    drawn.push(lastPick.place); $('phase').textContent = '짠! 오늘의 한 곳이야';
+    gBusy = false; renderFoot('result'); updateCardBtn();
   } else {
-    await chain; cls(); $('phase').textContent = '버튼을 눌러 캡슐을 뽑아봐';
+    await chain; cls(); $('phase').textContent = '';
     $('gout').replaceChildren(el('span', 'g-msg', data.message || '이번엔 못 뽑았어. 다시 돌려줘!'));
+    gBusy = false; renderFoot('error');
   }
-  gBusy = false; updateGachaBtn();
 }
-$('gbtn').addEventListener('click', spinGacha);
-updateGachaBtn();
+
+// [이걸로 코스 짜줘] → 팝업을 닫고 결과를 채팅방 카드 메시지로 넣은 뒤, 같은 장소로 대화를 이어간다(날씨·혼잡도 재확인).
+function useIt() {
+  if (!lastPick || busy) return;
+  const p = lastPick, checked = lastChecked; closeModal();
+  const m = addMate(false); m.bubble.append(el('div', null, '가챠 결과야! 🎰'));
+  const rc = el('div', 'rcard'); rc.append(ticketNode(p, checked, true)); m.bubble.parentElement.append(rc);
+  m.msg.classList.add('has-wide'); m.bubble.parentElement.classList.add('stack'); scrollDown();
+  ask(p.place + ' 포함해서 코스 짜줘');
+}
 
 let busy = false;
 async function ask(text) {
