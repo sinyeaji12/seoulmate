@@ -4,51 +4,129 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>서울 메이트 · 서울메이트</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%23B9D65A' stroke='%23111' stroke-width='5'/%3E%3Cg fill='%23111' stroke='%23111' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='31' y='8' width='2' height='9'/%3E%3Cpath d='M23 24Q23 17 32 17Q41 17 41 24L39 29H25Z'/%3E%3Cpath d='M29 29H35L37 50H27Z'/%3E%3Cpath d='M22 50H42L46 57H18Z'/%3E%3C/g%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%23C6E25A' stroke='%23111' stroke-width='5'/%3E%3Cg fill='%23111' stroke='%23111' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='31' y='8' width='2' height='9'/%3E%3Cpath d='M23 24Q23 17 32 17Q41 17 41 24L39 29H25Z'/%3E%3Cpath d='M29 29H35L37 50H27Z'/%3E%3Cpath d='M22 50H42L46 57H18Z'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root {
-    --bg:#FFF8E7; --lime:#B9D65A; --pink:#FF5FA2; --sky:#6EC6FF; --ink:#111111; --paper:#ffffff;
-    --yellow:#FFE45C; --gray:#e4dfd0;
-    --bd:3px solid var(--ink); --sh:4px 4px 0 var(--ink);
-    --title:"Black Han Sans","Malgun Gothic",sans-serif;
-    --body:"Gowun Dodum","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+    --bg:#e9e9e6; --ink:#111111; --paper:#ffffff; --line:#d6d6d1; --mute:#66665f;
+    --pink:#f28cb7; --sky:#8fc3ff; --lime:#c6e25a; --silver:#cfd1d4; --cream:#eeede6;
+    --yellow:#FFE45C; --gray:#d9d9d5;
+    --sh:0 1px 2px rgba(0,0,0,.06), 0 6px 18px rgba(0,0,0,.08);
+    --body:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    --title:var(--body);
+    --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,"Liberation Mono",monospace;
   }
   * { box-sizing:border-box; }
   html { -webkit-text-size-adjust:100%; }
-  body {
-    margin:0; color:var(--ink); font:16px/1.6 var(--body); min-height:100vh; min-height:100dvh;
-    background-color:var(--bg);
-    background-image:radial-gradient(rgba(17,17,17,.12) 1.2px, transparent 1.4px);
-    background-size:18px 18px;
-  }
+  body { margin:0; color:var(--ink); font:16px/1.6 var(--body); min-height:100vh; min-height:100dvh; background:var(--bg); }
   svg.ic { width:1.15em; height:1.15em; flex:none; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; vertical-align:-.2em; }
 
   /* ---------- header ---------- */
-  header { position:sticky; top:0; z-index:10; background:var(--bg); border-bottom:var(--bd); }
-  .bar { max-width:820px; margin:0 auto; padding:8px 16px; display:flex; align-items:center; gap:12px; }
-  .logo { height:62px; width:auto; flex:none; overflow:visible; }
-  .tagline { font-size:.82rem; line-height:1.3; color:#444; }
+  header { position:sticky; top:0; z-index:10; background:var(--bg); }
+  .bar { max-width:820px; margin:0 auto; padding:14px 16px 10px; display:flex; align-items:center; gap:12px; }
+  .brand { display:flex; align-items:center; gap:10px; font-size:1.08rem; font-weight:800; letter-spacing:-.01em; }
+  .logo-dot { width:40px; height:40px; border-radius:50%; background:var(--lime); display:grid; place-items:center; flex:none; }
+  .logo-dot svg { width:15px; height:24px; }
   .spacer { flex:1; }
-  .badge { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; font-size:.8rem; font-weight:700; background:var(--paper); border:2px solid var(--ink); border-radius:99px; box-shadow:2px 2px 0 var(--ink); white-space:nowrap; }
-  .badge b { font-weight:400; font-size:.7rem; line-height:1; }
+  .badge { display:inline-flex; align-items:center; gap:7px; padding:6px 12px; font-size:.85rem; font-weight:600; background:#dcdcd7; border-radius:99px; white-space:nowrap; }
+  .dot { width:8px; height:8px; border-radius:50%; background:#a5a59e; flex:none; }
+  .dot.ok { background:#36a35a; } .dot.bad { background:#e0457b; }
+
+  /* ---------- 홈: 제목 + 메탈 자판기 ---------- */
+  main { max-width:820px; margin:0 auto; padding:6px 16px 12px; }
+  .fold { display:grid; grid-template-rows:1fr; transition:grid-template-rows .32s ease; }
+  .stage.folded .fold { grid-template-rows:0fr; }
+  .fold-in { min-height:0; overflow:hidden; padding:8px 16px 44px; margin:-8px -16px -40px; transition:padding .32s ease, margin .32s ease; }
+  .stage.folded .fold-in { padding-top:0; padding-bottom:0; margin-top:0; margin-bottom:0; }
+  .stage-grid { display:grid; gap:18px; }
+  .hero h1 { margin:0; font-size:clamp(1.5rem, 6.2vw, 1.9rem); line-height:1.25; font-weight:800; letter-spacing:-.02em; text-wrap:balance; }
+  .hero p { margin:6px 0 0; color:var(--mute); font-size:1rem; }
+  @media (min-width:860px) {
+    .stage-grid { grid-template-columns:1fr 400px; align-items:center; gap:36px; padding:10px 0 4px; }
+    .hero h1 { font-size:1.8rem; }
+    .hero p { font-size:1.1rem; }
+  }
+  .fold-bar { display:none; margin:0 0 12px; }
+  .stage.has-chat .fold-bar { display:block; }
+  .fold-toggle { display:inline-flex; align-items:center; gap:12px; padding:8px 16px; border:0; border-radius:99px; background:#161a17; color:#c5ef4a; font:700 12px/1 var(--mono); letter-spacing:.08em; }
+  .fold-toggle .ftxt { color:#aab59a; font-family:var(--body); font-size:12px; letter-spacing:0; }
+
+  /* 가챠 기계: 브러시드 실버 본체 / 초록 LCD / 유리창 / COIN · TURN · PICK UP */
+  .machine { position:relative; width:min(100%, 380px); margin:0 auto; padding:14px 14px 12px; border-radius:26px;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.03) 0 1px, rgba(255,255,255,.04) 1px 3px),
+      linear-gradient(135deg, #f6f6f6 0%, #c9cacd 26%, #efeff0 50%, #bcbdc1 76%, #e6e6e8 100%);
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.85), inset 0 0 0 3px rgba(0,0,0,.1), 0 14px 28px rgba(0,0,0,.2), 0 2px 5px rgba(0,0,0,.25); }
+  .screw { position:absolute; width:9px; height:9px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff, #a9aaae 70%); box-shadow:0 0 0 1px rgba(0,0,0,.25); }
+  .screw::after { content:""; position:absolute; left:1px; right:1px; top:4px; height:1px; background:rgba(0,0,0,.45); transform:rotate(-30deg); }
+  .screw.a { left:8px; top:8px; } .screw.b { right:8px; top:8px; } .screw.c { left:8px; bottom:8px; } .screw.d { right:8px; bottom:8px; }
+  .lcd { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px; border-radius:12px; background:linear-gradient(#0c110e, #1a221d);
+    box-shadow:inset 0 2px 7px #000, 0 0 0 2px #b4b5b9, 0 1px 0 2px #fff; }
+  .lcd-main { font:800 clamp(19px, 6vw, 25px)/1 var(--mono); letter-spacing:.06em; color:#c5ef4a; text-shadow:0 0 9px rgba(197,239,74,.55); white-space:nowrap; }
+  .lcd-sub { text-align:right; font:600 11px/1.35 var(--mono); color:#b7c3a6; white-space:nowrap; }
+  .glass { position:relative; margin-top:12px; border-radius:16px; overflow:hidden; background:linear-gradient(160deg, #3a3e42, #15181a 55%, #24282b);
+    box-shadow:inset 0 3px 12px rgba(0,0,0,.75), 0 0 0 2px #b4b5b9, 0 1px 0 2px #fff; }
+  .glass svg { display:block; width:100%; height:auto; }
+  .glass::after { content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(112deg, rgba(255,255,255,.17) 0 16%, transparent 16% 24%, rgba(255,255,255,.08) 24% 28%, transparent 28%); }
+  .cap { transform-box:fill-box; transform-origin:center; }
+  .machine.shaking .cap { animation:jig .2s ease-in-out infinite alternate; animation-delay:var(--d, 0s); }
+  @keyframes jig { from { transform:translate(-2px,1px) rotate(-7deg); } to { transform:translate(2px,-1.5px) rotate(7deg); } }
+
+  .controls { display:grid; grid-template-columns:1fr 1.5fr 1fr; gap:8px; align-items:end; margin-top:14px; padding:0 6px; }
+  .ctl { display:flex; flex-direction:column; align-items:center; gap:7px; min-width:0; }
+  .ctl > span { font:700 10px/1 var(--mono); letter-spacing:.14em; color:#3b3b3e; }
+  .coin { width:100%; max-width:62px; height:74px; border-radius:11px; display:grid; place-items:center;
+    background:linear-gradient(#f7f7f7, #c3c4c8); box-shadow:inset 0 0 0 1px rgba(255,255,255,.9), 0 0 0 1px rgba(0,0,0,.18), 0 3px 5px rgba(0,0,0,.2); }
+  .coin i { width:7px; height:38px; border-radius:4px; background:#0d0d0d; box-shadow:inset 0 1px 2px #000, 0 1px 0 rgba(255,255,255,.85); }
+  .knob { position:relative; width:min(100%, 106px); aspect-ratio:1; padding:0; border:0; border-radius:50%; cursor:pointer;
+    background:radial-gradient(circle at 34% 28%, #fff 0%, #e2e2e4 30%, #a7a8ac 72%, #85868a 100%);
+    box-shadow:inset 0 -5px 10px rgba(0,0,0,.2), 0 8px 14px rgba(0,0,0,.3), 0 0 0 4px rgba(255,255,255,.4); }
+  .knob:active { transform:scale(.97); }
+  .knob[aria-disabled="true"] { cursor:default; }
+  .knob-face { position:absolute; inset:0; display:grid; place-items:center; }
+  .knob-bar { position:relative; width:74%; height:21%; border-radius:99px; display:grid; place-items:center;
+    background:linear-gradient(#fafafa, #bdbec2); box-shadow:inset 0 0 0 1px rgba(255,255,255,.9), 0 0 0 1px rgba(0,0,0,.16), 0 3px 5px rgba(0,0,0,.3); }
+  .knob-bar i { width:34%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 30%, #e6f58c, var(--lime) 60%, #96b53a); box-shadow:0 0 0 1px rgba(0,0,0,.2); }
+  .knob.turning .knob-face { animation:knobSpin .8s linear infinite; }
+  @keyframes knobSpin { to { transform:rotate(360deg); } }
+  .tray-wrap { position:relative; width:100%; max-width:66px; }
+  .tray-wrap::after { content:""; position:absolute; inset:-5px; border-radius:16px; border:2px solid var(--cap, var(--pink)); opacity:0; pointer-events:none; }
+  .tray-wrap.has::after { animation:ring 1.5s ease-in-out .8s infinite; }
+  @keyframes ring { 0%,100% { opacity:0; transform:scale(.96); } 50% { opacity:.9; transform:scale(1.06); } }
+  .tray { position:relative; display:block; width:100%; height:74px; padding:0; border:0; border-radius:11px; overflow:hidden; background:linear-gradient(#25292c, #0b0c0d);
+    box-shadow:inset 0 3px 8px #000, 0 0 0 2px #b0b1b5, 0 1px 0 2px #fff; }
+  .tray::before { content:""; position:absolute; left:0; right:0; top:0; height:20px; background:linear-gradient(#a3a5a9, #3b3d40); }
+  .tray:disabled { cursor:default; }
+  .tray.has { cursor:pointer; }
+  .pc { display:none; position:absolute; left:50%; bottom:7px; font-size:46px; width:1em; height:1em; margin-left:-.5em; border-radius:50%; transform:rotate(-14deg);
+    background:linear-gradient(180deg, var(--cap, var(--pink)) 0 50%, var(--cream) 50% 100%);
+    box-shadow:inset -.06em -.08em .12em rgba(0,0,0,.2), inset .04em .05em .08em rgba(255,255,255,.7), 0 .03em .06em rgba(0,0,0,.35); }
+  .pc::after { content:""; position:absolute; left:.17em; top:.13em; width:.26em; height:.12em; border-radius:50%; background:rgba(255,255,255,.8); transform:rotate(-32deg); }
+  .tray.has .pc { display:block; animation:dropIn .75s cubic-bezier(.3,.1,.5,1) both; }
+  @keyframes dropIn {
+    0% { transform:translateY(-120px) rotate(-40deg); }
+    52% { transform:translateY(0) rotate(8deg); }
+    70% { transform:translateY(-15px) rotate(-8deg); }
+    86% { transform:translateY(0) rotate(2deg); }
+    100% { transform:translateY(0) rotate(-14deg); } }
+  .vend { margin:12px 0 0; text-align:center; font:600 9.5px/1 var(--mono); letter-spacing:.16em; color:#555559; }
+  .mstatus { min-height:2em; margin:14px 0 0; text-align:center; font-size:.92rem; font-weight:600; color:var(--mute); }
+  .g-msg { display:inline-block; padding:5px 14px; background:var(--paper); border:1px solid var(--pink); border-radius:99px; color:var(--ink); }
 
   /* ---------- chat ---------- */
-  main { max-width:820px; margin:0 auto; padding:18px 16px 12px; }
-  #log { display:flex; flex-direction:column; gap:18px; }
+  #log { display:flex; flex-direction:column; gap:18px; margin-top:6px; }
   .msg { display:flex; gap:10px; max-width:100%; }
   .msg.me { justify-content:flex-end; }
-  .avatar { width:40px; height:40px; flex:none; border:var(--bd); border-radius:50%; background:var(--lime); display:grid; place-items:center; box-shadow:2px 2px 0 var(--ink); }
-  .avatar svg { width:20px; height:26px; }
-  .bubble { position:relative; padding:12px 16px; border:var(--bd); box-shadow:var(--sh); min-width:0; max-width:min(100%, 560px); overflow-wrap:anywhere; }
-  .me .bubble { background:var(--pink); color:var(--ink); border-radius:18px 18px 4px 18px; font-weight:700; transform:rotate(.6deg); }
-  .mate .bubble { background:var(--lime); border-radius:18px 18px 18px 4px; }
+  .avatar { width:36px; height:36px; flex:none; border-radius:50%; background:var(--lime); display:grid; place-items:center; }
+  .avatar svg { width:14px; height:22px; }
+  .bubble { position:relative; padding:12px 16px; min-width:0; max-width:min(100%, 560px); overflow-wrap:anywhere; }
+  .me .bubble { background:var(--ink); color:#fff; border-radius:20px 20px 6px 20px; font-weight:600; }
+  .mate .bubble { background:var(--paper); border-radius:20px 20px 20px 6px; box-shadow:var(--sh); }
   .mate .bubble.wide { max-width:100%; flex:1; }
-  .mate .name { font-family:var(--title); font-size:.95rem; margin-bottom:2px; }
+  .mate .name { font-weight:800; font-size:.92rem; margin-bottom:2px; }
   .mate-col { min-width:0; flex:1; }
   .msg.mate:not(.has-wide) .mate-col { flex:0 1 auto; }
+  .mate-col.stack { display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:1; }
 
   .dots span { display:inline-block; animation:bounce 1s infinite; }
   .dots span:nth-child(2) { animation-delay:.15s; } .dots span:nth-child(3) { animation-delay:.3s; }
@@ -57,193 +135,153 @@
   /* ---------- result inside mate bubble ---------- */
   .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0 12px; }
   @media (max-width:560px) { .kpis { grid-template-columns:repeat(2,1fr); } }
-  .kpi { background:var(--paper); border:2px solid var(--ink); box-shadow:3px 3px 0 var(--ink); padding:8px 10px; border-radius:10px; }
-  .kpi .lab { font-size:.74rem; color:#444; display:flex; gap:5px; align-items:center; }
-  .kpi .val { font-family:var(--title); font-size:1.2rem; display:flex; gap:6px; align-items:center; }
-  .brief { background:var(--paper); border:2px solid var(--ink); border-radius:10px; padding:10px 12px; margin-bottom:14px; display:flex; gap:8px; }
-  .timeline { display:flex; flex-direction:column; gap:16px; }
-  .stop { position:relative; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; display:grid; grid-template-columns:170px 1fr; overflow:visible; }
+  .kpi { background:var(--bg); padding:8px 10px; border-radius:12px; }
+  .kpi .lab { font-size:.74rem; color:var(--mute); display:flex; gap:5px; align-items:center; }
+  .kpi .val { font-weight:800; font-size:1.15rem; display:flex; gap:6px; align-items:center; }
+  .brief { background:var(--bg); border-radius:12px; padding:10px 12px; margin-bottom:14px; display:flex; gap:8px; }
+  .timeline { display:flex; flex-direction:column; gap:18px; }
+  .stop { position:relative; background:var(--paper); border:1px solid var(--line); border-radius:16px; display:grid; grid-template-columns:170px 1fr; overflow:visible; }
   @media (max-width:560px) { .stop { grid-template-columns:1fr; } }
-  .time { position:absolute; left:-8px; top:-12px; z-index:2; padding:1px 10px; background:var(--sky); border:2px solid var(--ink); box-shadow:2px 2px 0 var(--ink); font-family:var(--title); font-size:1.05rem; transform:rotate(-4deg); border-radius:6px; }
-  .photo-wrap { display:flex; flex-direction:column; border-right:var(--bd); border-radius:11px 0 0 11px; overflow:hidden; background:var(--sky); }
+  .time { position:absolute; left:10px; top:-11px; z-index:2; padding:1px 11px; background:var(--ink); color:#fff; font-weight:700; font-size:.88rem; border-radius:99px; }
+  .photo-wrap { display:flex; flex-direction:column; border-radius:15px 0 0 15px; overflow:hidden; background:#dfe8f3; }
   .photo { position:relative; flex:1; min-height:150px; overflow:hidden; }
-  .credit { display:none; padding:2px 8px; font-size:.68rem; background:var(--paper); border-top:2px solid var(--ink); }
+  .credit { display:none; padding:2px 8px; font-size:.68rem; background:var(--paper); border-top:1px solid var(--line); }
   .photo-wrap.has-img .credit { display:block; }
-  @media (max-width:560px) { .photo-wrap { border-right:0; border-bottom:var(--bd); border-radius:11px 11px 0 0; } .photo { min-height:140px; } }
+  @media (max-width:560px) { .photo-wrap { border-radius:15px 15px 0 0; } .photo { min-height:140px; } }
   .photo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .photo .ph { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:.8rem; }
+  .photo .ph { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:.8rem; color:var(--mute); }
   .photo .ph svg { width:38px; height:38px; }
-  .tag { position:absolute; left:8px; bottom:8px; display:inline-flex; align-items:center; gap:5px; padding:2px 8px; background:var(--yellow); border:2px solid var(--ink); border-radius:99px; font-size:.76rem; font-weight:700; }
+  .tag { position:absolute; left:8px; bottom:8px; display:inline-flex; align-items:center; gap:5px; padding:2px 9px; background:var(--paper); border-radius:99px; font-size:.76rem; font-weight:700; }
   .info { padding:16px 14px 12px; display:flex; flex-direction:column; gap:8px; min-width:0; }
-  .info h3 { margin:0; font-family:var(--title); font-weight:400; font-size:1.15rem; }
+  .info h3 { margin:0; font-weight:800; font-size:1.1rem; }
   .why { margin:0; font-size:.92rem; }
-  .crowd { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:5px 10px; border:2px solid var(--ink); border-radius:10px; }
+  .crowd { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:5px 10px; border-radius:10px; }
   .crowd .people { display:flex; gap:1px; }
   .crowd .people svg { width:18px; height:18px; stroke:var(--ink); stroke-width:1.5; fill:var(--ink); }
   .crowd .lvl { font-weight:700; font-size:.88rem; }
   .crowd .nx { font-size:.78rem; margin-left:auto; display:flex; gap:4px; align-items:center; }
-  .lv-1 { background:var(--lime); } .lv-2 { background:var(--sky); } .lv-3 { background:var(--yellow); } .lv-4 { background:var(--pink); } .lv-0 { background:var(--gray); }
-  .note { margin-top:12px; font-size:.78rem; display:flex; gap:6px; align-items:flex-start; }
+  .note { margin-top:12px; font-size:.78rem; color:var(--mute); display:flex; gap:6px; align-items:flex-start; }
 
-  /* ---------- gacha: 작은 카드 메시지 + 팝업(라임 키치) ---------- */
-  .mate-col.stack { display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:1; }
-  .gcard { position:relative; display:flex; align-items:center; gap:14px; width:min(100%, 440px); min-height:100px; padding:12px 14px; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:16px; overflow:hidden; }
-  .gcard::before { content:""; position:absolute; inset:0; background:repeating-linear-gradient(-45deg, rgba(255,95,162,.09) 0 10px, transparent 10px 20px); pointer-events:none; }
-  .gcard > * { position:relative; }
-  .gcard .cap-wrap { flex:none; width:64px; display:grid; place-items:center; animation:bob 2.6s ease-in-out infinite; }
-  @keyframes bob { 0%,100% { transform:translateY(2px) rotate(-5deg); } 50% { transform:translateY(-6px) rotate(5deg); } }
-  .gtext { flex:1; min-width:0; }
-  .gtext h3 { margin:0; font-family:var(--title); font-weight:400; font-size:1.4rem; line-height:1.15; }
-  .gtext p { margin:2px 0 0; font-size:.86rem; line-height:1.35; }
-  .pull { flex:none; padding:10px 18px; border:var(--bd); border-radius:14px; background:var(--lime); box-shadow:var(--sh); font-family:var(--title); font-size:1.25rem; line-height:1.1; }
-  .pull:active:not(:disabled) { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
-  .pull:disabled { background:var(--gray); cursor:default; }
-
-  /* 캡슐: em 기준이라 font-size만 바꿔 카드(작게)·팝업(크게)에서 같이 쓴다 */
-  .capsule { position:relative; font-size:120px; width:1em; height:1em; transform-origin:50% 100%; filter:drop-shadow(.033em .033em 0 var(--ink)); }
-  .capsule.sm { font-size:58px; }
-  .half { position:absolute; left:0; width:100%; height:.5em; border:max(2.5px,.025em) solid var(--ink); }
-  .top { top:0; border-radius:.5em .5em .05em .05em; background:var(--pink); transform-origin:12% 100%; transition:transform .32s cubic-bezier(.3,1.5,.5,1); }
-  .top::after { content:""; position:absolute; left:.125em; top:.075em; width:.233em; height:.117em; border-radius:50%; background:rgba(255,255,255,.85); transform:rotate(-30deg); }
-  .bot { bottom:0; border-radius:.05em .05em .5em .5em; background:var(--sky); overflow:hidden; }
-  .bot::after { content:"★"; position:absolute; left:50%; top:.03em; transform:translateX(-50%); font-size:.22em; line-height:1; color:var(--lime); -webkit-text-stroke:max(1.5px,.017em) var(--ink); paint-order:stroke fill; }
-  .slip { position:absolute; left:50%; top:.2em; width:.28em; height:.37em; margin-left:-.14em; background:var(--lime); border:2px solid var(--ink); border-radius:4px; opacity:0; z-index:-1; transform:translateY(24px) rotate(-6deg); }
-  .slip::after { content:""; position:absolute; left:6px; right:6px; top:10px; height:2px; background:var(--ink); box-shadow:0 7px 0 var(--ink), 0 14px 0 var(--ink); }
-
-  /* 팝업: 데스크톱은 가운데 모달, 모바일은 화면 전체를 덮는 바텀시트 (상태 클래스 이름이 서로 겹치지 않게 on / lid 로 구분) */
+  /* ---------- 가챠 팝업: 데스크톱은 가운데 모달, 모바일은 화면 전체를 덮는 바텀시트 (상태 클래스 이름이 서로 겹치지 않게 on / lid 로 구분) ---------- */
   body.noscroll { overflow:hidden; }
-  .overlay { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(17,17,17,.55); }
+  .overlay { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(17,17,17,.5); }
   .overlay.on { display:flex; animation:fadeIn .2s ease both; }
-  .dialog { position:relative; display:flex; flex-direction:column; width:min(100%, 440px); max-height:min(100%, 780px); background:var(--paper); border:var(--bd); box-shadow:6px 6px 0 var(--ink); border-radius:20px; overflow:hidden; animation:dlg .3s cubic-bezier(.2,1.2,.4,1) both; }
+  .dialog { position:relative; display:flex; flex-direction:column; width:min(100%, 440px); max-height:min(100%, 780px); background:var(--bg); border-radius:26px; box-shadow:0 20px 50px rgba(0,0,0,.35); overflow:hidden; animation:dlg .3s cubic-bezier(.2,1.1,.4,1) both; }
   .dialog:focus { outline:none; }
-  @keyframes dlg { from { opacity:0; transform:translateY(24px) scale(.94); } to { opacity:1; transform:none; } }
-  .dialog::before { content:""; position:absolute; inset:0; background:repeating-linear-gradient(-45deg, rgba(255,95,162,.09) 0 12px, transparent 12px 24px); pointer-events:none; }
-  .dialog > * { position:relative; }
-  .dhead { display:flex; align-items:center; padding:12px 14px 0 18px; }
-  .dhead h2 { margin:0; flex:1; font-family:var(--title); font-weight:400; font-size:1.4rem; }
-  .xbtn { width:38px; height:38px; border:var(--bd); border-radius:12px; background:var(--paper); box-shadow:2px 2px 0 var(--ink); font-size:1.1rem; line-height:1; }
+  @keyframes dlg { from { opacity:0; transform:translateY(24px) scale(.95); } to { opacity:1; transform:none; } }
+  .dhead { display:flex; align-items:center; padding:14px 14px 0 20px; }
+  .dhead h2 { margin:0; flex:1; font-size:1.2rem; font-weight:800; }
+  .dhead h2 small { margin-left:8px; font:700 11px var(--mono); letter-spacing:.1em; color:var(--mute); }
+  .xbtn { width:38px; height:38px; border:0; border-radius:50%; background:#dcdcd7; font-size:1rem; line-height:1; }
   .xbtn:disabled { opacity:.35; cursor:default; }
   .dbody { flex:1; overflow:auto; padding:0 18px 8px; text-align:center; }
-  .dbody .sub { margin:0; font-size:.9rem; }
+  .dbody .sub { margin:0; font-size:.9rem; color:var(--mute); }
 
   /* 연출 무대: 한 칸(grid 1/1)에 캡슐·그림자·쪽지 카드를 겹쳐 둔다 → 카드가 길어지면 영역이 함께 늘어난다 */
   .play { display:grid; justify-items:center; min-height:300px; margin:4px auto 0; }
   .play > * { grid-area:1 / 1; }
-  .floor { align-self:start; margin-top:262px; width:100px; height:14px; border-radius:50%; background:rgba(17,17,17,.25); filter:blur(3px); transition:opacity .3s; }
+  .floor { align-self:start; margin-top:262px; width:100px; height:14px; border-radius:50%; background:rgba(17,17,17,.22); filter:blur(3px); transition:opacity .3s; }
   .play .capsule { align-self:start; margin-top:144px; transition:opacity .3s, transform .3s; }
   .shaking .capsule { animation:rattle .5s ease-in-out infinite; }
-  .hopping .capsule { animation:hop .48s linear both; }
-  .hopping .floor { animation:floorHop .48s linear both; }
   .lid .top { transform:translate(-18px,-42px) rotate(-24deg); }
   .slipOut .slip { animation:slipUp .36s cubic-bezier(.2,.9,.3,1) both; }
   .done .capsule { opacity:0; transform:translateY(18px) scale(.88); }
   .done .floor { opacity:0; }
   @keyframes rattle { 0%,100% { transform:translateX(0) rotate(0); } 15% { transform:translateX(-9px) rotate(-10deg); } 35% { transform:translateX(8px) rotate(9deg); } 55% { transform:translateX(-7px) rotate(-7deg); } 75% { transform:translateX(6px) rotate(6deg); } }
-  @keyframes hop {
-    0% { transform:translateY(0); animation-timing-function:cubic-bezier(.2,.7,.4,1); }
-    38% { transform:translateY(-84px) rotate(-5deg); animation-timing-function:cubic-bezier(.55,0,.9,.6); }
-    72% { transform:translateY(0) scale(1.05,.94); animation-timing-function:ease-out; }
-    86% { transform:translateY(-13px); animation-timing-function:ease-in; }
-    100% { transform:translateY(0); } }
-  @keyframes floorHop { 0%,72%,100% { transform:scale(1); opacity:1; } 38% { transform:scale(.62); opacity:.5; } 86% { transform:scale(.85); opacity:.8; } }
   @keyframes slipUp { from { opacity:0; transform:translateY(26px) rotate(-6deg); } 30% { opacity:1; } to { opacity:1; transform:translateY(-66px) rotate(5deg); } }
 
+  /* 캡슐(팝업): em 기준 */
+  .capsule { position:relative; font-size:120px; width:1em; height:1em; transform-origin:50% 100%; filter:drop-shadow(0 .04em .05em rgba(0,0,0,.3)); }
+  .half { position:absolute; left:0; width:100%; height:.5em; }
+  .top { top:0; border-radius:.5em .5em 0 0; background:var(--cap, var(--pink)); transform-origin:12% 100%; transition:transform .32s cubic-bezier(.3,1.5,.5,1); box-shadow:inset .04em .05em .08em rgba(255,255,255,.55); }
+  .top::after { content:""; position:absolute; left:.14em; top:.09em; width:.25em; height:.11em; border-radius:50%; background:rgba(255,255,255,.8); transform:rotate(-30deg); }
+  .bot { bottom:0; border-radius:0 0 .5em .5em; background:var(--cream); box-shadow:inset -.05em -.07em .1em rgba(0,0,0,.15); }
+  .slip { position:absolute; left:50%; top:.2em; width:.28em; height:.37em; margin-left:-.14em; background:#fff; border:1px solid #cfcfca; border-radius:4px; opacity:0; z-index:-1; transform:translateY(24px) rotate(-6deg); }
+  .slip::after { content:""; position:absolute; left:6px; right:6px; top:10px; height:2px; background:#c9c9c4; box-shadow:0 7px 0 #c9c9c4, 0 14px 0 #c9c9c4; }
+
   /* 펼쳐지는 쪽지 = 결과 카드 */
-  .ticket { align-self:start; width:100%; text-align:left; background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; opacity:0; pointer-events:none; transform-origin:50% 45%; }
+  .ticket { align-self:start; width:100%; text-align:left; background:var(--paper); border-radius:18px; box-shadow:var(--sh); overflow:hidden; opacity:0; pointer-events:none; transform-origin:50% 45%; }
   .showTicket .ticket { pointer-events:auto; animation:unfold .48s cubic-bezier(.2,.9,.3,1.08) both; }
   @keyframes unfold { from { opacity:0; transform:translateY(80px) scale(.16,.22); } 35% { opacity:1; } to { opacity:1; transform:none; } }
-  .ticket .photo-wrap, .rcard .photo-wrap { border-right:0; border-bottom:var(--bd); border-radius:11px 11px 0 0; }
+  .ticket .photo-wrap, .rcard .photo-wrap { border-radius:0; }
   .ticket .photo { min-height:120px; }
   .tbody { padding:12px 14px 14px; display:flex; flex-direction:column; gap:8px; }
-  .tname { font-family:var(--title); font-size:1.15rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .phrase { align-self:flex-start; font-family:var(--title); font-size:1.7rem; line-height:1.2; background:linear-gradient(transparent 58%, var(--lime) 58%); padding:0 4px; }
+  .tname { font-weight:800; font-size:1.12rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .phrase { align-self:flex-start; font-weight:800; font-size:1.6rem; line-height:1.25; background:linear-gradient(transparent 58%, var(--lime) 58%); padding:0 4px; }
   .cchips { display:flex; flex-wrap:wrap; gap:6px; }
-  .cchip { padding:1px 10px; border:2px solid var(--ink); border-radius:99px; font-size:.84rem; font-weight:700; background:var(--paper); box-shadow:2px 2px 0 var(--ink); }
+  .cchip { padding:1px 11px; border-radius:99px; font-size:.84rem; font-weight:700; background:var(--bg); }
+  .lv-1 { background:var(--lime); } .lv-2 { background:var(--sky); } .lv-3 { background:#f8c5d9; } .lv-4 { background:var(--pink); } .lv-0 { background:var(--gray); }
   .tnote { margin:0; font-size:.88rem; }
-  .tnote b { font-family:var(--title); font-weight:400; }
-  .verify { font-size:.76rem; display:flex; gap:6px; align-items:center; }
-  .phase { min-height:30px; margin:8px 0 0; font-family:var(--title); font-size:1.15rem; }
-  .g-msg { display:inline-block; margin-top:8px; padding:8px 14px; background:var(--yellow); border:2px solid var(--ink); border-radius:12px; box-shadow:3px 3px 0 var(--ink); }
+  .tnote b { font-weight:800; }
+  .verify { font-size:.76rem; color:var(--mute); display:flex; gap:6px; align-items:center; }
+  .phase { min-height:30px; margin:8px 0 0; font-weight:700; font-size:1.05rem; }
 
   .dfoot { padding:8px 18px 18px; display:flex; flex-direction:column; gap:10px; }
   .dfoot .row { display:flex; gap:10px; }
   .dfoot .row > * { flex:1; }
-  .mbtn { padding:12px 10px; border:var(--bd); border-radius:14px; background:var(--paper); box-shadow:var(--sh); font-family:var(--title); font-size:1.1rem; line-height:1.15; }
-  .mbtn.cta { background:var(--lime); font-size:1.3rem; padding:14px 10px; }
-  .mbtn:active:not(:disabled) { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
-  .mbtn:disabled { background:var(--gray); cursor:default; }
-  .g-left { display:flex; justify-content:center; align-items:center; gap:7px; font-size:.8rem; }
-  .mini { width:22px; height:22px; border-radius:50%; border:2px solid var(--ink); background:linear-gradient(180deg, var(--pink) 50%, var(--sky) 50%); box-shadow:2px 2px 0 var(--ink); transition:opacity .4s, transform .4s; }
-  .mini.used { opacity:.2; transform:scale(.8); box-shadow:none; }
+  .mbtn { padding:12px 10px; border:0; border-radius:99px; background:var(--paper); box-shadow:var(--sh); font-weight:700; font-size:1rem; line-height:1.15; }
+  .mbtn.cta { background:var(--ink); color:#fff; font-size:1.1rem; padding:15px 10px; }
+  .mbtn:active:not(:disabled) { transform:scale(.98); }
+  .mbtn:disabled { background:var(--gray); color:var(--mute); box-shadow:none; cursor:default; }
+  .g-left { display:flex; justify-content:center; align-items:center; gap:7px; font-size:.8rem; color:var(--mute); }
+  .mini { width:20px; height:20px; border-radius:50%; background:linear-gradient(180deg, var(--pink) 50%, var(--cream) 50%); box-shadow:0 1px 3px rgba(0,0,0,.25); transition:opacity .4s, transform .4s; }
+  .mini.used { opacity:.25; transform:scale(.8); box-shadow:none; }
 
   /* 채팅으로 이어진 가챠 결과 카드 */
-  .rcard { width:min(100%, 360px); background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; overflow:hidden; animation:rise .4s cubic-bezier(.2,1.2,.4,1) both; }
+  .rcard { width:min(100%, 360px); background:var(--paper); border-radius:18px; box-shadow:var(--sh); overflow:hidden; animation:rise .4s cubic-bezier(.2,1.1,.4,1) both; }
   @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
   .rcard .photo { min-height:96px; }
   .rcard .tbody { padding:10px 12px 12px; gap:6px; }
-  .rcard .phrase { font-size:1.35rem; }
+  .rcard .phrase { font-size:1.3rem; }
 
   /* ---------- traffic light ---------- */
-  .tl { position:relative; display:inline-flex; vertical-align:middle; padding:3px 4px; margin:0 2px; background:#2a2a2a; border:2px solid var(--ink); border-radius:99px; cursor:help; }
+  .tl { position:relative; display:inline-flex; vertical-align:middle; padding:3px 4px; margin:0 2px; background:#2a2a2a; border:1px solid var(--ink); border-radius:99px; cursor:help; }
   .tl svg { width:12px; height:30px; display:block; }
-  button.tl:not(:disabled):hover { animation:none; }
-  .tl .tip { display:none; position:absolute; left:0; top:calc(100% + 8px); z-index:20; width:max-content; max-width:min(240px, 70vw); padding:8px 10px; background:var(--yellow); color:var(--ink); border:2px solid var(--ink); border-radius:10px; box-shadow:3px 3px 0 var(--ink); font:400 .82rem/1.45 var(--body); text-align:left; white-space:normal; }
+  .tl .tip { display:none; position:absolute; left:0; top:calc(100% + 8px); z-index:20; width:max-content; max-width:min(240px, 70vw); padding:8px 12px; background:var(--ink); color:#fff; border-radius:12px; box-shadow:var(--sh); font:400 .82rem/1.45 var(--body); text-align:left; white-space:normal; }
   .tl .tip b { display:block; font-weight:700; }
   .tl:hover .tip, .tl:focus-visible .tip, .tl.open .tip { display:block; }
-  .legend-box { background:var(--paper); border:var(--bd); box-shadow:var(--sh); border-radius:14px; margin-bottom:18px; }
-  .legend-box summary { cursor:pointer; padding:10px 14px; font-family:var(--title); font-size:1.05rem; list-style:none; }
+  .legend-box { background:var(--paper); border-radius:16px; box-shadow:var(--sh); margin:14px 0 18px; }
+  .legend-box summary { cursor:pointer; padding:10px 16px; font-weight:700; font-size:.95rem; list-style:none; }
   .legend-box summary::-webkit-details-marker { display:none; }
   .legend-box summary::after { content:" ▾"; }
   .legend-box[open] summary::after { content:" ▴"; }
-  .legend-box .rows { padding:2px 14px 12px; display:flex; flex-direction:column; gap:8px; }
+  .legend-box .rows { padding:2px 16px 12px; display:flex; flex-direction:column; gap:8px; }
   .legend-box .row { display:flex; gap:10px; align-items:center; font-size:.9rem; }
   .legend-box .row .tl { cursor:default; flex:none; }
   .legend-box .row b { display:block; }
 
-  @media (prefers-reduced-motion:reduce) { .gcard .cap-wrap, .shaking .capsule, .hopping .capsule, .hopping .floor, .slipOut .slip, .dialog, .rcard { animation:none !important; } .top, .capsule, .floor, .mini { transition:none !important; } .showTicket .ticket { animation:fadeIn .3s ease both; } }
+  @media (prefers-reduced-motion:reduce) { .machine.shaking .cap, .knob.turning .knob-face, .tray.has .pc, .tray-wrap.has::after, .shaking .capsule, .slipOut .slip, .dialog, .rcard { animation:none !important; } .top, .capsule, .floor, .mini, .fold, .fold-in { transition:none !important; } .showTicket .ticket { animation:fadeIn .3s ease both; } }
   @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
   @media (max-width:560px) {
     .overlay { padding:0; align-items:flex-end; }
-    .dialog { width:100%; height:100%; max-height:none; border-radius:0; border-width:0; box-shadow:none; animation:sheet .34s cubic-bezier(.2,.9,.3,1) both; }
+    .dialog { width:100%; height:100%; max-height:none; border-radius:0; box-shadow:none; animation:sheet .34s cubic-bezier(.2,.9,.3,1) both; }
     @keyframes sheet { from { transform:translateY(100%); } to { transform:none; } }
-    .dhead { padding-top:calc(12px + env(safe-area-inset-top)); }
+    .dhead { padding-top:calc(14px + env(safe-area-inset-top)); }
     .dbody { display:flex; flex-direction:column; }
     .dbody .play { margin:auto; }
-    .dfoot { padding:12px 18px calc(16px + env(safe-area-inset-bottom)); border-top:var(--bd); background:var(--paper); }
-    .gtext h3 { font-size:1.2rem; } .pull { padding:10px 14px; } .phrase { font-size:1.5rem; }
+    .dfoot { padding:12px 18px calc(16px + env(safe-area-inset-bottom)); border-top:1px solid var(--line); background:var(--paper); }
+    .phrase { font-size:1.45rem; }
   }
 
   /* ---------- composer ---------- */
-  .composer { position:sticky; bottom:0; z-index:9; background:var(--bg); border-top:var(--bd); padding:10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .composer { position:sticky; bottom:0; z-index:9; background:var(--bg); padding:8px 16px calc(12px + env(safe-area-inset-bottom)); }
   .composer-in { max-width:820px; margin:0 auto; }
-  .chips { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; scrollbar-width:none; }
+  .chips { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 12px; scrollbar-width:none; }
   .chips::-webkit-scrollbar { display:none; }
-  form.ask { display:flex; gap:10px; align-items:stretch; }
-  textarea { flex:1; resize:none; min-width:0; height:50px; padding:11px 14px; border:var(--bd); border-radius:14px; background:var(--paper); color:var(--ink); font:inherit; font-size:16px; box-shadow:var(--sh); }
-  textarea:focus { outline:3px solid var(--sky); outline-offset:2px; }
-  textarea::placeholder { color:#777; }
+  form.ask { display:flex; gap:10px; align-items:center; }
+  textarea { flex:1; resize:none; min-width:0; height:52px; padding:14px 20px; border:1px solid var(--line); border-radius:26px; background:var(--paper); color:var(--ink); font:inherit; font-size:16px; line-height:22px; overflow-y:auto; }
+  textarea:focus { outline:2px solid var(--ink); outline-offset:1px; }
+  textarea::placeholder { color:#8b8b85; }
 
   button { font:inherit; color:var(--ink); cursor:pointer; }
-  button.primary { display:flex; align-items:center; gap:6px; padding:0 18px; border:var(--bd); border-radius:14px; background:var(--lime); box-shadow:var(--sh); font-family:var(--title); font-size:1.05rem; white-space:nowrap; }
-  button.primary:active, .chip:active { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
-  button.primary:disabled { background:var(--gray); cursor:default; transform:none; box-shadow:var(--sh); animation:none; }
-  .chip { display:inline-flex; align-items:center; gap:6px; flex:none; padding:6px 13px; border:2px solid var(--ink); border-radius:99px; background:var(--paper); box-shadow:3px 3px 0 var(--ink); font-size:.9rem; font-weight:700; }
-  .chip:nth-child(3n+1) { background:var(--pink); } .chip:nth-child(3n+2) { background:var(--sky); } .chip:nth-child(3n) { background:var(--yellow); }
-
-  /* hover wiggle */
-  @keyframes wiggle { 0%,100% { transform:rotate(0); } 20% { transform:rotate(-4deg); } 40% { transform:rotate(3.5deg); } 60% { transform:rotate(-2.5deg); } 80% { transform:rotate(2deg); } }
-  @media (hover:hover) { button:not(:disabled):hover { animation:wiggle .45s ease-in-out; } }
+  button.primary { display:grid; place-items:center; flex:none; width:52px; height:52px; padding:0; border:0; border-radius:50%; background:var(--ink); color:#fff; font-size:1.2rem; }
+  button.primary:active { transform:scale(.95); }
+  button.primary:disabled { background:#b8b8b2; cursor:default; transform:none; }
+  .chip { display:inline-flex; align-items:center; gap:6px; flex:none; padding:9px 16px; border:1px solid var(--line); border-radius:99px; background:var(--paper); box-shadow:0 1px 2px rgba(0,0,0,.05); font-size:.92rem; font-weight:600; }
+  .chip:active { transform:scale(.97); }
+  .chip:hover { border-color:var(--ink); }
   button:focus-visible { outline:3px solid var(--sky); outline-offset:2px; }
-  @media (prefers-reduced-motion:reduce) { button:hover { animation:none !important; } .dots span { animation:none; } }
-
-  @media (max-width:560px) {
-    .tagline { display:none; }
-    .logo { height:54px; }
-    .avatar { width:34px; height:34px; }
-    .avatar svg { width:16px; height:22px; }
-    button.primary span.t { display:none; }
-    button.primary { padding:0 16px; }
-  }
+  @media (prefers-reduced-motion:reduce) { .dots span { animation:none; } }
 </style>
 </head>
 <body>
@@ -256,7 +294,7 @@
         <path d="M16 30 L24 30 L26.5 66 L13.5 66 Z"/>
         <path d="M8 66 L32 66 L37 78 L3 78 Z"/>
       </g>
-      <rect x="13" y="20" width="14" height="3" fill="#FFF8E7"/>
+      <rect x="13" y="20" width="14" height="3" fill="#fff"/>
     </symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
     <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 15a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 5.5 4.75 4.75 0 0 1 17.5 15H7z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/></symbol>
@@ -273,36 +311,58 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2zM12 10v5M12 18v.5"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/></symbol>
-    <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L3 11l7 3 3 7zM10 14l11-11"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
     <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="6" r="3.5"/><path d="M5 21v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3z"/></symbol>
-    <filter id="sticker" x="-20%" y="-20%" width="150%" height="150%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-color="#111"/></filter>
   </defs>
 </svg>
 
 <header>
   <div class="bar">
-    <!-- 로고 A: 말풍선 스티커 (직접 그린 SVG) -->
-    <svg class="logo" viewBox="0 0 300 240" role="img" aria-label="서울메이트">
-      <defs>
-        <text id="wmA" x="150" y="212" text-anchor="middle" font-size="52" style="font-family:var(--title)">서울메이트</text>
-      </defs>
-      <g transform="rotate(-4 150 120)" filter="url(#sticker)">
-        <path d="M150 14 C84 14 38 54 38 108 C38 140 56 164 84 178 L72 198 L112 182 C124 185 137 186 150 186 C216 186 262 146 262 108 C262 54 216 14 150 14 Z" fill="#fff" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
-        <path d="M150 14 C84 14 38 54 38 108 C38 140 56 164 84 178 L72 198 L112 182 C124 185 137 186 150 186 C216 186 262 146 262 108 C262 54 216 14 150 14 Z" fill="#B9D65A" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
-        <use href="#tower" x="120" y="42" width="60" height="120"/>
-        <path d="M214 56 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5 z" fill="#FF5FA2" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-        <use href="#wmA" stroke="#fff" stroke-width="16" stroke-linejoin="round" fill="#fff"/>
-        <use href="#wmA" stroke="#111" stroke-width="7" stroke-linejoin="round" fill="#111"/>
-        <use href="#wmA" fill="#FF5FA2"/>
-      </g>
-    </svg>
-    <div class="tagline">실시간 날씨·붐빔을<br>확인한 서울 나들이 코스</div>
+    <div class="brand">
+      <span class="logo-dot" aria-hidden="true"><svg viewBox="0 0 40 80"><use href="#tower"/></svg></span>
+      <span>서울메이트</span>
+    </div>
     <div class="spacer"></div>
-    <span id="mode" class="badge" role="status" title="서버 연결 상태"><b id="mode-dot">🟡</b><span id="mode-txt">확인 중</span></span>
+    <span id="mode" class="badge" role="status" title="서버 연결 상태"><i id="mode-dot" class="dot"></i><span id="mode-txt">확인 중</span></span>
   </div>
 </header>
 
 <main>
+  <div class="stage" id="stage">
+    <div class="fold-bar">
+      <button class="fold-toggle" id="ftoggle" type="button" aria-expanded="true" aria-controls="fold-in"><span>SEOUL GACHA</span><span class="ftxt" id="ftxt">접기 ▴</span></button>
+    </div>
+    <div class="fold">
+      <div class="fold-in" id="fold-in">
+        <div class="stage-grid">
+          <div class="hero">
+            <h1>오늘 어디 갈지 말만 해.</h1>
+            <p>아니면 손잡이 한 번 돌려봐.</p>
+          </div>
+          <div>
+            <div class="machine" id="machine">
+              <i class="screw a"></i><i class="screw b"></i><i class="screw c"></i><i class="screw d"></i>
+              <div class="lcd"><span class="lcd-main">SEOUL GACHA</span><span class="lcd-sub">서울 가챠<br>NO.01</span></div>
+              <div class="glass">
+                <svg id="capfield" viewBox="0 0 300 172" role="img" aria-label="캡슐이 가득 든 유리창">
+                  <defs>
+                    <radialGradient id="capShade" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></radialGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="controls">
+                <div class="ctl"><div class="coin" aria-hidden="true"><i></i></div><span>COIN</span></div>
+                <div class="ctl"><button class="knob" id="turn" type="button" aria-label="TURN 손잡이를 돌려 캡슐 뽑기"><span class="knob-face"><span class="knob-bar"><i></i></span></span></button><span>TURN</span></div>
+                <div class="ctl"><div class="tray-wrap" id="trayWrap"><button class="tray" id="pickup" type="button" aria-label="PICK UP 캡슐 열기" disabled><span class="pc"></span></button></div><span>PICK UP</span></div>
+              </div>
+              <p class="vend">SEOUL MATE VENDING · TODAY'S COURSE</p>
+            </div>
+            <p class="mstatus" id="mstatus" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <details class="legend-box">
     <summary>🚦 혼잡도 보는 법</summary>
@@ -317,15 +377,15 @@
     <div class="chips" id="chips"></div>
     <form class="ask" id="form">
       <textarea id="q" maxlength="500" rows="1" placeholder="어디 가고 싶어? 편하게 말해줘" required></textarea>
-      <button class="primary" id="send"><svg class="ic"><use href="#i-send"/></svg><span class="t">보내기</span></button>
+      <button class="primary" id="send" aria-label="보내기"><svg class="ic"><use href="#i-arrow"/></svg></button>
     </form>
   </div>
 </div>
 
-<!-- 가챠 팝업(모달 / 모바일 바텀시트). 평소 가챠는 첫 인사 아래 작은 카드 메시지로만 보인다. -->
+<!-- 가챠 팝업(모달 / 모바일 바텀시트). PICK UP 칸의 캡슐을 누르면 열리고, 캡슐이 열리며 결과 카드가 펼쳐진다. -->
 <div class="overlay" id="overlay" aria-hidden="true">
   <div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dtitle" tabindex="-1">
-    <div class="dhead"><h2 id="dtitle">🎰 서울 가챠</h2><button class="xbtn" id="xbtn" type="button" aria-label="닫기">✕</button></div>
+    <div class="dhead"><h2 id="dtitle">서울 가챠<small>NO.01</small></h2><button class="xbtn" id="xbtn" type="button" aria-label="닫기">✕</button></div>
     <div class="dbody">
       <p class="sub">오늘의 서울, 운명에 맡겨 볼래?</p>
       <div class="play" id="play">
@@ -334,7 +394,6 @@
         <article class="ticket" id="ticket"></article>
       </div>
       <p class="phase" id="phase" aria-live="polite"></p>
-      <div id="gout" aria-live="polite"></div>
     </div>
     <div class="dfoot" id="dfoot"></div>
   </div>
@@ -404,11 +463,11 @@ for (const [lv, name, desc] of [
 }
 
 // ---------- 연결 상태 배지 ----------
-function setStatus(dot, txt, tip) { $('mode-dot').textContent = dot; $('mode-txt').textContent = txt; $('mode').title = tip; }
+function setStatus(state, txt, tip) { $('mode-dot').className = 'dot ' + state; $('mode-txt').textContent = txt; $('mode').title = tip; }
 fetch('/health').then(r => { if (!r.ok) throw 0; return r.json(); }).then(h => {
   MOCK = !!h.mock_tools;
-  setStatus('🟢', '연결됨', h.mock_tools ? '샘플 데이터 모드' : '서울시 실시간 데이터');
-}).catch(() => setStatus('🔴', '연결 안 됨', '서버에 연결할 수 없어요'));
+  setStatus('ok', '연결됨', h.mock_tools ? '샘플 데이터 모드' : '서울시 실시간 데이터');
+}).catch(() => setStatus('bad', '연결 안 됨', '서버에 연결할 수 없어요'));
 
 // ---------- 채팅 ----------
 const log = $('log');
@@ -421,11 +480,6 @@ function addMate(wide) {
   return { msg: m, bubble: b };
 }
 function say(bubble, text) { bubble.append(el('div', null, text)); }
-
-{ // 첫 인사 + 바로 아래 가챠 카드 메시지
-  const w = addMate(false); w.bubble.append(el('div', null, '안녕! 나는 서울메이트야 🗼 오늘 어디 갈지 말만 해. 날씨랑 붐빔 확인해서 코스 짜줄게!'));
-  w.msg.classList.add('has-wide'); w.bubble.parentElement.classList.add('stack'); w.bubble.parentElement.append(gachaCard());
-}
 
 // 예시 질문 칩
 for (const t of ['비 와도 갈 데 있어?', '덜 붐비는 데이트 코스', '혼자 2시간 산책']) {
@@ -482,17 +536,19 @@ function renderCourse(bubble, course) {
 }
 
 // ---------- 서울 가챠 ----------
-// 평소: 첫 인사 아래 작은 카드 메시지. "뽑기"를 누르면 팝업이 떠서 연출이 진행된다.
-// 흐름: 덜컹(도구 호출 중) → 통 튀어 오름 → 뚜껑 열림 → 쪽지가 올라와 펼쳐지며 결과. 확인(날씨·혼잡도)이 끝난 장소만 나온다.
+// 자판기: TURN 손잡이를 돌리면 날씨·혼잡도를 확인해 장소를 뽑고, 캡슐이 PICK UP 칸으로 떨어진다.
+// 그 캡슐을 누르면 팝업이 열리며 뚜껑이 열리고 쪽지(결과 카드)가 펼쳐진다. 확인(날씨·혼잡도)이 끝난 장소만 나온다.
 const MAX_SPINS = 3, drawn = [];
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const PHRASE = { SSR:'지금이 딱이야 🧡', SR:'가볼 만해 👍', R:'무난해 🙂' };  // 서버 등급 → 누구나 이해하는 문구
 const PHASES = ['서울 하늘 보는 중… ☁️', '사람 얼마나 있는지 보는 중… 👥', '두구두구… 🥁'];
 const PHASE_MIN = 420;  // 문구 하나를 최소 이만큼은 보여준다(도구가 빨리 끝나도 읽을 수 있게)
-const T = { hop:480, pop:320, slip:360, unfold:480 };
-const play = $('play');
-let gBusy = false, lastPick = null, lastChecked = [], lastFocus = null;
+const SPIN_MIN = 1100;  // 손잡이는 최소 한 바퀴 넘게 돈다
+const T = { pop:320, slip:360, unfold:480 };
+const CAPS = ['var(--pink)', 'var(--sky)', 'var(--lime)'];
+const play = $('play'), machine = $('machine'), knob = $('turn'), tray = $('pickup'), trayWrap = $('trayWrap'), mstatus = $('mstatus');
+let gBusy = false, spinning = false, pending = false, lastPick = null, lastChecked = [], lastFocus = null, lastCap = CAPS[0];
 function cls(...c) { play.className = 'play ' + c.join(' '); }
 function lampEmoji(level) { return { '여유':'🟢', '보통':'🟡', '약간 붐빔':'🟡', '붐빔':'🔴' }[level] || '⚪'; }
 function weatherChip(w) {
@@ -523,7 +579,7 @@ function openModal() {
   document.body.classList.add('noscroll'); $('dialog').focus();
 }
 function closeModal() {
-  if (gBusy) return;  // 뽑는 중에는 닫지 않는다
+  if (gBusy) return;  // 캡슐이 열리는 동안에는 닫지 않는다
   $('overlay').classList.remove('on'); $('overlay').setAttribute('aria-hidden', 'true'); document.body.classList.remove('noscroll');
   if (lastFocus && lastFocus.focus) lastFocus.focus();
 }
@@ -545,13 +601,11 @@ function renderFoot(state) {
   const f = $('dfoot'); f.replaceChildren();
   const left = MAX_SPINS - drawn.length;
   const mk = (txt, cb, c2, dis) => { const b = el('button', 'mbtn ' + (c2 || ''), txt); b.type = 'button'; b.disabled = !!dis; if (cb) b.onclick = cb; return b; };
-  if (state === 'busy') f.append(mk('뽑는 중…', null, 'cta', true));        // 로딩 중엔 비활성 + "뽑는 중…"
+  if (state === 'busy') f.append(mk('뽑는 중…', null, 'cta', true));        // 캡슐이 열리는 동안엔 비활성 + "뽑는 중…"
   else {
-    const again = mk(left <= 0 ? '오늘 캡슐은 끝!' : '한 번 더 🔄', spinGacha, '', left <= 0);
-    if (state === 'result') {
-      f.append(mk('이걸로 코스 짜줘', useIt, 'cta', busy));  // 채팅이 진행 중이면 잠깐 비활성
-      const row = el('div', 'row'); row.append(again, mk('닫기', closeModal)); f.append(row);
-    } else { const row = el('div', 'row'); row.append(again, mk('닫기', closeModal)); f.append(row); }
+    const again = mk(left <= 0 ? '오늘 캡슐은 끝!' : '한 번 더 🔄', () => { closeModal(); knob.focus(); turn(); }, '', left <= 0);
+    f.append(mk('이걸로 코스 짜줘', useIt, 'cta', busy));  // 채팅이 진행 중이면 잠깐 비활성
+    const row = el('div', 'row'); row.append(again, mk('닫기', closeModal)); f.append(row);
   }
   const l = el('div', 'g-left'); l.append(el('span', null, '남은 캡슐'));
   for (let i = 0; i < MAX_SPINS; i++) l.append(el('i', 'mini' + (i < drawn.length ? ' used' : '')));
@@ -559,16 +613,41 @@ function renderFoot(state) {
   $('xbtn').disabled = state === 'busy';
 }
 
-// 평소 상태의 작은 가챠 카드 메시지(첫 인사 바로 아래)
-function gachaCard() {
-  const card = el('div', 'gcard');
-  const wrap = el('div', 'cap-wrap');
-  const cap = el('div', 'capsule sm'); cap.setAttribute('aria-hidden', 'true'); cap.append(el('div', 'half bot'), el('div', 'half top')); wrap.append(cap);
-  const txt = el('div', 'gtext'); txt.append(el('h3', null, '🎰 서울 가챠'), el('p', null, '오늘의 서울, 운명에 맡겨 볼래?'));
-  const b = el('button', 'pull', '뽑기'); b.type = 'button'; b.id = 'pull'; b.addEventListener('click', () => { openModal(); spinGacha(); });
-  card.append(wrap, txt, b); return card;
+// ----- 자판기 화면 -----
+// 유리창 안 캡슐: 위 반쪽만 분홍·하늘·라임·은색, 아래 반쪽은 크림색. 모양은 항상 같게(고정 시드).
+function buildCapsules() {
+  const svg = $('capfield'), mk = (tag, attrs) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
+  const tops = ['var(--pink)', 'var(--sky)', 'var(--silver)', 'var(--lime)'];
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const rows = [[58, 3, 104, 46], [86, 6, 35, 46], [114, 5, 58, 46], [142, 6, 35, 46]];  // [y, 개수, 첫 x, 간격]
+  let n = 0;
+  for (const [y, count, x0, dx] of rows.reverse()) for (let i = 0; i < count; i++, n++) {
+    const g = mk('g', { transform: 'translate(' + (x0 + i * dx + (rnd() * 4 - 2)).toFixed(1) + ' ' + (y + (rnd() * 4 - 2)).toFixed(1) + ')' });
+    const c = mk('g', { class: 'cap' }); c.style.setProperty('--d', '-' + (rnd() * .3).toFixed(2) + 's');
+    const t = mk('g', { transform: 'rotate(' + Math.round(rnd() * 90 - 45) + ')' });
+    const top = mk('path', { d: 'M-22 0A22 22 0 0 1 22 0Z' }); top.style.fill = tops[n % tops.length];
+    const bot = mk('path', { d: 'M-22 0A22 22 0 0 0 22 0Z', fill: '#eceae2' });
+    t.append(top, bot, mk('circle', { r: 22, fill: 'url(#capShade)' }), mk('ellipse', { cx: -8, cy: -11, rx: 6, ry: 3.2, fill: '#fff', opacity: .75, transform: 'rotate(-35 -8 -11)' }));
+    c.append(t); g.append(c); svg.append(g);
+  }
 }
-function updateCardBtn() { const b = $('pull'); if (b) { b.disabled = drawn.length >= MAX_SPINS; b.textContent = b.disabled ? '끝' : '뽑기'; } }
+buildCapsules();
+
+function machineSay(txt, err) { mstatus.replaceChildren(); if (err) mstatus.append(el('span', 'g-msg', txt)); else mstatus.textContent = txt; }
+function idleText() { const left = MAX_SPINS - drawn.length; return left > 0 ? 'TURN을 돌려 뽑아봐 · 남은 캡슐 ' + left + '개' : '오늘 캡슐은 끝! 내일 또 만나자.'; }
+function syncMachine() {
+  knob.setAttribute('aria-disabled', String(spinning || gBusy || pending || drawn.length >= MAX_SPINS));
+  tray.disabled = !pending || spinning || gBusy;
+  tray.classList.toggle('has', pending); trayWrap.classList.toggle('has', pending);
+}
+function stopTurning() {   // 손잡이는 한 바퀴를 마저 돌고 멈춘다(중간에 툭 끊기지 않게)
+  machine.classList.remove('shaking');
+  if (!knob.classList.contains('turning')) return Promise.resolve();
+  return new Promise((res) => {
+    const done = () => { knob.classList.remove('turning'); res(); };
+    knob.firstElementChild.addEventListener('animationiteration', done, { once:true }); setTimeout(done, 900);
+  });
+}
 
 // /gacha/stream: 날씨·혼잡도 도구가 실제로 호출될 때마다 tool 이벤트가 오고, 마지막에 result가 온다.
 async function readGachaStream(onTool) {
@@ -588,14 +667,17 @@ async function readGachaStream(onTool) {
   return result || { ok:false, message:'앗, 가챠 기계가 잠깐 멈췄어. 다시 돌려줘!' };
 }
 
-async function spinGacha() {
-  if (gBusy || drawn.length >= MAX_SPINS) return;
-  gBusy = true; renderFoot('busy'); $('gout').replaceChildren(); cls();
-  const rm = reducedMotion();
+// TURN: 손잡이가 돌고 캡슐들이 흔들리는 동안 결과를 뽑고, 끝나면 캡슐이 PICK UP 칸에 떨어진다.
+async function turn() {
+  if (spinning || gBusy) return;
+  if (pending) { machineSay('PICK UP 칸의 캡슐을 먼저 열어봐! 👇'); return; }
+  if (drawn.length >= MAX_SPINS) { machineSay(idleText()); return; }
+  spinning = true; lastPick = null; syncMachine();
+  const rm = reducedMotion(), t0 = Date.now();
   let phaseAt = Date.now(), chain = Promise.resolve(), crowdShown = false;
-  const show = (n) => { $('phase').textContent = PHASES[n]; phaseAt = Date.now(); };
+  const show = (n) => { machineSay(PHASES[n]); phaseAt = Date.now(); };
   const goPhase = (n) => (chain = chain.then(async () => { const w = PHASE_MIN - (Date.now() - phaseAt); if (w > 0) await sleep(w); show(n); }));
-  show(0); if (!rm) cls('shaking');
+  show(0); if (!rm) { machine.classList.add('shaking'); knob.classList.add('turning'); }
   let data;
   try {
     data = await readGachaStream((d) => { if (d.name === 'get_crowd' && !crowdShown) { crowdShown = true; goPhase(1); } });
@@ -603,24 +685,48 @@ async function spinGacha() {
 
   if (data.ok && data.pick) {
     if (!crowdShown) goPhase(1);
-    await goPhase(2);                                   // 두구두구 (문구는 튀어 오르는 동안에도 보인다)
-    lastPick = data.pick; lastChecked = data.checked || [];
-    $('ticket').replaceChildren(ticketNode(lastPick, lastChecked, false));
-    if (rm) { cls('done', 'showTicket'); await sleep(300); }   // 모션 줄이기: 흔들림·튀어오름 없이 카드만 부드럽게
-    else {
-      cls('hopping'); await sleep(T.hop);
-      cls('lid'); await sleep(T.pop);
-      cls('lid', 'slipOut'); await sleep(T.slip);
-      cls('lid', 'slipOut', 'done', 'showTicket'); await sleep(T.unfold);
-    }
-    drawn.push(lastPick.place); $('phase').textContent = '짠! 오늘의 한 곳이야';
-    gBusy = false; renderFoot('result'); updateCardBtn();
+    await goPhase(2);                                   // 두구두구
+    const wait = SPIN_MIN - (Date.now() - t0); if (!rm && wait > 0) await sleep(wait);
+    await stopTurning();
+    lastPick = data.pick; lastChecked = data.checked || []; drawn.push(lastPick.place);
+    lastCap = CAPS[Math.floor(Math.random() * CAPS.length)]; trayWrap.style.setProperty('--cap', lastCap); tray.style.setProperty('--cap', lastCap);
+    pending = true; machineSay('캡슐이 나왔어! 눌러서 열어봐 👆');
   } else {
-    await chain; cls(); $('phase').textContent = '';
-    $('gout').replaceChildren(el('span', 'g-msg', data.message || '이번엔 못 뽑았어. 다시 돌려줘!'));
-    gBusy = false; renderFoot('error');
+    await chain; await stopTurning();
+    machineSay(data.message || '이번엔 못 뽑았어. 다시 돌려줘!', true);
   }
+  spinning = false; syncMachine();
 }
+
+// PICK UP 칸의 캡슐을 누르면 팝업이 열리고, 캡슐이 덜컹 → 뚜껑이 열림 → 쪽지가 올라와 펼쳐지며 결과가 나온다.
+async function openCapsule() {
+  if (!pending || spinning || gBusy) return;
+  pending = false; gBusy = true; syncMachine();
+  play.style.setProperty('--cap', lastCap);
+  $('ticket').replaceChildren(ticketNode(lastPick, lastChecked, false));
+  cls(); $('phase').textContent = ''; renderFoot('busy'); openModal();
+  if (reducedMotion()) { cls('done', 'showTicket'); await sleep(300); }   // 모션 줄이기: 흔들림 없이 카드만 부드럽게
+  else {
+    await sleep(260); cls('shaking'); await sleep(520);
+    cls('lid'); await sleep(T.pop);
+    cls('lid', 'slipOut'); await sleep(T.slip);
+    cls('lid', 'slipOut', 'done', 'showTicket'); await sleep(T.unfold);
+  }
+  $('phase').textContent = '짠! 오늘의 한 곳이야';
+  gBusy = false; renderFoot('result'); syncMachine(); machineSay(idleText());
+}
+knob.addEventListener('click', turn);
+tray.addEventListener('click', openCapsule);
+machineSay(idleText()); syncMachine();
+
+// 채팅이 시작되면 홈(제목 + 기계)은 위로 접히고, 위쪽 막대로 다시 펼칠 수 있다.
+const stage = $('stage'), ftoggle = $('ftoggle');
+function setFolded(f) {
+  stage.classList.toggle('folded', f); $('fold-in').inert = f; $('fold-in').setAttribute('aria-hidden', String(f));
+  ftoggle.setAttribute('aria-expanded', String(!f)); $('ftxt').textContent = f ? '펼치기 ▾' : '접기 ▴';
+}
+ftoggle.addEventListener('click', () => setFolded(!stage.classList.contains('folded')));
+function chatStarted() { if (!stage.classList.contains('has-chat')) { stage.classList.add('has-chat'); setFolded(true); } }
 
 // [이걸로 코스 짜줘] → 팝업을 닫고 결과를 채팅방 카드 메시지로 넣은 뒤, 같은 장소로 대화를 이어간다(날씨·혼잡도 재확인).
 function useIt() {
@@ -636,6 +742,7 @@ let busy = false;
 async function ask(text) {
   text = text.trim(); if (!text || busy) return;
   busy = true; $('send').disabled = true; $('q').value = '';
+  chatStarted();
   addMe(text);
   const { msg, bubble } = addMate(false);
   const wait = el('div', 'dots'); wait.append('날씨랑 붐빔 확인하는 중', ...[1,2,3].map(() => el('span', null, '.')));
